@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />
+    <link rel="stylesheet" href="../lib/animate.css">
+</head>
+<body>
+<div id="frame1" v-cloak class="flex_col_start flex_items_stretch VH100">
+    <div class="header bg_2B2B2B W_100 flex_shrink_0">
+        <div class="P_4 color_fff flex_rowC relative flex_shrink_0">
+            <span class="fontS_15">加盟代理</span>
+        </div>
+    </div>
+
+    <div class="overflow_y flex_grow_1 W_100">
+
+        <img :src="jmdata.img" alt="" class="W_100">
+        <div class="textC">
+            <div class="fontS_16 PTB_4 color_FFC41C font_weight_bold">特权详解</div>
+            <div class="fontS_11">在加盟区购买任意一款商品升级为代理</div>
+        </div>
+
+        <div class="" v-for="(item,index) in jionArry" style="margin-top: 1px">
+            <div class="PLR_5 PTB_4 flex_row_between bg_2B2B2B">
+                <div class="flex_row_left" @click="item.isshow=!item.isshow">
+                    <img :src="item.pic" alt="" class="VW_5">
+                    <div class="fontS_14 color_fff PLR_2">{{item.title}}</div>
+                    <i class="iconfont color_FFC41C fontS_14" :class="item.isshow?'iconxia':'iconshang1'"></i>
+                </div>
+                <div class="PTB_3 VW_20 textC B_radius_20 bg_F3CB7B" @click="goto(index)">{{item.money}}</div>
+            </div>
+            <div class="M_2 B_1_eeeeee P_4 animated fadeIn" v-if="item.isshow" v-html="item.cont"></div>
+        </div>
+
+
+        <div class="MT_20 MLR_auto W_90 PB_5">
+            <div class="fontS_16 color_fff bg_FFC41C B_radius_25 textC PTB_4" @click="joinqd">点击进入加盟渠道</div>
+            <div class="flex_row_left P_3">
+                <i class="iconfont color_FFC41C VW_5 VH_5" @click="isconsent=!isconsent" :class="isconsent?'iconyuan':'iconyuan1'"></i>
+                <div style="margin-top: -2px" class="PL_2 fontS_11">点击同意<span class="color_FFC41C" @click="toPage('agreement','./frame1/agreement.html',{'type':'会员协议','cont':jmdata.user_agree})">《会员协议》</span></div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>
+<script src="../script/api.js"></script>
+<script src="../script/const.js"></script>
+<script src="../lib/fastclick.min.js"></script>
+<script src="../lib/vue/vue.js"></script>
+<script src="../lib/vant/vant.min.js"></script>
+<script src="../lib/jquery-3.0.0.min.js"></script>
+<script src="../lib/swiper/swiper.min.js"></script>
+<script src="../script/rsa.js"></script>
+<script src="../script/aes.js"></script>
+<script src="../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#frame1',
+            data: {
+                isconsent:false,
+                jionArry:[
+                    {'title':'分享达人','money':'免费','isshow':false,'pic':'../image/j0-2.png'},
+                    {'title':'成为代理','money':'购买商品','isshow':false,'pic':'../image/j0-3.png'},
+                    {'title':'成为店掌柜','money':'购买商品','isshow':false,'pic':'../image/j0-4.png'},
+                    {'title':'成为推广商户','money':'免费','isshow':false,'pic':'../image/j0-6.png'},
+                    {'title':'成为地区服务商','money':'免费','isshow':false,'pic':'../image/j0-5.png'},
+                ],
+
+                jmdata:{},
+                joindaili:''
+            },
+
+            created:function(){
+                var that = this;
+                that.getlunbo();
+                that.getqita();
+            },
+
+            mounted:function(){
+                var that = this;
+            },
+
+            methods: {
+                //
+                goto:function(index){
+                    var that = this;
+                    if(index==1){
+                        that.joinqd();
+                    }else if(index==2){
+                        that.toPage('join_store','./frame1/join_store.html',{'cont':that.jmdata.shopkeeper});
+                    }else {
+                        that.jionArry[index].isshow = !that.jionArry[index].isshow;
+                    }
+                },
+
+                //加入渠道
+                joinqd:function () {
+                    var that = this;
+                    if(that.isconsent){
+                        that.toPage('buy_as_agent','./frame1/buy_as_agent.html',{'img':that.joindaili});
+                    }else {
+                        that.$toast('请点击同意会员协议');
+                    }
+                },
+
+
+                //加盟代理
+                getlunbo:function(){
+                    var that = this;
+                    that.http(o2oJoinInfo, 'post', {}, function (res) {
+                        // console.log(JSON.stringify(res));
+                        if (res.code == 0) {
+                            that.jmdata = res.data;
+                            that.jionArry[0].cont = res.data.share;
+                            that.jionArry[1].cont = res.data.daili;
+                            that.jionArry[2].cont = res.data.xianshang;
+                            that.jionArry[3].cont = res.data.o2o;
+                            that.jionArry[4].cont = res.data.service;
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                },
+
+                //首页其他图片
+                getqita:function(){
+                    var that = this;
+                    that.http(taokeHomeImg, 'post', {}, function (res) {
+                        console.log(JSON.stringify(res));
+                        if (res.code == 0) {
+                            that.joindaili = res.data.joindaili;
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                },
+            },
+        })
+    }
+</script>

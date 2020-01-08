@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="change_pay_password" v-cloak class="flex_col_between flex_items_stretch VH100">
+    <div class="header W_100 flex_shrink_0 bg_2B2B2B color_fff">
+        <div class="P_4 flex_rowC relative flex_shrink_0">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">设置二级密码</span>
+        </div>
+    </div>
+
+
+    <div class="overflow_y flex_grow_1">
+        <div class="flex_row_left BB_1_eeeeee P_5 W_100">
+            <div class="fontS_13">登录账号</div>
+            <input v-model="params.mobile" disabled class="PTB_1 PL_8 color_666 W_80 fontS_10 opacity_10">
+        </div>
+
+
+        <div class="flex_row_left BB_1_eeeeee P_5 W_100">
+            <div class="fontS_13">设置密码</div>
+            <input type="password" v-model="new_pwd" placeholder="请输入二级密码" class="PTB_1 PL_8 color_666 W_80 fontS_10">
+        </div>
+
+        <div class="flex_row_left BB_1_eeeeee P_5 W_100">
+            <div class="fontS_13">确认密码</div>
+            <input type="password" v-model="params.password" placeholder="请确认二级密码" class="PTB_1 PL_8 color_666 W_80 fontS_10">
+        </div>
+
+        <div class="flex_row_between BB_1_eeeeee border_color_333 PLR_5 PTB_2">
+            <div class="flex_row_left W_75">
+                <div class="fontS_13 W_25">图片验证</div>
+                <input v-model="picCode" type="text" placeholder="请输入图片验证码" class="PL_4 W_70 fontS_10">
+            </div>
+            <img :src="Imgs" @click="updateImg" alt="" class="W_25 VH_10 MB_1">
+        </div>
+
+
+        <div class="flex_row_between BB_1_eeeeee P_5 W_100">
+            <div class="flex_row_left">
+                <div class="fontS_13">验&ensp;证&ensp;码</div>
+                <input type="number" v-model="params.code" placeholder="请输入验证码" class="PTB_1 PL_8 color_666 W_60 fontS_10">
+            </div>
+            <div @click="fnAuthSendMsg" class="PLR_3 PTB_1 B_1_eeeeee borderColor_666 fontS_11 B_radius_15">
+                {{fnSendMsgText}}
+            </div>
+        </div>
+
+
+        <div class="W_80 MLR_auto MT_10 textC PTB_4 bg_F3CB7B B_radius_10" @click="oksub">确认</div>
+
+        <!--<div class="W_80 MLR_auto textR color_F3CB7B fontS_14 MT_5" @click="toPage('forget_pay_password','./forget_pay_password.html')">忘记二级密码?</div>-->
+    </div>
+
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/rsa.js"></script>
+<script src="../../script/aes.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#change_pay_password',
+            data: {
+                downCount:0,
+                new_pwd:'',
+                params:{
+                    'mobile':api.pageParam.mobile,
+                    'password':'',
+                    'code':'',
+                },
+
+                picCode:'',
+                Imgs:''
+            },
+            created: function() {
+                var that = this;
+                that.updateImg();
+            },
+
+            computed: {
+                fnSendMsgText:function () {
+                    return this.downCount?'重新获取('+this.downCount+')':'获取验证码';
+                }
+            },
+
+
+            methods: {
+                //获取图片验证
+                updateImg: function () {
+                    var that = this;
+                    that.Imgs = baseUrl + 'User/getCode?time=' + new Date().getTime()
+                },
+
+                // 获取验证码
+                fnAuthSendMsg:function () {
+                    var that = this;
+                    if(!that.params.mobile){
+                        that.$toast('请输入手机号');
+                        return false;
+                    }
+                    if(!that.picCode){
+                        that.$toast('请输入图片验证码');
+                        return false;
+                    }
+                    that.http(UserSendMsg,'post',{mobile: that.params.mobile,picCode:that.picCode}, function(res){
+                        console.log(JSON.stringify(res));
+                        that.$toast(res.msg);
+                        if(res.code==0){
+                            that.downCount = 60;
+                            var tempFn = setInterval(function (){
+                                if(that.downCount>0) {
+                                    that.downCount --;
+                                } else {
+                                    clearInterval(tempFn);
+                                }
+                            },1000);
+                        }
+                    })
+                },
+
+                //确认修改
+                oksub: function() {
+                    var that = this;
+                    if(!that.new_pwd){
+                        that.$toast('请输入二级密码');
+                        return false;
+                    }
+                    if(that.new_pwd != that.params.password){
+                        that.$toast('两次密码不一致');
+                        return false;
+                    }
+                    if(!that.params.code){
+                        that.$toast('请输入验证码');
+                        return false;
+                    }
+                    // console.log(JSON.stringify(that.params));
+                    that.http(UserForgetPwd,'post',that.params, function(res) {
+                        console.log(JSON.stringify(res));
+                        if(res.code == 0) {
+                            that.$toast('设置成功');
+                            setTimeout(function () {
+                                that.goBack();
+                            },1000)
+                        }else {
+                            that.$toast(res.msg);
+                        }
+                    });
+                }
+            },
+        })
+    };
+</script>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="shopping_cart" v-cloak class="flex_col_start flex_items_stretch VH100">
+    <div class="header W_100 flex_shrink_0 bg_2B2B2B color_fff">
+        <div class="P_4 flex_rowC relative flex_shrink_0">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">购物车</span>
+            <span @click="isEditor=!isEditor" class="absolute PR_4" style="right: 0">{{isEditor?'完成':'管理'}}</span>
+        </div>
+    </div>
+
+
+    <div class="overflow_y flex_grow_1 W_100">
+        <div class="BB_1_f2f2f2" v-for="(item, index) in shopcarList" v-if="shopcarList.length>0" :key="index">
+            <div class="PLR_4 PTB_6">
+                <div class="flex_row_between">
+                    <div class="flex_rowL">
+                        <i @click="selectstore(index)" class="iconfont fontS_18 VW_5 VH_5 color_FFC41C" :class="item.is_select?'iconyuan':'iconyuan1'"></i>
+                        <i class="iconfont iconai204 PLR_2 fontS_20 color_FFC41C"></i>
+                        <span>{{item.title}}</span>
+                        <i class="iconfont iconfanhui1 fontS_14"></i>
+                    </div>
+                </div>
+
+                <div class="flex_row_between PT_5" v-for="(item1, index1) in item.cartList" :key="index1">
+                    <i @click="selectshop(index,index1)" class="iconfont color_FFC41C flex_shrink_0 VW_5 VH_5 MR_4 fontS_18" :class="item1.is_select?'iconyuan':'iconyuan1'"></i>
+                    <img :src="item1.thumb" class="VW_25 VH_25 flex_shrink_0" alt="">
+                    <div class="W_50 flex_self_start PTB_2 PL_3">
+                        <div class="text_overflow_2">{{item1.goods_name}}</div>
+                        <div class="color_999 PT_3" v-if="item1.field[0]">【{{item1.field[0]}}：{{item1.attr[0]}} {{item1.field[1]}}：{{item1.attr[1]}}】</div>
+                    </div>
+                    <div class="W_20 flex_self_start textR PT_2">
+                        <div>￥109.00</div>
+                        <div class="color_999 PT_3">X1</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 结算 -->
+    <div class="flex_shrink_0">
+        <div class="flex_row_between color_666 bg_fff BT_1_f2f2f2">
+            <div class="flex_rowL PL_5">
+                <i @click="selectAll" class="VW_5 color_FFC41C VH_5 iconfont flex_shrink_0 fontS_18" :class="selectAllStatus?'iconyuan':'iconyuan1'"></i>
+                <span class="PL_3">全选</span>
+            </div>
+            <div class="flex_rowL">
+                <div v-if="!isEditor" class="PR_7 fontS_14">
+                    合计:<span class="">￥{{totalPrice}}</span>
+                </div>
+                <button class="PTB_5 bg_F3CB7B color_fff fontS_14 VW_25" v-if="isEditor" @click="shopcarList=[]">删除商品</button>
+                <button class="PTB_5 bg_F3CB7B color_fff fontS_14 VW_25"  v-if="!isEditor" @click="oksub">结算</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
+<script type="text/javascript" src="../../lib/api.js"></script>
+<script type="text/javascript" src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#shopping_cart',
+            data: {
+                isEditor:false,
+                totalPrice:0,//总价
+                selectAllStatus:0,//是否全选
+                selectGoods:[],//选中商品
+
+                shopcarList:[{"id":1,"title":"荣事达","logo":"","is_select":false,"cartList":[{"id":15,"user_id":4,"shop_id":1,"goods_id":8,"attr_id":0,"goods_num":1,"create_time":1561341004,"update_time":0,"delete_time":0,"thumb":"../../image/1111.jpg","goods_name":"《熟悉的味道》节目定制款 荣事达锅具三件套(炒锅+汤锅+煎锅)","current_price":"188.00","field":"","postage":"0.00","is_select":false,"attr_text":""},{"id":18,"user_id":4,"shop_id":1,"goods_id":1,"attr_id":2,"goods_num":1,"create_time":1562924870,"update_time":0,"delete_time":0,"thumb":"../../image/222.png","goods_name":"【买一赠一共发四盒】神丹 鹌鹑皮蛋 12枚*2盒","current_price":"1999.00","field":["颜色","尺寸"],"postage":"0.00","is_select":false,"attr":["黄色","2.0m*1.5m"],"attr_text":""}]},{"id":2,"title":"保健品专营店","logo":"","is_select":false,"cartList":[{"id":19,"user_id":4,"shop_id":2,"goods_id":4,"attr_id":0,"goods_num":1,"create_time":1562924929,"update_time":0,"delete_time":0,"thumb":"../../image/1111.jpg","goods_name":"《熟悉的味道》节目定制款 荣事达锅具三件套(炒锅+汤锅+煎锅)","current_price":"1666.00","field":"","postage":"20.00","is_select":false,"attr_text":""}]}],
+            },
+            created: function() {
+                var that = this;
+            },
+
+
+            methods: {
+                // //下拉刷新
+                // setpull:function(){
+                //     var that = this;
+                //     setTimeout(function () {
+                //         that.downLoading = false
+                //     },2000)
+                // },
+
+                // 单选商品选中
+                selectshop:function(index,index1){
+                    var that = this;
+                    // console.log(e)
+                    // 商品选中
+                    var shop = that.shopcarList;
+                    var selected = shop[index].cartList[index1].is_select;
+                    shop[index].cartList[index1].is_select = !selected;
+
+                    // 店铺选中
+                    var datass =  shop[index].cartList;
+                    var shopselected = true;
+                    for (var i = 0; i < datass.length;i++){
+                        if (!datass[i].is_select){
+                            shopselected = false;
+                            break;
+                        }
+                    }
+                    if (shopselected){
+                        shop[index].is_select = true;
+                    }else{
+                        shop[index].is_select = false;
+                    }
+                    that.pddianpu();
+                    that.getTotalPrice();
+                },
+
+                // 单选店铺选中
+                selectstore: function (index) {
+                    var that = this;
+                    // 商品选中
+                    var shop = that.shopcarList;
+                    var selected = shop[index].is_select;
+                    shop[index].is_select = !selected;
+
+                    var datass = shop[index].cartList;
+                    for (var i = 0; i < datass.length;i++){
+                        // console.log(shop[e.currentTarget.dataset.index])
+                        if (shop[index].is_select = !selected) {
+                            datass[i].is_select = true;
+                        }else{
+                            datass[i].is_select = false;
+                        }
+                    }
+                    that.pddianpu();
+                    that.getTotalPrice();
+                },
+
+                // 计算价格
+                getTotalPrice() {
+                    var that = this;
+                    var shop = that.shopcarList;// 获取购物车列表
+                    var total = 0;
+                    var selectGoods = [];
+                    for (var i = 0; i < shop.length; i++) {// 循环列表得到每个数据
+                        // console.log(shop[i])
+                        for (var j = 0; j < shop[i].cartList.length;j++){
+                            if (shop[i].cartList[j].is_select) { // 判断选中才会计算价格
+                                total += shop[i].cartList[j].goods_num * Number(shop[i].cartList[j].current_price);// 所有价格加起来
+                                selectGoods.push(shop[i].cartList[j])
+                            }
+                        }
+                    }
+                    that.totalPrice = total;//总价
+                    that.selectGoods = selectGoods;
+                },
+
+                // 是否选中店铺
+                pddianpu: function () {
+                    var that = this;
+                    var shop = that.shopcarList;
+                    var xuan = true;
+                    for (var i = 0; i < shop.length; i++) {
+                        if (!shop[i].is_select){
+                            xuan = false;
+                            break;
+                        }
+                    }
+                    that.selectAllStatus = xuan;
+                },
+
+                //全选
+                selectAll() {
+                    var that = this;
+                    var shop = that.shopcarList;
+                    if (shop){
+                        if (!that.selectAllStatus) {
+                            that.selectAllStatus=true;
+                            for (var i = 0; i < shop.length; i++) {
+                                shop[i].is_select = true;
+                                var datass = shop[i].cartList;
+                                for (var j = 0; j < datass.length; j++) {
+                                    shop[i].cartList[j].is_select = true;
+                                }
+                            }
+                        } else {
+                            that.selectAllStatus=false;
+
+                            for (var i = 0; i < shop.length; i++) {
+                                shop[i].is_select = false;
+
+                                var datass = shop[i].cartList;
+                                for (var j = 0; j < datass.length; j++) {
+                                    shop[i].cartList[j].is_select = false;
+                                }
+                            }
+                        }
+                        that.getTotalPrice();
+                    }
+                },
+
+
+                //结算
+                oksub:function () {
+                    var that = this;
+                    // var condition = [
+                    //     {shopId:'1',goodsInfo:[
+                    //             {'goodsId':'111','buyNum':'1','cartID':'1','attrId':'123'},
+                    //             {'goodsId':'222','buyNum':'1','cartID':'1','attrId':'456'}]
+                    //     },
+                    //     {shopId:'2',goodsInfo:[
+                    //             {'goodsId':'333','buyNum':'1','cartID':'2','attrId':'789'}]
+                    //     },
+                    // ];
+
+                    // var goodarry = that.selectGoods;
+                    // if(goodarry.length==0){
+                    //     that.$toast('请选择结算的商品');
+                    //     return false;
+                    // }
+                    // // console.log(JSON.stringify(goodarry));
+                    // var gouwudata = [];
+                    // for (var i = 0;i < goodarry.length; i++) {
+                    //     var obj = {};
+                    //     obj.cart_id = goodarry[i].id;
+                    //     obj.goods_id = goodarry[i].goods_id;
+                    //     obj.attr_id = goodarry[i].attr_id;
+                    //     obj.goods_num = goodarry[i].goods_num;
+                    //     gouwudata.push(obj)
+                    // }
+                    // console.log(JSON.stringify(gouwudata))
+                    that.toPage('affirm_order','../frame1/affirm_order.html');
+                }
+
+            },
+        })
+    };
+</script>

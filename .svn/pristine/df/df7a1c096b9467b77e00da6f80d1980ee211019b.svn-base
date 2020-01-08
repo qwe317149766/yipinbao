@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+    <style>
+        input::-webkit-input-placeholder{
+            color:#000;
+        }
+    </style>
+</head>
+<body>
+<div id="offline_store" v-cloak class="flex_col_between flex_items_stretch VH100">
+    <div class="header bg_2B2B2B W_100 flex_shrink_0">
+        <div class="P_4 color_fff flex_rowC relative flex_shrink_0 ">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">O2O小店</span>
+            <div class="absolute flex_rowC PR_4" style="right: 0;" @click="openSelect()">
+                <span>{{pov?(pov.length<5?pov:pov.slice(0,4)+'...'):'定位失败'}}</span>
+                <i class="iconfont iconxia1 color_FFC41C fontS_18"></i>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="overflow_y flex_grow_1">
+
+        <!-- 轮播 -->
+        <div class="relative">
+            <div @click="toPage('offline_store_search','./offline_store_search.html')" class="W_90 MLR_auto bg_rgba_fff absoluteTBLR flex_row_left PLR_5 z_index_300 B_radius_20" style="top: 8px;height: 28px">
+                <i class="iconfont iconsearch"></i>
+                <input type="text" disabled class="W_100" placeholder="请输入关键字">
+            </div>
+            <van-swipe :autoplay="3000" indicator-color="white" class="VH_45" :show-indicators="true">
+                <van-swipe-item v-for="(item,idx) in bannerArr" :key="idx">
+                    <img :src="item" alt="" class="W_100 H_100 object_fit_cover">
+                </van-swipe-item>
+            </van-swipe>
+        </div>
+
+        <div class="flex_row_between PLR_4 MT_8 PB_4 BB_1_eeeeee">
+            <div class="flex_rowL">
+                <div class="fontS_14 BL_5_eeeeee borderColor_FFC41C PL_2">附近商家</div>
+            </div>
+            <!--<div class="color_999 fontS_11">-->
+                <!--查看更多<i class="iconfont iconfanhui1 color_FFC41C fontS_12"></i>-->
+            <!--</div>-->
+        </div>
+
+        <!--商家列表-->
+        <div class='P_4 BB1 BB_1_eeeeee flex_row_left' v-for="item in 8" @click="toPage('offline_store_info','./offline_store_info.html')">
+            <img src="../../image/1111.jpg" class="VW_25 VH_25 flex_shrink_0 object_fit_cover" alt="">
+            <div class='flex_col_between ML_4 W_100 VH_25'>
+
+                <div class='flex_row_between fontS_4 W_100'>
+                    <div class='flex_row_left'>
+                        <i class="iconfont iconai204 color_666 fontS_18"></i>
+                        <div class="PL_2">店铺名称</div>
+                    </div>
+                </div>
+
+                <div class="flex_row_left W_100 fontS_10">
+                    <div class="PLR_3 color_fff bg_FFC41C B_radius_10 MR_2">销量</div>
+                    <div>消费12次</div>
+                </div>
+                <div class='color_999 fontS_10 W_100 flex_row_between'>
+                    <div>百货</div>
+                    <div>1223km</div>
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#offline_store',
+            data: {
+                bannerArr:['../../image/1111.jpg','../../image/222.png'],
+
+                pov:'',//地址
+                city:'',
+            },
+            created: function() {
+                var that = this;
+                that.pov = $api.getStorage('city');
+                that.city = $api.getStorage('city');
+            },
+
+            methods: {
+
+
+                //选择地址
+                openSelect: function () {
+                    var that = this;
+                    that.toPage('cityList','../cityList.html',{'city': that.city, 'select': that.pov});
+                },
+
+
+                //获取地址
+                getcity:function(data){
+                    var that = this;
+                    console.log(JSON.stringify(data));
+                    that.pov = data.pov;
+                    // that.getlists();
+                },
+            },
+        })
+    };
+</script>

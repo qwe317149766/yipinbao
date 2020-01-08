@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" href="../../lib/animate.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <style>
+        .van-tab{
+            font-size: 16px!important;
+        }
+    </style>
+</head>
+<body>
+<div id="share_movie_search" v-cloak class="flex_col_start flex_items_stretch VH100">
+    <div class="header W_100 flex_shrink_0 bg_2B2B2B color_fff">
+        <div class="P_4 flex_rowC relative flex_shrink_0">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">搜索</span>
+        </div>
+    </div>
+
+    <div class="overflow_y flex_grow_1">
+        <div class="VH_10 flex_rowC W_90 MLR_auto MT_5">
+            <div class="B_1_eeeeee B_radiusL_5 color_999 flex_rowL H_90 W_80 PLR_3">
+                <i class="iconfont iconsearch"></i>
+                <input type="text" v-model="word" class="PL_2 fontS_12 H_100 flex_grow_1" placeholder="请输入关键词">
+            </div>
+            <button class="fontS_14 H_90 W_30 bg_F3CB7B B_radiusR_5 P_2" @click="toPage('shareVideoSearch','shareVideoSearch.html')">搜索</button>
+        </div>
+
+
+        <van-tabs class="MT_5" line-height="3px" :border="false" background="#eee" v-model="movietype" title-active-color="#000" color="#F3CB7B">
+            <van-tab title="电影"></van-tab>
+            <van-tab title="电视"></van-tab>
+            <van-tab title="综艺"></van-tab>
+            <van-tab title="动漫"></van-tab>
+        </van-tabs>
+
+
+        <div class="P_5">
+            <div class="flex_row_left MT_5" v-for="item in 5">
+                <img src="../../image/222.png" alt="" class="VW_25 VH_35 B_radius_5">
+                <div class="PLR_4 VH_25 bg_eee flex_col_around">
+                    <div class="font_weight_bold fontS_14 W_100">狮子王</div>
+                    <div class="W_100">阿士大夫静安寺贷款买房会考虑将士大夫家电和法律框架阿萨德</div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+</body>
+</html>
+<script src="../../script/const.js"></script>
+<script src="../../lib/api.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#share_movie_search',
+            data: {
+                movietype:0,
+                word:''
+            },
+
+            created:function () {
+                var that = this;
+                that.word = api.pageParam.word;
+            },
+
+            methods: {
+
+
+
+            },
+        })
+    }
+</script>

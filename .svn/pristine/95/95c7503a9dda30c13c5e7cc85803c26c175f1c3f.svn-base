@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="change_pay_password" v-cloak class="flex_col_between flex_items_stretch VH100">
+    <div class="header W_100 flex_shrink_0 bg_2B2B2B color_fff">
+        <div class="P_4 flex_rowC relative flex_shrink_0">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">输入二级密码</span>
+        </div>
+    </div>
+
+
+    <div class="overflow_y flex_grow_1">
+
+        <div class="flex_row_left BB_1_eeeeee P_5 W_100">
+            <div class="fontS_13">登录账号</div>
+            <input v-model="phone" disabled class="PTB_1 PL_8 color_666 W_80 fontS_10 opacity_10">
+        </div>
+
+
+        <div class="flex_row_left BB_1_eeeeee P_5 W_100">
+            <div class="fontS_13">二级密码</div>
+            <input v-model="params.new_pwd" type="password" placeholder="请输入二级密码" class="PTB_1 PL_8 color_666 W_80 fontS_10">
+        </div>
+
+        <div class="flex_row_left BB_1_eeeeee P_5 W_100">
+            <div class="fontS_13">确认密码</div>
+            <input v-model="params.new_pwd2" type="password" placeholder="请确认密码" class="PTB_1 PL_8 color_666 W_80 fontS_10">
+        </div>
+
+        <div class="W_80 MLR_auto MT_10 textC PTB_4 bg_F3CB7B B_radius_10" @click="oksub">确认</div>
+
+        <div class="W_80 MLR_auto textR color_F3CB7B fontS_14 MT_5" @click="toPage('forget_pay_password','./forget_pay_password.html')">忘记二级密码?</div>
+    </div>
+
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#change_pay_password',
+            data: {
+                phone:'135767484',
+                params:{
+                    'new_pwd':'',
+                    'new_pwd2':'',
+                }
+            },
+            created: function() {
+                var that = this;
+            },
+
+            methods: {
+                //确认修改
+                oksub: function() {
+                    var that = this;
+                    if(that.params.new_pwd != that.params.new_pwd2){
+                        that.$toast('两次密码不一致');
+                        return false;
+                    }
+                    that.http(UserUpdate_login_pwd,'post',that.params, function(res) {
+                        console.log(JSON.stringify(res));
+                        if(res.code == 0) {
+                            that.$toast('修改成功');
+                        }else {
+                            that.$toast(res.msg);
+                        }
+                    });
+
+                }
+            },
+        })
+    };
+</script>

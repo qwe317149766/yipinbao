@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" href="../../lib/animate.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+</head>
+<body>
+<div id="tkstore_info" v-cloak class="flex_col_start flex_items_stretch VH100">
+    <div class="header W_100 flex_shrink_0 bg_2B2B2B color_fff">
+        <div class="P_4 flex_rowC relative flex_shrink_0">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">商家店铺</span>
+        </div>
+    </div>
+
+    <div class="overflow_y flex_grow_1 H_100">
+        <!--店铺信息-->
+        <div class="P_5 flex_row_left BB_1_eeeeee">
+            <img src="../../image/222.png" alt="" class="VW_15 VH_15">
+            <div class="PL_4 textT VH_15 flex_col_around">
+                <div class="W_100 PB_1">特步旗舰店</div>
+                <img src="../../image/tamll.png" alt="" class="VW_20">
+            </div>
+        </div>
+
+        <div class="flex_row_between P_5 fontS_11">
+            <div v-for="dpmsg in 3">宝贝描述：4.9&ensp;<span class="bg_red color_fff PLR_1">高</span></div>
+        </div>
+
+        <!--商品列表-->
+        <div class="flex_row_left flex_wrap PLR_3 bg_eee PB_4">
+            <div class="W_50 PT_4" v-for="(item,index) in 10" :class="index%2==0?'PR_2':'PL_2'">
+
+                <img src="../../image/1111.jpg" alt="" class="W_100 VH_45 B_radiusT_5">
+                <div class="bg_fff P_3 B_radiusB_5" style="margin-top: -3px">
+                    <div class="text_overflow_1 PB_2">驱蚊器翁无群二群阿士大夫撒地方收到</div>
+
+                    <div class="flex_row_between W_100">
+                        <div class="fontS_10">
+                            <span class="color_red fontS_14">￥198.00</span>
+                            <span class="text_decoration_line-through color_999">199.00</span>
+                            <span class="color_red">赚2.50</span>
+                        </div>
+                        <img src="../../image/tb.png" alt="" style="width: 16px;height: 16px">
+                    </div>
+
+                    <div class="flex_row_between PT_2 W_100">
+                        <div style="width: 60px;height: 25px;background: url('../../image/quanjian.png')no-repeat;background-size: 100% 100%;" class="color_red flex_rowC">10元券</div>
+                        <div class="color_999 fontS_11">已售：120</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
+<script src="../../script/const.js"></script>
+<script src="../../lib/api.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#tkstore_info',
+            data: {
+
+
+            },
+
+            created:function () {
+                var that = this;
+
+            },
+
+            methods: {
+
+
+
+            },
+        })
+    }
+</script>

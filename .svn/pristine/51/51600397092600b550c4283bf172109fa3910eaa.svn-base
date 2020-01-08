@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="offline_store_info" v-cloak class="flex_col_between flex_items_stretch VH100">
+    <div class="header bg_2B2B2B W_100 flex_shrink_0">
+        <div class="P_4 color_fff flex_rowC relative flex_shrink_0 ">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">特步旗舰店</span>
+        </div>
+    </div>
+
+
+
+    <div class="overflow_y flex_grow_1 bg_eee">
+        <van-swipe :autoplay="3000" indicator-color="white" class="VH_70" :show-indicators="true">
+            <van-swipe-item v-for="(item,idx) in bannerArr" :key="idx">
+                <img :src="item" alt="" class="W_100 H_100 object_fit_cover">
+            </van-swipe-item>
+        </van-swipe>
+
+        <div class="MT_3 P_3 fontS_13">按时根据地方撒即可官方就卡死的考虑将发挥违法士大夫了空间的撒发</div>
+
+        <div class="flex_row_left bg_fff BB_1_eeeeee PLR_7 PTB_6">
+            <i class="iconfont iconbohao color_FFC41C"></i>
+            <div class="PL_2">185456465465</div>
+        </div>
+        <div class="flex_row_left bg_fff PLR_7 PTB_6">
+            <i class="iconfont iconweizhi color_FFC41C"></i>
+            <div class="PL_2">河南省郑州市二七区</div>
+        </div>
+
+        <div class="W_85 MLR_auto MT_15 bg_F3CB7B B_radius_5 textC PTB_4" @click="toPage('offline_store_pay','./offline_store_pay.html')">付款</div>
+    </div>
+
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#offline_store_info',
+            data: {
+                bannerArr:['../../image/1111.jpg','../../image/222.png'],
+            },
+            created: function() {
+                var that = this;
+
+
+            },
+
+            methods: {
+
+
+
+
+            },
+        })
+    };
+</script>

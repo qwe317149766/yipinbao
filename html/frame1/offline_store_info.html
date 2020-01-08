@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="offline_store_info" v-cloak class="flex_col_between flex_items_stretch VH100">
+    <div class="header bg_2B2B2B W_100 flex_shrink_0">
+        <div class="P_4 color_fff flex_rowC relative flex_shrink_0 ">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">{{dpdata.title?dpdata.title:'店铺信息'}}</span>
+            <i @click="isshow=true" class="iconfont iconico absolute PR_4 fontS_20" style="right: 0"></i>
+        </div>
+    </div>
+
+
+
+    <div class="overflow_y flex_grow_1 bg_eee">
+        <van-swipe :autoplay="3000" indicator-color="white" class="VH_70" :show-indicators="true">
+            <van-swipe-item v-for="(item,idx) in dpdata.images" :key="idx">
+                <img :src="item" alt="" class="W_100 H_100 object_fit_cover">
+            </van-swipe-item>
+        </van-swipe>
+
+        <div class="MT_3 P_3 fontS_13">{{dpdata.message}}</div>
+
+        <div class="flex_row_left bg_fff BB_1_eeeeee PLR_7 PTB_6">
+            <i class="iconfont iconbohao color_FFC41C"></i>
+            <div class="PL_2">{{dpdata.mobile}}</div>
+        </div>
+        <div class="flex_row_left bg_fff PLR_7 PTB_6">
+            <i class="iconfont iconweizhi color_FFC41C"></i>
+            <div class="PL_2">{{dpdata.address}}</div>
+        </div>
+
+        <div class="W_85 MLR_auto MT_15 bg_F3CB7B B_radius_5 textC PTB_4" @click="toPage('offline_store_pay','./offline_store_pay.html',{'id':dpdata.spid})">付款</div>
+    </div>
+
+
+    <!--转增弹框-->
+    <van-popup v-model="isshow" class="B_radius_5 VW_70 P_5 color_FFD490 textC">
+        <div class="fontS_14">
+            <div class="fontS_13 PB_5">扫描二维码向我付钱</div>
+            <img :src="qrcode" alt="" class="VW_60 VH_60">
+        </div>
+    </van-popup>
+
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/rsa.js"></script>
+<script src="../../script/aes.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#offline_store_info',
+            data: {
+                isshow:false,
+                dpdata:{},
+                qrcode:''
+            },
+            created: function() {
+                var that = this;
+                that.getdata();
+                that.getqrcode();
+            },
+
+            methods: {
+                //获取店铺详情
+                getdata:function () {
+                    var that = this;
+                    that.$toast.loading({
+                        mask: true,
+                        loadingType:'spinner',
+                        message: '加载中...'
+                    });
+                    that.http(o2oO2oInfo, 'post', {'spid':api.pageParam.id}, function (res) {
+                        that.$toast.clear();
+                        console.log(JSON.stringify(res));
+                        if (res.code == 0) {
+                            that.dpdata = res.data.list;
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                },
+
+                //数据
+                getqrcode:function(){
+                    var that = this;
+                    that.http(o2oShopsCode, 'post', {'shop_id':api.pageParam.id}, function (res) {
+                        console.log(JSON.stringify(res));
+                        if (res.code == 0) {
+                            that.qrcode = res.data.url;
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                },
+            },
+        })
+    };
+</script>

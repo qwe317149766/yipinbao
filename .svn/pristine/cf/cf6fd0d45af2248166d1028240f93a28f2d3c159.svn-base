@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+</head>
+<body>
+<div id="video_detail" v-cloak class="flex_col_start flex_items_stretch VH100 overflow_hidden">
+
+    <div class="W_100 relative VH100">
+        <div class="absoluteTL VH_10 VW_10 flex_rowC bg_rgba_000 B_radius_circle" @click="goBack()" style="left: 1rem;top: 2rem">
+            <i class="iconfont iconfanhui fontS_18  color_fff"></i>
+        </div>
+
+        <div class="absoluteTL VH_10 flex_row_left" style="left: 1rem;top: 6rem">
+            <img src="../../image/222.png" alt="" class="B_radius_circle VH_10 VW_10">
+            <div class="PL_3">
+                <div>易拼宝</div>
+                <div>官方视频</div>
+            </div>
+        </div>
+
+        <video class="VW_100 setvideo VH100 object_fit_cover" autoplay controls preload loop webkit-playsinline="true" playsinline="true">
+            <source src="../../image/video1.mp4" type="video/mp4">
+        </video>
+
+
+        <div class="absoluteBLR W_70 color_fff" style="bottom: 6rem;left: 1rem">请问是打发递四三大范德萨范德萨发货的萨拉咖啡店理解是大法官方速递</div>
+    </div>
+
+</div>
+</body>
+</html>
+<script src="../../script/api.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../lib/jquery-3.0.0.min.js"></script>
+<script src="../../lib/swiper/swiper.min.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#video_detail',
+            data: {
+
+            },
+
+            created:function(){
+                var that = this;
+            },
+
+            mounted:function(){
+                var that = this;
+
+            },
+
+            methods: {
+
+
+
+            },
+        })
+    }
+</script>

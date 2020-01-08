@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="affirm_order" v-cloak class="flex_col_start VW_100 flex_items_stretch VH100">
+    <div class="header bg_2B2B2B W_100 color_fff flex_shrink_0">
+        <div class="P_4 flex_rowC relative flex_shrink_0 ">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">确认订单</span>
+        </div>
+    </div>
+
+
+    <div class="overflow_y flex_grow_1 bg_f2f2f2 PLR_4 PB_4">
+        <!--订单地址-->
+        <div v-if="goods_data.address_id" class="W_100 flex_row_left P_5 bg_fff B_radius_10 MT_5" @click="toPage('address_list','./address_list.html',{'selectId':1})">
+            <i class="iconfont icon107 color_FFC41C fontS_30"></i>
+            <div class="PL_5 W_100">
+                <div class="flex_row_left">
+                    <div class="fontS_16">{{goods_data.usename}}</div>
+                    <div class="color_999 PL_2">{{goods_data.mobile}}</div>
+                </div>
+                <div class="color_999 MT_2">{{goods_data.address}}</div>
+            </div>
+            <i class="iconfont iconfanhui1 color_FFC41C"></i>
+        </div>
+
+        <div v-if="!goods_data.address_id" @click="toPage('address_list','./address_list.html',{'selectId':1})" class="W_100 flex_row_between color_ccc P_5 bg_fff B_radius_10 MT_5">
+            <div class="flex_row_left">
+                <i class="iconfont icon107 fontS_25 PR_4"></i>
+                <span class="color_999">暂无收货地址，点击添加</span>
+            </div>
+            <i class="iconfont iconfanhui1"></i>
+        </div>
+
+        <!--商品-->
+        <div class="P_4 bg_fff B_radius_10 MT_5" v-for="list in 2">
+            <div class="flex_row_left">
+                <i class="iconfont iconai204 fontS_25 color_F3CB7B"></i>
+                <div class="PL_2 fontS_16">特步旗舰店</div>
+            </div>
+            <div class="PTB_3 flex_row_between" v-for="item in 2">
+                <img src="../../image/1111.jpg" alt="" class="VW_25 VH_25 B_radius_5">
+                <div class="W_50 flex_self_start PTB_2 PL_3">
+                    <div class="text_overflow_2">阿发送到发送到发斯蒂芬委屈而委屈入额我去了困扰未确认为二位请惹我</div>
+                    <div class="color_999 PT_3">【颜色：褐色 尺寸：27】</div>
+                </div>
+                <div class="W_20 flex_self_start textR PT_2">
+                    <div>￥109.00</div>
+                    <div class="color_999 PT_3">X1</div>
+                </div>
+            </div>
+
+            <div class="flex_row_between MT_5 fontS_11">
+                <div>配送方式<span class="color_999 PL_2">普通快递</span></div>
+                <div>快递 免邮></div>
+            </div>
+
+            <div class="flex_row_right PTB_3 BB_1_eeeeee">
+                <div>共1件，实付：</div>
+                <div class="color_red fontS_16">￥196.20</div>
+            </div>
+
+            <div class="color_F3CB7B PTB_3">根据您的消费星级：9.00折</div>
+            <div class="fontS_14 PB_4 flex_row_left">
+                <img src="../../image/1111.jpg" alt="" class="VH_5 VW_5">
+                <div class="PL_3">购买成功后赠送水滴：1.09个</div>
+            </div>
+
+            <div class="flex_row_left PT_3 BT_1_eeeeee">
+                <div class="fontS_16">备注</div>
+                <input type="text" placeholder="请输入备注信息" class="PL_4 W_80">
+            </div>
+
+        </div>
+
+
+    </div>
+    <!-- 结算 -->
+    <div class="flex_row_between PLR_4 PTB_2 color_666 bg_fff BT_1_f2f2f2 flex_shrink_0">
+        <div class="flex_row_left" @click="iswater=!iswater">
+            <i :class="iswater?'iconyuan':'iconyuan1'" class="flex_rowC iconfont color_F3CB7B VW_5 VH_5"></i>
+            <span class="fontS_10 PL_1">水滴抵扣</span>
+        </div>
+
+        <div class="flex_row_right">
+            <div class="flex_row_right PR_4 fontS_11">
+                <div>共1件，合计：</div>
+                <div class="color_red fontS_16">￥196.20</div>
+            </div>
+            <button class="PTB_3 PLR_5 color_fff bg_F3CB7B fontS_13 B_radius_20" @click="">确认支付</button>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script type="text/javascript" src="../../lib/api.js"></script>
+<script type="text/javascript" src="../../lib/vue/vue.js"></script>
+<script type="text/javascript" src="../../script/const.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#affirm_order',
+            data: {
+                iswater:false,//是否使用水滴
+                goods_data:{
+                    address_id:''
+                }
+            },
+            created: function() {
+                var that = this;
+                // console.log(JSON.stringify(api.pageParam.obj))
+                // that.getorderdata(api.pageParam.obj);
+            },
+
+
+            methods: {
+                // 获取订单详情
+                getorderdata:function (data) {
+                    var that = this;
+                    that.http(offlineCheck_order, 'post', data, function (res) {
+                        console.log(JSON.stringify(res));
+                        if (res.code == 0) {
+                            that.goods_data = res.data.info;
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                },
+
+                //设置地址
+                setdizhi:function (data) {
+                    var that = this;
+                    // console.log(JSON.stringify(data));
+                    that.goods_data.address_id = data.id;
+                    that.goods_data.usename = data.name;
+                    that.goods_data.mobile = data.tel;
+                    // that.goods_data.address.province = data.province;
+                    // that.goods_data.address.city = data.city;
+                    // that.goods_data.address.country = data.county;
+                    that.goods_data.address = data.province + data.city+ data.county + data.addressDetail;
+                },
+
+
+                //立即购买提交订单
+                submitOrder:function () {
+                    var that = this;
+                    var conditionParam =  {'goods_id':api.pageParam.obj.goods_id,'goods_nums':api.pageParam.obj.goods_nums,'attr_id':api.pageParam.obj.attr_id,'order_type':that.psmodel=='商家配送'?0:1,'address_id':that.goods_data.address_id};
+                    // console.log(JSON.stringify(conditionParam))
+                    that.$toast.loading({
+                        mask: true,
+                        loadingType:'spinner',
+                        message: '加载中...'
+                    });
+                    that.http(offlineCreate_order, 'post', conditionParam, function (res) {
+                        // console.log(JSON.stringify(res));
+                        that.$toast.clear();
+                        if (res.code == 0) {
+                            that.toPage('pay','./pay.html',{
+                                type:'订单支付',
+                                payId: res.data.payId,
+                                price: res.data.orderAmount,
+                                paySite:res.data.paySite,
+                            })
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                }
+
+            },
+        })
+    };
+</script>

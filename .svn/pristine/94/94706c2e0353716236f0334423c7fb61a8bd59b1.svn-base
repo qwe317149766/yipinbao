@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../lib/iconfont/iconfont.css" />
+</head>
+
+<body>
+    <div id="city_frame" v-cloak>
+        <div class="W_100 flex_row_left flex_wrap MB_5">
+            <div class="W_30 bg_eee ML_3 MT_3 flex_rowC PTB_6 B_radius_5" v-for="(each,index) in category" :key="index" @click="closeCityFrame(each)">{{each}}</div>
+        </div>
+    </div>
+</body>
+
+</html>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../lib/vue/vue.js"></script>
+<script type="text/javascript" src="../script/common.js"></script>
+<script type="text/javascript" src="../script/const.js"></script>
+<script>
+    apiready = function () {
+        var city_frame = new Vue({
+            el: '#city_frame',
+            data: {
+                cateId: '',
+                category: [],
+                select:''
+            },
+            created: function () {
+                var that = this;
+                if (api.pageParam) {
+                    that.category = api.pageParam.area;
+                    that.select = api.pageParam.select;
+                }
+            },
+            methods: {
+                closeCityFrame:function(each){
+                    var that = this;
+                    var newparams = {
+                        pov: that.select + each,
+                    };
+                    // console.log(JSON.stringify(each))
+                    $api.setStorage('city', that.select + each);
+                    api.execScript({
+                        name:'city_frame.html',
+                        // frameName: 'frame2',
+                        script:'vm.getcity('+JSON.stringify(newparams)+')'
+                    });
+                    that.goBack();
+                    api.closeFrame();
+                },
+            }
+        });
+    };
+</script>

@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="join_platform_partners" v-cloak class="flex_col_start VW_100 flex_items_stretch VH100">
+    <div class="header bg_2B2B2B W_100 color_fff flex_shrink_0">
+        <div class="P_4 flex_rowC relative flex_shrink_0 ">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">加入平台合作商</span>
+        </div>
+    </div>
+
+
+    <div class="overflow_y flex_grow_1">
+        <div class="PTB_6 PLR_3 flex_row_left">
+            <div @click="getistype(index)" class="flex_row_left MR_5" v-for="(item,index) in typeArry">
+                <i v-if="item" :class="active==index?'iconyuan':'iconyuan1'" class="iconfont color_F3CB7B VW_5 VH_5"></i>
+                <div class="PL_1">{{item}}</div>
+            </div>
+        </div>
+
+        <!--店掌柜-->
+        <div class="W_100" v-if="active==0">
+            <div class="flex_row_left BB_1_eeeeee P_5 W_100 fontS_14">
+                <div class="W_25">姓&ensp;&ensp;&ensp;&ensp;名：</div>
+                <input type="text" v-model="dataobj.realname" placeholder="请输入真实姓名" class="W_75 fontS_13">
+            </div>
+
+            <div class="flex_row_left BB_1_eeeeee P_5 W_100 fontS_14">
+                <div class="W_25">店铺名称：</div>
+                <input type="text" v-model="dataobj.title" placeholder="请输入您的店铺名称" class="W_75 fontS_13">
+            </div>
+
+            <div class="flex_row_left BB_1_eeeeee P_5 W_100 fontS_14">
+                <div class="W_25">商&ensp;&ensp;&ensp;&ensp;户：</div>
+                <input type="text" v-model="dataobj.shop_number" placeholder="请输入您的商户号" class="W_75 fontS_13">
+            </div>
+
+
+            <!--上传相关资料-->
+            <div class="P_5 MB_5">
+                <div class="color_999 BL_3_eeeeee borderColor_F3CB7B PL_2 fontS_13">上传相关资料（3张）</div>
+                <div class="flex_row_between MT_5">
+                    <div class=" textC">
+                        <img :src="dataobj.yyzz_img||'../../image/addShop.png'" alt="" class="VW_30 VH_30 object_fit_cover" @click="uptype('yyzz_img')">
+                        <div class="PT_2">营业执照</div>
+                    </div>
+                    <div class=" textC">
+                        <img :src="dataobj.zmz_img||'../../image/addShop.png'" alt="" class="VW_30 VH_30 object_fit_cover" @click="uptype('zmz_img')">
+                        <div class="PT_2">身份证（正面）</div>
+                    </div>
+                    <div class=" textC">
+                        <img :src="dataobj.scz_img||'../../image/addShop.png'" alt="" class="VW_30 VH_30 object_fit_cover" @click="uptype('scz_img')">
+                        <div class="PT_2">手持身份证</div>
+                    </div>
+                </div>
+            </div>
+
+            <!--<div class="flex_row_left BB_1_eeeeee P_5 W_100 fontS_14">-->
+                <!--<div class="W_25">商家名称：</div>-->
+                <!--<input type="text" v-model="dataobj.sjname" placeholder="请输入商家名称" class="W_75 fontS_13">-->
+            <!--</div>-->
+
+            <div class="flex_row_between BB_1_eeeeee P_5 W_100 fontS_14">
+                <div class="W_25">店铺区域：</div>
+                <div class="flex_row_right color_999" @click="isdizhi=true">
+                    <span>{{dataobj.province?dataobj.province + dataobj.city + dataobj.county:'请选择'}}</span>
+                    <i class="iconfont iconfanhui1 fontS_13 PL_2"></i>
+                </div>
+            </div>
+
+            <div class="flex_row_left BB_1_eeeeee P_5 W_100 fontS_14">
+                <div class="W_25">详细地址：</div>
+                <input type="text" v-model="dataobj.address" placeholder="请输入详细地址" class="W_75 fontS_13">
+            </div>
+
+            <div class="flex_row_left BB_1_eeeeee P_5 W_100 fontS_14">
+                <div class="W_25">联系电话：</div>
+                <input type="text" v-model="dataobj.mobile" placeholder="请输入联系电话" class="W_75 fontS_13">
+            </div>
+
+            <!--<div class="flex_row_between BB_1_eeeeee P_5 W_100 fontS_14">-->
+                <!--<div>分类：</div>-->
+                <!--<div class="flex_row_right color_999" @click="iscate=true">-->
+                    <!--<div>{{dataobj.cate?dataobj.cate:'请选择'}}</div>-->
+                    <!--<i class="iconfont iconfanhui1 fontS_13 PL_2"></i>-->
+                <!--</div>-->
+            <!--</div>-->
+
+            <div class="flex_row_left BB_1_eeeeee P_5 W_100 fontS_14">
+                <div class="W_25">描&ensp;&ensp;&ensp;&ensp;述：</div>
+                <input type="text" v-model="dataobj.message" placeholder="最多输入100字" maxlength="100" class="W_75 fontS_13">
+            </div>
+
+            <!--门店logo照-->
+            <div class="P_5 MT_3">
+                <div class="color_999 BL_3_eeeeee borderColor_F3CB7B PL_2 fontS_13">门店logo照（1张）</div>
+                <div class="flex_row_between MT_5">
+                    <div class=" textC">
+                        <img :src="dataobj.logo||'../../image/addShop.png'" alt="" class="VW_30 VH_30 object_fit_cover" @click="uptype('logo')">
+                    </div>
+                </div>
+            </div>
+
+
+            <!--展示图片（最多5张）-->
+            <div class="P_5">
+                <div class="color_999 BL_3_eeeeee borderColor_F3CB7B PL_2 fontS_13">展示图片（最多5张，建议尺寸2:1）</div>
+                <div class="flex_row_left flex_wrap MT_5">
+                    <div class="textC MR_2">
+                        <img :src="dataobj.img1||'../../image/addShop.png'" alt="" class="VW_30 VH_30 object_fit_cover" @click="uptype('img1')">
+                    </div>
+                    <div class="MR_2 textC">
+                        <img :src="dataobj.img2||'../../image/addShop.png'" alt="" class="VW_30 VH_30 object_fit_cover" @click="uptype('img2')">
+                    </div>
+                    <div class=" textC">
+                        <img :src="dataobj.img3||'../../image/addShop.png'" alt="" class="VW_30 VH_30 object_fit_cover" @click="uptype('img3')">
+                    </div>
+                    <div class="MR_2 MT_1 textC">
+                        <img :src="dataobj.img4||'../../image/addShop.png'" alt="" class="VW_30 VH_30 object_fit_cover" @click="uptype('img4')">
+                    </div>
+                    <div class="MR_2 MT_1 textC">
+                        <img :src="dataobj.img5||'../../image/addShop.png'" alt="" class="VW_30 VH_30 object_fit_cover" @click="uptype('img5')">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--推广商户-->
+        <div class="W_100" v-if="active==1">
+            <div class="flex_row_left BB_1_eeeeee P_5 W_100 fontS_14">
+                <div class="W_25">商家名称：</div>
+                <input type="text" v-model="dataobj1.title" placeholder="请输入商家名称" class="W_75 fontS_13">
+            </div>
+            <div class="flex_row_between BB_1_eeeeee P_5 W_100 fontS_14">
+                <div class="W_25">店铺区域：</div>
+                <div class="flex_row_right color_999" @click="isdizhi=true">
+                    <span>{{dataobj1.province?dataobj1.province + dataobj1.city + dataobj1.county:'请选择'}}</span>
+                    <i class="iconfont iconfanhui1 fontS_13 PL_2"></i>
+                </div>
+            </div>
+            <div class="flex_row_left BB_1_eeeeee P_5 W_100 fontS_14">
+                <div class="W_25">详细地址：</div>
+                <input type="text" v-model="dataobj1.address" placeholder="请输入详细地址" class="W_75 fontS_13">
+            </div>
+            <div class="flex_row_left BB_1_eeeeee P_5 W_100 fontS_14">
+                <div class="W_25">联系电话：</div>
+                <input type="text" v-model="dataobj1.mobile" placeholder="请输入联系电话" class="W_75 fontS_13">
+            </div>
+            <!--<div class="flex_row_between BB_1_eeeeee P_5 W_100 fontS_14">-->
+                <!--<div>分类：</div>-->
+                <!--<div class="flex_row_right color_999" @click="iscate=true">-->
+                    <!--<div>{{dataobj1.cate?dataobj1.cate:'请选择'}}</div>-->
+                    <!--<i class="iconfont iconfanhui1 fontS_13 PL_2"></i>-->
+                <!--</div>-->
+            <!--</div>-->
+            <div class="flex_row_between BB_1_eeeeee P_5 W_100 fontS_14">
+                <div>您最熟知的项目是：</div>
+                <div class="flex_row_right color_999" @click="isproject=true">
+                    <div>{{dataobj1.project?dataobj1.project:'请选择'}}</div>
+                    <i class="iconfont iconfanhui1 fontS_13 PL_2"></i>
+                </div>
+            </div>
+            <div class="flex_row_between BB_1_eeeeee P_5 W_100 fontS_14">
+                <div>您为何加盟：</div>
+                <div class="flex_row_right color_999" @click="iswhy=true">
+                    <div>{{dataobj1.why?dataobj1.why:'请选择'}}</div>
+                    <i class="iconfont iconfanhui1 fontS_13 PL_2"></i>
+                </div>
+            </div>
+
+            <div class="flex_row_left BB_1_eeeeee P_5 W_100 fontS_14">
+                <div class="W_25">描&ensp;&ensp;&ensp;&ensp;述：</div>
+                <input type="text" v-model="dataobj1.message" placeholder="最多输入100字" maxlength="100" class="W_75 fontS_13">
+            </div>
+
+            <!--门店logo照-->
+            <div class="P_5 MT_3">
+                <div class="color_999 BL_3_eeeeee borderColor_F3CB7B PL_2 fontS_13">门店logo照（1张）</div>
+                <div class="flex_row_between MT_5">
+                    <div class=" textC">
+                        <img :src="dataobj1.logo||'../../image/addShop.png'" alt="" class="VW_30 VH_30 object_fit_cover" @click="uptype('logo')">
+                    </div>
+                </div>
+            </div>
+
+
+            <!--展示图片（最多5张）-->
+            <div class="P_5">
+                <div class="color_999 BL_3_eeeeee borderColor_F3CB7B PL_2 fontS_13">展示图片（最多5张）</div>
+                <div class="flex_row_left flex_wrap MT_5">
+                    <div class="textC MR_2">
+                        <img :src="dataobj1.img1||'../../image/addShop.png'" alt="" class="VW_30 VH_30 object_fit_cover" @click="uptype('img1')">
+                    </div>
+                    <div class="MR_2 textC">
+                        <img :src="dataobj1.img2||'../../image/addShop.png'" alt="" class="VW_30 VH_30 object_fit_cover" @click="uptype('img2')">
+                    </div>
+                    <div class=" textC">
+                        <img :src="dataobj1.img3||'../../image/addShop.png'" alt="" class="VW_30 VH_30 object_fit_cover" @click="uptype('img3')">
+                    </div>
+                    <div class="MR_2 MT_1 textC">
+                        <img :src="dataobj1.img4||'../../image/addShop.png'" alt="" class="VW_30 VH_30 object_fit_cover" @click="uptype('img4')">
+                    </div>
+                    <div class="MR_2 MT_1 textC">
+                        <img :src="dataobj1.img5||'../../image/addShop.png'" alt="" class="VW_30 VH_30 object_fit_cover" @click="uptype('img5')">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!--地区服务商-->
+        <div class="W_100" v-if="active==2">
+            <div class="flex_row_left BB_1_eeeeee P_5 W_100 fontS_14">
+                <div class="W_25">姓&ensp;&ensp;&ensp;&ensp;名：</div>
+                <input type="text" v-model="dataobj2.realname" placeholder="请输入真实姓名" class="W_75 fontS_13">
+            </div>
+            <div class="flex_row_left BB_1_eeeeee P_5 W_100 fontS_14">
+                <div class="W_25">店铺名称：</div>
+                <input type="text" v-model="dataobj2.title" placeholder="请输入您的店铺名称" class="W_75 fontS_13">
+            </div>
+            <div class="flex_row_between BB_1_eeeeee P_5 W_100 fontS_14">
+                <div class="W_25">选择区域：</div>
+                <div class="flex_row_right color_999" @click="isdizhi=true">
+                    <span>{{dataobj2.province?dataobj2.province + dataobj2.city + dataobj2.county:'请选择'}}</span>
+                    <i class="iconfont iconfanhui1 fontS_13 PL_2"></i>
+                </div>
+            </div>
+            <div class="flex_row_left BB_1_eeeeee P_5 W_100 fontS_14">
+                <div class="W_25">代理类型：</div>
+                <div class="flex_row_left MR_6 fontS_13 color_666" @click="dataobj2.type=2">
+                    <i :class="dataobj2.type==2?'iconyuan':'iconyuan1'" class="iconfont color_F3CB7B VW_5 VH_5"></i>
+                    <div class="PL_1">区县代理</div>
+                </div>
+                <div class="flex_row_left fontS_13 color_666" @click="dataobj2.type=1">
+                    <i :class="dataobj2.type==1?'iconyuan':'iconyuan1'" class="iconfont color_F3CB7B VW_5 VH_5"></i>
+                    <div class="PL_1">市代理</div>
+                </div>
+            </div>
+            <div class="flex_row_left BB_1_eeeeee P_5 W_100 fontS_14">
+                <div class="W_25">联系电话：</div>
+                <input type="text" v-model="dataobj2.mobile" placeholder="请输入联系电话" class="W_75 fontS_13">
+            </div>
+            <div class="flex_row_between BB_1_eeeeee P_5 W_100 fontS_14">
+                <div>您最熟知的项目是：</div>
+                <div class="flex_row_right color_999" @click="isproject=true">
+                    <div>{{dataobj2.project?dataobj2.project:'请选择'}}</div>
+                    <i class="iconfont iconfanhui1 fontS_13 PL_2"></i>
+                </div>
+            </div>
+            <div class="flex_row_between BB_1_eeeeee P_5 W_100 fontS_14">
+                <div>您为何加盟：</div>
+                <div class="flex_row_right color_999" @click="iswhy=true">
+                    <div>{{dataobj2.why?dataobj2.why:'请选择'}}</div>
+                    <i class="iconfont iconfanhui1 fontS_13 PL_2"></i>
+                </div>
+            </div>
+            <div class="flex_row_left BB_1_eeeeee P_5 W_100 fontS_14">
+                <div class="W_25">描&ensp;&ensp;&ensp;&ensp;述：</div>
+                <input type="text" v-model="dataobj2.message" placeholder="最多输入100字" maxlength="100" class="W_75 fontS_13">
+            </div>
+
+
+            <!--上传相关资料-->
+            <div class="P_5 MB_5">
+                <div class="color_999 BL_3_eeeeee borderColor_F3CB7B PL_2 fontS_13">上传相关资料（3张）</div>
+                <div class="flex_row_between MT_5">
+                    <div class=" textC">
+                        <img :src="dataobj2.yyzz_img||'../../image/addShop.png'" alt="" class="VW_30 VH_30 object_fit_cover" @click="uptype('yyzz_img')">
+                        <div class="PT_2">营业执照</div>
+                    </div>
+                    <div class=" textC">
+                        <img :src="dataobj2.zmz_img||'../../image/addShop.png'" alt="" class="VW_30 VH_30 object_fit_cover" @click="uptype('zmz_img')">
+                        <div class="PT_2">身份证（正面）</div>
+                    </div>
+                    <div class=" textC">
+                        <img :src="dataobj2.scz_img||'../../image/addShop.png'" alt="" class="VW_30 VH_30 object_fit_cover" @click="uptype('scz_img')">
+                        <div class="PT_2">手持身份证</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!--提交-->
+        <div class="W_100">
+            <div @click="oksumit" class="W_80 MLR_auto PTB_5 MT_10 MB_6 bg_F3CB7B textC color_fff B_radius_5">立即入驻</div>
+            <div class="flex_rowC MB_10">
+                <i class="iconfont fontS_20" @click="isread=!isread" :class="isread?'iconzhengfangxinggouxuankuang color_FFC41C':'iconzhengfangxinggouxuankuang-weixuanzhong'"></i>
+                <div class="textC fontS_12 PL_2">
+                    <span>确认即表示同意</span>
+                    <span class="color_FFC41C" @click="toPage('agreement','../frame1/agreement.html',{'type':'易拼宝商家入驻服务协议','cont':dpxieyi})">《易拼宝商家入驻服务协议》</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!--选择地址-->
+    <van-popup v-model="isdizhi" position="bottom">
+        <van-area confirm-button-text="完成" @confirm="getarea" @cancel="isdizhi=false" :area-list="areaList" />
+    </van-popup>
+
+    <!--商家分类-->
+    <van-popup v-model="iscate" position="bottom">
+        <van-picker :columns="cateArry" value-key="title" :default-index="0" @confirm="getcate" @cancel="iscate=false" show-toolbar/>
+    </van-popup>
+
+
+    <!--选择熟知的项目-->
+    <van-popup v-model="isproject" position="bottom">
+        <van-picker :columns="projectArry" value-key="title" :default-index="0" @confirm="gettype" @cancel="isproject=false" show-toolbar/>
+    </van-popup>
+
+
+    <!--为何加盟-->
+    <van-popup v-model="iswhy" position="bottom">
+        <van-picker :columns="joinArry" value-key="title" :default-index="0" @confirm="getwhy" @cancel="iswhy=false" show-toolbar/>
+    </van-popup>
+
+</div>
+</body>
+</html>
+<script type="text/javascript" src="../../lib/api.js"></script>
+<script type="text/javascript" src="../../lib/vue/vue.js"></script>
+<script type="text/javascript" src="../../script/const.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../res/area.js"></script>
+<script src="../../script/rsa.js"></script>
+<script src="../../script/aes.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#join_platform_partners',
+            data: {
+                is_apply:0,//申请过得类型
+                active:1,
+                typeArry:['店掌柜','推广商户','地区合作商'],
+                isread:false,//是否阅读
+
+                isdizhi:false,//地址弹框
+                iscate:false,//商家分类弹框
+                isproject:false,//熟知的项目弹框
+                iswhy:false,//为何加盟
+
+                dataobj:{//店掌柜信息
+                    realname:'',//真实名称
+                    title:'',//店铺名称
+                    shop_number:'',//商户号
+                    // cate:'',//分类
+                    // shopsCateId:'',//分类id
+                    province:'',//省
+                    city:'',//市
+                    county:'',//区县
+                    address:'',//详细地址
+                    mobile:'',//联系电话
+                    message:'',//留言
+                    yyzz_img:'',
+                    zmz_img:'',
+                    scz_img:'',
+                    logo:'',
+                    img1:'',
+                    img2:'',
+                    img3:'',
+                    img4:'',
+                    img5:'',
+                },
+
+                cateArry:[
+                    {'id':'1','title':'男装'},
+                    {'id':'2','title':'女装'},
+                    {'id':'3','title':'护肤'},
+                    {'id':'4','title':'家具'},
+                    {'id':'5','title':'母婴'}
+                    ],
+                projectArry:['社交电商','实体电商','实体店铺','微商保险','工业行业','农业类','文职销售'],
+                joinArry:['兼职赚钱','寻求合作','职业推广','着重趋势','列表销售','只是看看'],
+                dataobj1:{//推广商户
+                    title:'',//商家名称
+                    province:'',//省
+                    city:'',//市
+                    county:'',//区县
+                    address:'',//详细地址
+                    mobile:'',//联系电话
+                    lon:'',//经度
+                    lat:'',//纬度
+                    // cate:'',//分类
+                    // shopsCateId:'',//分类id
+                    project:'',//项目
+                    why:'',//为何加盟
+                    message:'',//留言
+                    logo:'',
+                    img1:'',
+                    img2:'',
+                    img3:'',
+                    img4:'',
+                    img5:'',
+                },
+
+                dataobj2:{//地区服务商
+                    realname:'',//真实姓名
+                    title:'',//店铺名称
+                    province:'',//省
+                    city:'',//市
+                    county:'',//区县
+                    mobile:'',//联系电话
+                    project:'',//项目
+                    why:'',//为何加盟
+                    message:'',//留言
+                    yyzz_img:'',
+                    zmz_img:'',
+                    scz_img:'',
+                    type:2,//2县区代理 1市代理
+                },
+
+                dpxieyi:'',//协议
+            },
+            created: function() {
+                var that = this;
+                that.getxieyi();
+                that.areaList = areaList;
+                if(api.pageParam.is_apply){
+                    that.is_apply = api.pageParam.is_apply;
+                    if(that.is_apply==1){
+                        that.active = 1;
+                        that.typeArry = ['','推广商户','地区合作商'];
+                    }else if(that.is_apply==2){
+                        that.active = 2;
+                        that.typeArry = ['店掌柜','','地区合作商'];
+                    }else if(that.is_apply==3){
+                        that.active = 2;
+                        that.typeArry = ['','','地区合作商'];
+                    }
+                }
+            },
+
+
+            methods: {
+                getistype:function(value){
+                    var that = this;
+                    if(value===0){
+                        if(that.is_apply==2||that.is_apply==3){
+                            that.active = 2;
+                        }else {
+                            that.active = 1;
+                        }
+                        that.http(shopCheckOnlineInfo, 'post', {}, function (res) {
+                            console.log(JSON.stringify(res));
+                            if (res.data.code == 0) {
+                                that.active = 0;
+                            }else if(res.data.code == 3 ){
+                                that.active = 0;
+                                that.$toast(res.msg)
+                            }else {
+                                that.$toast(res.msg)
+                            }
+                        });
+                    }else {
+                        that.active = value;
+                    }
+                },
+
+                //协议
+                getxieyi:function(){
+                    var that = this;
+                    that.http(homeTreaty, 'post', {'type':'shopkeeper'}, function (res) {
+                        console.log(JSON.stringify(res));
+                        if (res.code == 0) {
+                            that.dpxieyi = res.data;
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                },
+
+
+                //选择上传类型
+                uptype:function (nub) {
+                    var that = this;
+                    api.actionSheet({
+                        cancelTitle: '取消',
+                        buttons: ['从相册选一张', '拍照'],
+                        style:{
+                            fontNormalColor:'#666',
+                            fontPressColor:'#666',
+                        }
+                    }, function(ret, err) {
+                        var index = ret.buttonIndex;
+                        if(index==1) {
+                            that.gopic('album',nub);
+                        }else if(index==2){
+                            that.gopic('camera',nub);
+                        }
+                    });
+                },
+                //上传图片
+                gopic: function (type,nub) {
+                    var that = this;
+                    api.getPicture({
+                        sourceType: type,
+                        encodingType: 'jpg',
+                        mediaValue: 'pic',
+                        destinationType: 'base64',
+                        allowEdit: true,
+                        quality: 80,
+                        targetWidth: 720,
+                        targetHeight: 600,
+                        saveToPhotoAlbum: false
+                    }, function (ret, err) {
+                        if (ret) {
+                            if(ret.base64Data){
+                                if(that.active==0){
+                                    that.dataobj[nub] = ret.base64Data;
+                                } else if(that.active==1){
+                                    that.dataobj1[nub] = ret.base64Data;
+                                }else if(that.active==2){
+                                    that.dataobj2[nub] = ret.base64Data;
+                                }
+                            }
+                            // console.log('双向绑定')
+                            // console.log(ret.base64Data)
+                        } else {
+                            console.log(err);
+                        }
+                    });
+                },
+
+                //获取区域
+                getarea:function(data){
+                    var that = this;
+                    that.isdizhi = false;
+                    if(that.active == 0){
+                        that.dataobj.province = data[0].name;
+                        that.dataobj.city = data[1].name;
+                        that.dataobj.county = data[2].name;
+                        // that.dataobj.code = data[2].code;
+                    }else if(that.active == 1){
+                        that.dataobj1.province = data[0].name;
+                        that.dataobj1.city = data[1].name;
+                        that.dataobj1.county = data[2].name;
+                    }else if(that.active == 2){
+                        that.dataobj2.province = data[0].name;
+                        that.dataobj2.city = data[1].name;
+                        that.dataobj2.county = data[2].name;
+                    }
+                },
+
+                //店铺分类
+                getcate(value,index) {
+                    var that = this;
+                    that.iscate=false;
+                    // console.log(value);
+                    // console.log(index)
+                    // if(that.active == 0){
+                    //     that.dataobj.cate = value.title;
+                    //     that.dataobj.shopsCateId = value.id;
+                    // }else
+                    if(that.active == 1){
+                        that.dataobj1.cate = value.title;
+                        that.dataobj1.shopsCateId = value.id;
+                    }
+                },
+
+                //获取熟知的项目
+                gettype(value,index) {
+                    var that = this;
+                    that.isproject=false;
+                    // console.log(value)
+                    // console.log(index)
+                    if(that.active == 1){
+                        that.dataobj1.project = value;
+                    }else if(that.active == 2){
+                        that.dataobj2.project = value;
+                    }
+                },
+
+                //为什么加盟
+                getwhy(value,index) {
+                    var that = this;
+                    that.iswhy=false;
+                    // console.log(value)
+                    // console.log(index)
+                    if(that.active == 1){
+                        that.dataobj1.why = value;
+                    }else if(that.active == 2){
+                        that.dataobj2.why = value;
+                    }
+                },
+
+                //立即入住
+                oksumit:function () {
+                    var that = this;
+                    if(!that.isread){
+                        that.$toast('请阅读合同并勾选');
+                        return false;
+                    }
+                    that.$toast.loading({
+                        mask: true,
+                        loadingType:'spinner',
+                        message: '加载中...',
+                        duration:20000
+                    });
+                    var dataobjs = {};
+                    if(that.active==0){
+                        dataobjs = that.dataobj;
+                        that.subdata(dataobjs);
+                    }else if(that.active==1){
+                        dataobjs = that.dataobj1;
+                        // console.log(JSON.stringify(dataobjs));
+                        var map = api.require('bMap');
+                        map.getCoordsFromName({
+                            city: dataobjs.city,
+                            address: dataobjs.province + dataobjs.city + dataobjs.county + dataobjs.address
+                        }, function(ret, err) {
+                            console.log(JSON.stringify(ret));
+                            // console.log(JSON.stringify(err));
+                            if (ret.status) {
+                                dataobjs.lon = ret.lon;
+                                dataobjs.lat = ret.lat;
+                                that.subdata(dataobjs);
+                                // console.log(JSON.stringify(ret));
+                            }
+                        });
+                    }else if(that.active==2){
+                        dataobjs = that.dataobj2;
+                        that.subdata(dataobjs);
+                    }
+                    // return;
+                    // for(var key in dataobjs){
+                    //     if(!dataobjs[key]){
+                    //         that.$toast('请完善所有信息');
+                    //         return false;
+                    //     }
+                    // }
+                },
+
+                //提交数据
+                subdata:function (dataobjs) {
+                    var that = this;
+                    console.log(JSON.stringify(dataobjs));
+                    if(!dataobjs.title){
+                        that.$toast('请输入店铺名称');
+                        return false;
+                    }
+                    var url;
+                    if(that.active==0){
+                        url = shopAddOnlineInfo;
+                    }else if(that.active==1){
+                        url = shopAddO2oInfo;
+                    }else if(that.active==2){
+                        url = shopAddDailiInfo;
+                    }
+                    // console.log(JSON.stringify(dataobjs));
+                    that.http(url, 'post', dataobjs, function (res) {
+                        console.log(JSON.stringify(res));
+                        that.$toast.clear();
+                        if (res.code == 0) {
+                            api.execScript({//个人中心
+                                name: 'root',
+                                frameName: 'frame4',
+                                script: 'vm.getUserInfo()'
+                            });
+                            setTimeout(function(){
+                                api.openWin({//特殊对待
+                                    name: 'audit_certification',
+                                    url: './audit_certification.html',
+                                    reload: true,
+                                    bgColor:'#fff',
+                                    slidBackEnabled: false,
+                                    animation: {
+                                        type: "push", //动画类型（详见动画类型常量）
+                                        subType: "from_right", //动画子类型（详见动画子类型常量）
+                                        duration: 300 //动画过渡时间，默认300毫秒
+                                    },
+                                    pageParam: {'type':1}
+                                });
+                            },300);
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    });
+                }
+
+            },
+        })
+    };
+</script>

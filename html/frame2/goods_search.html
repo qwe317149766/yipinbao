@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+</head>
+<body>
+<div id="goods_search" v-cloak>
+    <div class="header PLR_4 W_100 flex_shrink_0 bg_2B2B2B">
+        <div class="flex_row_between PTB_3">
+            <i class="iconfont iconfanhui color_fff fontS_20" @click="goBack()"></i>
+            <div class="flex_center color_999 bg_fff B_radius_15 PTB_2 W_80">
+                <i class="iconfont iconsearch PL_5"></i>
+                <input class="W_100 fontS_12 PLR_2" type="search" v-model="word" placeholder="请输入关键字" @keyup.enter="goSearch('goods_searchList','./goods_searchList.html',{'word':word})">
+            </div>
+            <div class="color_fff fontS_14">
+                <p @click="goSearch('goods_searchList','./goods_searchList.html',{'word':word})">搜索</p>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!--历史搜索-->
+    <div class="P_5">
+        <div class="flex_row_between PB_5">
+            <div class="flex_row_left">
+                <p class="PL_1">历史记录</p>
+            </div>
+            <i class="iconfont iconicon-shanchu color_999" @click="fnTaokeDelSearchHistory" v-if="hisstorywords.length>0"></i>
+        </div>
+
+        <div class="flex_row_left flex_wrap fontS_14">
+            <div v-for="item in hisstorywords" :key="" class="fontS_10 B_1_eeeeee B_radius_15 PTB_2 PLR_4 MR_5 MB_5 color_666" @click="toPage('goods_searchList','./goods_searchList.html',{'word':item})">{{item}}</div>
+        </div>
+    </div>
+
+
+
+    <!--热门搜索-->
+    <div class="P_5">
+        <div class="flex_row_left PB_5">
+            <p class="PL_1">大家都在搜</p>
+        </div>
+        <div class="flex_row_left flex_wrap fontS_14">
+            <div v-for="item in keywords" :key="" class="fontS_10 B_1_eeeeee B_radius_15 PTB_2 PLR_4 MR_5 MB_5 color_666" @click="toPage('goods_searchList','./goods_searchList.html',{'word':item})">{{item}}</div>
+        </div>
+    </div>
+
+
+</div>
+</body>
+</html>
+<script src="../../script/const.js"></script>
+<script type="text/javascript" src="../../lib/api.js"></script>
+<script type="text/javascript" src="../../lib/vue/vue.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+    apiready = function(){
+        window.vm = new Vue({
+            el: '#goods_search',
+            data: {
+                word:'',
+                hisstorywords:['qwewq','werwe'],
+                keywords:['qwewq','werwe'],
+            },
+            created: function() {
+                var that = this;
+                // that.fnTaokeGetSearchHistory();
+            },
+
+
+            methods: {
+
+                //获取 历史记录
+                fnTaokeGetSearchHistory:function() {
+                    this.http(taokeGet_search_history_list,'post',{},
+                        function(res){
+                            console.log(JSON.stringify(res))
+                            if(res.code == 0) {
+                                this.hisstorywords = res.data.list;
+                                this.keywords = res.data.hot_list;
+                            }
+                        })
+                },
+                //清空 历史记录
+                fnTaokeDelSearchHistory:function() {
+                    this.http(taokeDel_search_history,'post',{},
+                        function(res){
+                            if(res.code == 0) {
+                                this.fnTaokeGetSearchHistory(); //重新获取清空后的数据
+                            }
+                        })
+                },
+
+                //搜索
+                goSearch:function(name,url,params) {
+                    var that = this;
+                    if(that.word){
+                        that.toPage(name,url,params)
+                    }else {
+                        that.$toast({message:'请输入关键词',duration:1000});
+                    }
+                },
+            },
+        })
+    }
+</script>

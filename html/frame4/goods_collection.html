@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="goods_collection" v-cloak class="flex_col_between flex_items_stretch VH100">
+    <div class="header W_100 flex_shrink_0 bg_2B2B2B color_fff">
+        <div class="P_4 flex_rowC relative flex_shrink_0 ">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">收藏夹</span>
+        </div>
+    </div>
+
+    <div class="overflow_y flex_grow_1">
+        <van-list
+                v-model="upLoading"
+                :finished="finished"
+                finished-text="没有更多了"
+                @load="getlist"
+                :immediate-check="false">
+            <div class="flex_row_between PLR_3 PTB_4 BB_1_eeeeee" v-for="(item1, index1) in goods_list" :key="index1">
+                <i @click="selectshop(item1)" class="iconfont color_FFC41C flex_shrink_0 VW_5 VH_5 MR_2 fontS_18" :class="item1.is_select?'iconyuan':'iconyuan1'"></i>
+                <img :src="item1.img" class="VW_25 VH_25 flex_shrink_0 B_radius_5" alt="">
+                <div class="W_50 flex_self_start PTB_2 PL_3">
+                    <div class="text_overflow_2">
+                        <span class="fontS_10 color_F3CB7B">{{item1.shop_name}}</span>
+                        {{item1.title}}
+                    </div>
+                </div>
+                <div class="W_20 flex_self_start textR PT_2">
+                    <div>￥{{item1.spe_price}}</div>
+                </div>
+            </div>
+        </van-list>
+    </div>
+
+
+    <div v-if="goods_list.length>0" class="flex_row_between flex_shrink_0 PLR_4 PTB_2 color_666 bg_fff BT_1_f2f2f2">
+        <div class="flex_rowL" @click="selectAll">
+            <i class="iconfont PL_2 flex_shrink_0 fontS_18 VW_5 VH_5 MR_2 color_FFC41C" :class="isselectAll?'iconyuan':'iconyuan1'"></i>
+            <span class="PL_3">全选</span>
+        </div>
+        <button class="PTB_3 PLR_8 bg_F3CB7B color_fff fontS_14 B_radius_20" @click="deleteshop">删除</button>
+    </div>
+
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/rsa.js"></script>
+<script src="../../script/aes.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#goods_collection',
+            data: {
+                isselectAll:false,
+
+                goods_list:[],
+                page:1,
+                upLoading:false,
+                finished:false,
+            },
+            created: function() {
+                var that = this;
+                that.getlist();
+            },
+
+
+            methods: {
+                //单选商品
+                selectshop:function(data){
+                    var that = this;
+                    var alldata = that.goods_list;
+                    data.is_select = !data.is_select;
+                    var xuan = true;
+                    for (var i in alldata){
+                        if(!alldata[i].is_select){
+                            xuan = false;
+                            break;
+                        }
+                    }
+                    that.isselectAll = xuan;
+                },
+
+                //全选商品
+                selectAll:function(){
+                    var that = this;
+                    var alldata = that.goods_list;
+                    if(that.isselectAll) {
+                        that.isselectAll = false;
+                        for (var i in alldata) {
+                            alldata[i].is_select = false;
+                        }
+                    }else {
+                        for (var j in alldata) {
+                            alldata[j].is_select = true;
+                        }
+                        that.isselectAll = true;
+                    }
+                },
+
+
+                //收藏列表
+                getlist:function(){
+                    var that = this;
+                    if(that.upLoading) { //上拉加载
+                        that.page ++;
+                    } else{
+                        that.page = 1; //刷新
+                        if(that.goods_list.length>10){
+                            that.finished = false;
+                        }
+                    }
+                    // console.log(that.page);
+                    that.http(userCollect_list, 'post', {'page':that.page}, function (res) {
+                        // console.log(JSON.stringify(res));
+                        if (res.code == 0) {
+                            if(res.data.list.length < 10) {
+                                that.finished = true;
+                            }else {
+                                that.finished = false;
+                            }
+                            if(that.upLoading) {
+                                that.goods_list = that.goods_list.concat(res.data.list);
+                                that.upLoading = false;
+                            }else {
+                                that.goods_list = res.data.list;
+                            }
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                },
+
+
+                //删除收藏商品
+                deleteshop:function () {
+                    var that = this;
+                    var alldata = that.goods_list;
+                    var idarry = [];
+                    for (var i in alldata) {
+                        if(alldata[i].is_select){
+                            idarry.push(alldata[i].id);
+                        }
+                    }
+                    if(idarry.length==0){
+                        that.$toast('请选择商品');
+                        return false;
+                    }
+                    // console.log(JSON.stringify(idarry))
+                    that.http(userDelete_collect, 'post', {'id':idarry}, function (res) {
+                        // console.log(JSON.stringify(res));
+                        if (res.code == 0) {
+                            that.$toast('删除成功');
+                            that.getlist();
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                }
+
+            },
+        })
+    };
+</script>

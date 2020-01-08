@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+</head>
+<body>
+<div id="taokeList" v-cloak class="flex_col_start flex_items_stretch VH100">
+    <div class="header W_100 flex_shrink_0 bg_2B2B2B">
+        <div class="P_4 color_fff flex_rowC relative flex_shrink_0 ">
+            <i class="iconfont iconfanhui absolute fontS_20 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_16">{{type}}</span>
+        </div>
+
+        <div class="flex_row_between bg_fff P_4 BB_1_eeeeee" @click="toPage('search','./search.html')">
+            <div class="flex_center color_999 bg_eee B_radius_10 PTB_3 W_100">
+                <i class="iconfont iconsearch PLR_3"></i>
+                <input class="W_100 fontS_12 PR_2" type="search" disabled placeholder="请输入您要搜索的商品">
+            </div>
+        </div>
+
+        <!--筛选条件-->
+        <div class="W_100 flex_row_around PTB_5 fontS_12 bg_fff">
+            <div class="flex_center" :class="sort==0?'color_FFC41C':'color_666'" @click="settj(0)">
+                <span>综合</span>
+            </div>
+            <div class="flex_center" :class="(sort==1||sort==2)?'color_FFC41C':'color_666'" @click="settj(1)">
+                <span>价格</span>
+                <div class="flex_col_c" style="padding-top: 1px">
+                    <i class="iconfont iconshang fontS_8" :class="sort==2?'color_FFC41C':'color_666'" style="margin-bottom: -3px"></i>
+                    <i class="iconfont iconxia1 fontS_8" :class="sort==1?'color_FFC41C':'color_666'"></i>
+                </div>
+            </div>
+            <div class="flex_center" :class="(sort==3||sort==4)?'color_FFC41C':'color_666'" @click="settj(2)">
+                <span>佣金</span>
+                <div class="flex_col_c" style="padding-top: 1px">
+                    <i class="iconfont iconshang fontS_8" :class="sort==4?'color_FFC41C':'color_666'" style="margin-bottom: -3px"></i>
+                    <i class="iconfont iconxia1 fontS_8" :class="sort==3?'color_FFC41C':'color_666'"></i>
+                </div>
+            </div>
+            <div class="flex_center" :class="(sort==5||sort==6)?'color_FFC41C':'color_666'" @click="settj(3)">
+                <span>销量</span>
+                <div class="flex_col_c" style="padding-top: 1px">
+                    <i class="iconfont iconshang fontS_8" :class="sort==6?'color_FFC41C':'color_666'" style="margin-bottom: -3px"></i>
+                    <i class="iconfont iconxia1 fontS_8" :class="sort==5?'color_FFC41C':'color_666'"></i>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="overflow_y flex_grow_1 W_100">
+        <van-pull-refresh v-model="downLoading" @refresh="getlists">
+            <van-list
+                    v-model="upLoading"
+                    :finished="finished"
+                    finished-text="没有更多了"
+                    @load="getlists"
+                    :immediate-check="false">
+                <!--商品列表-->
+                <div class="flex_row_left flex_wrap PLR_3 bg_eee PB_4">
+                    <div class="W_50 PT_4" v-for="(item,index) in 10" :class="index%2==0?'PR_2':'PL_2'">
+
+                        <img src="../../image/1111.jpg" alt="" class="W_100 VH_45 B_radiusT_5">
+                        <div class="bg_fff P_3 B_radiusB_5" style="margin-top: -3px">
+                            <div class="text_overflow_1 PB_2">驱蚊器翁无群二群阿士大夫撒地方收到</div>
+
+                            <div class="flex_row_between W_100">
+                                <div class="fontS_10">
+                                    <span class="color_red fontS_14">￥198.00</span>
+                                    <span class="text_decoration_line-through color_999">199.00</span>
+                                    <span class="color_red">赚2.50</span>
+                                </div>
+                                <img src="../../image/tb.png" alt="" style="width: 16px;height: 16px">
+                            </div>
+
+                            <div class="flex_row_between PT_2 W_100">
+                                <div style="width: 60px;height: 25px;background: url('../../image/quanjian.png')no-repeat;background-size: 100% 100%;" class="color_red flex_rowC">10元券</div>
+                                <div class="color_999 fontS_11">已售：120</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </van-list>
+        </van-pull-refresh>
+    </div>
+</div>
+</body>
+</html>
+<script src="../../script/const.js"></script>
+<script type="text/javascript" src="../../lib/api.js"></script>
+<script type="text/javascript" src="../../lib/vue/vue.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/Tween.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#taokeList',
+            data: {
+                downLoading:false,
+                upLoading:false,
+                finished:false,
+
+                page:1,//分类
+                cate_id:0,//分类id
+                sort:0,//
+                keyword:'',//
+                typeindex:'',//分类
+                goodsList:[],//推荐商品列表
+
+            },
+
+            created:function () {
+                var that = this;
+                that.type = api.pageParam.type;
+                // that.getlists();
+            },
+
+            methods: {
+                //搜索条件
+                settj:function (index) {
+                    var that = this;
+                    $api.dom('.overflow_y').scrollTop = 0; //回到顶部
+                    if(index==0){//综合
+                        that.sort = 0;
+                    }else if(index==1){ //高低价格
+                        if(that.sort===2){
+                            that.sort = 1;
+                        }else {
+                            that.sort = 2;
+                        }
+                    }else if(index==2){ //佣金
+                        if(that.sort===4){
+                            that.sort = 3;
+                        }else {
+                            that.sort = 4;
+                        }
+                    }else if(index==3){ //销量
+                        if(that.sort===6){
+                            that.sort = 5;
+                        }else {
+                            that.sort = 6;
+                        }
+                    }
+                    console.log(that.sort)
+                    // that.getlists();
+                },
+
+
+
+                //商品列表
+                getlists:function () {
+                    var that = this;
+                    return;
+                    if(that.upLoading) { //上拉加载
+                        that.page ++;
+                    } else{
+                        that.$toast.loading({
+                            mask: true,
+                            loadingType:'spinner',
+                            message: '加载中...'
+                        });
+                        $api.dom('.overflow_y').scrollTop = 0; //回到顶部
+                        // document.getElementById("setdiv").scrollIntoView();//切换条件时 返回头部
+                        that.page = 1; //刷新
+                        if(that.goodsList.length>10){
+                            that.finished = false;
+                        }
+                    }
+                    // console.log(that.page);
+                    that.http(taokeGet_goods_list, 'post', {'page':that.page,'cate_id':that.cate_id,'keyword':that.keyword,'type':that.typeindex,'sort':that.sort}, function (res) {
+                        that.$toast.clear();
+                        console.log(JSON.stringify(res));
+                        if (res.code == 0) {
+                            if(res.data.list.length < 10) {
+                                that.finished = true;
+                            }else {
+                                that.finished = false;
+                            }
+                            if(that.upLoading) {
+                                that.goodsList = that.goodsList.concat(res.data.list);
+                                that.upLoading = false;
+                            }else {
+                                that.goodsList = res.data.list;
+                                that.downLoading = false;
+                            }
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                },
+            },
+        })
+    }
+</script>
+
+

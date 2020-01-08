@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+    <style>
+        .van-picker__cancel{
+            color: gray;
+        }
+        .van-picker__confirm{
+            color: #F3CB7B;
+        }
+        .van-switch--on{
+            background:#FFC41C
+        }
+        .van-button--danger{
+            background: #F3CB7B;
+            border: 0;
+            height: 40px;
+            line-height: 40px;
+            color: black;
+            border-radius: 10px;
+            font-size: 13px;
+        }
+        .van-button.van-button--default.van-button--normal.van-button--block{
+            height: 40px;
+            line-height: 40px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+<div id="address_edit" v-cloak class="flex_col_start VW_100 flex_items_stretch VH100">
+    <div class="header W_100 bg_2B2B2B flex_shrink_0 bg_red color_fff">
+        <div class="P_4 flex_rowC relative flex_shrink_0">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">{{usermsg.id?'修改地址':'添加地址'}}</span>
+        </div>
+    </div>
+
+    <div class="overflow_y flex_grow_1">
+        <van-address-edit
+            :address-info="usermsg"
+            :area-list="areaList"
+            :show-delete="usermsg.id?true:false"
+            show-set-default
+            @save="onSave"
+            @delete="onDelete"
+            save-button-text="确认"/>
+    </div>
+
+</div>
+</body>
+</html>
+<script type="text/javascript" src="../../lib/api.js"></script>
+<script type="text/javascript" src="../../lib/vue/vue.js"></script>
+<script type="text/javascript" src="../../script/const.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script type="text/javascript" src="../../res/area.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#address_edit',
+            data: {
+                usermsg: {}
+            },
+            created: function() {
+                var that = this;
+                // console.log(JSON.stringify(api.pageParam.usermsg));
+                if(api.pageParam.usermsg&&api.pageParam.usermsg.id) {
+                    that.usermsg = api.pageParam.usermsg;
+                }
+                that.areaList = areaList;
+            },
+
+
+            methods: {
+                //添加修改地址
+                onSave:function (info) {
+                    var that = this;
+                    // console.log(JSON.stringify(info));
+                    var conditionParam = {};
+                    if(info.id){//修改
+                        conditionParam = {'id':info.id,'type':'edit','userName':info.name,'mobile':info.tel,'province':info.province,'city':info.city,'country':info.county,'code':info.areaCode,'detail':info.addressDetail,'is_default':info.isDefault?1:0};
+                    }else {//添加
+                        conditionParam = {'userName':info.name,'mobile':info.tel,'province':info.province,'city':info.city,'country':info.county,'code':info.areaCode,'detail':info.addressDetail,'is_default':info.isDefault?1:0};
+                    }
+                    console.log(JSON.stringify(conditionParam));
+                    that.http(PostaddrAdd_address, 'post', conditionParam, function (res) {
+                        console.log(JSON.stringify(res));
+                        if (res.code == 0) {
+                            that.$toast('成功');
+                            api.execScript({
+                                name: 'addressList',
+                                script:'vm.getdzlist();'
+                            });
+                            setTimeout(function () {
+                                that.goBack();
+                            },1500)
+                        }else {
+                            that.$toast(res.msg);
+                        }
+                    })
+                },
+
+                //删除地址
+                onDelete:function () {
+                    var that = this;
+                    // console.log(JSON.stringify(that.usermsg))
+                    that.http(PostaddrDel_address, 'post', {'id': that.usermsg.id}, function (res) {
+                        console.log(JSON.stringify(res));
+                        that.$toast(res.msg);
+                        if (res.code == 0) {
+                            api.execScript({
+                                name: 'address_list',
+                                script:'vm.getdzlist();'
+                            });
+                            setTimeout(function () {
+                                that.goBack();
+                            },1500)
+                        }
+                    })
+                },
+
+            },
+        });
+    };
+  </script>

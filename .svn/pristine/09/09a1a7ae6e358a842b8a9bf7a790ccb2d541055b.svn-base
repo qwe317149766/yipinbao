@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="tk_order" v-cloak class="flex_col_between flex_items_stretch VH100">
+    <div class="header W_100 flex_shrink_0 bg_2B2B2B color_fff">
+        <div class="P_4 flex_rowC relative flex_shrink_0 ">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">淘客订单</span>
+        </div>
+
+        <div class="W_100">
+            <van-tabs v-model="active" color="#F3CB7B">
+                <van-tab v-for="item in navArry" :title="item"></van-tab>
+            </van-tabs>
+        </div>
+    </div>
+
+    <div class="overflow_y flex_grow_1 bg_eee">
+        <van-pull-refresh v-model="downLoading" @refresh="getlists">
+            <van-list
+                    v-model="upLoading"
+                    :finished="finished"
+                    finished-text="没有更多了"
+                    @load="getlists"
+                    :immediate-check="false">
+                <div class="P_5 flex_row_left MT_3 bg_fff" v-for="item in goodsList" @click="getlink(item.itemid,item.tmall)">
+                    <img :src="item.imgUrl" alt="" class="VW_25 VH_25 object_fit_cover flex_shrink_0">
+                    <div class="VH_25 flex_col_between PL_5 VW_70">
+                        <div class="W_100 flex_row_left">
+                            <img v-if="item.tmall==1" src="../../image/tb.png" alt="" class="VW_5 VH_5">
+                            <img v-if="item.tmall==2" src="../../image/tm_icon.png" alt="" class="VW_5 VH_5">
+                            <img v-if="item.tmall==3" src="../../image/copy_jd.png" alt="" class="VW_5 VH_5">
+                            <img v-if="item.tmall==4" src="../../image/copy_pdd.png" alt="" class="VW_5 VH_5">
+                            <div class="text_overflow_1 PL_2">{{item.goods_info}}</div>
+                        </div>
+                        <div class="W_100 fontS_10 color_999 flex_row_left">
+                            <div>创建日：{{item.create_time}}</div>
+                            <div v-if="active==2" class="PL_4">结算日：{{item.js_time}}</div>
+                        </div>
+                        <div class="W_100 fontS_10 color_999 flex_row_left">
+                            <div>订单号 {{item.order_no}}</div>
+                            <div class="ML_8 PLR_3 color_000 B_radius_10" @click.stop="copy(item.order_no)" style="border: 1px solid black">复制</div>
+                        </div>
+                        <div class="W_100 fontS_10 color_999 flex_row_between" v-if="active!=3">
+                            <div>消费金额：{{item.pay_money}}</div>
+                            <div class="color_F3CB7B fontS_11 PR_3">预计佣金：{{item.commission_money}}</div>
+                        </div>
+                    </div>
+                </div>
+            </van-list>
+        </van-pull-refresh>
+
+    </div>
+
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/rsa.js"></script>
+<script src="../../script/aes.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#tk_order',
+            data: {
+                active:0,
+                navArry:['全部','已付款','已结算','已失效'],
+
+                page:1,
+                goodsList:[],
+
+                downLoading:false,
+                upLoading:false,
+                finished:false,
+                alibaichuan:api.require('alibaichuan'),
+                jdapp:api.require('jdapp')
+            },
+            created: function() {
+                var that = this;
+                that.initSDK();
+                that.initJDSDK();
+                that.getlists();
+            },
+
+            watch:{
+                active:function (value) {
+                    var that = this;
+                    that.active = value;
+                    that.getlists();
+                }
+            },
+
+            methods: {
+                // 初始化模块信息
+                initSDK: function () {
+                    var that = this;
+                    var param = {
+                        isvcode: "feelinglife"
+                    };
+                    that.alibaichuan.initTaeSDK(param, function (ret, err) {
+                        if (ret) {
+                            // console.log(JSON.stringify(ret));
+                        } else {
+                            // console.log(JSON.stringify(err));
+                        }
+                    });
+                },
+                // 初始化京东
+                initJDSDK: function() {
+                    var that = this;
+                    var params = {
+                        act_id: "100",
+                        ext: api.systemType + "_" + api.systemVersion,
+                        params: "test",
+                        position: 11,
+                    };
+                    that.jdapp.init(params, function(rs, err) {
+                        // console.log(JSON.stringify(rs));
+                    })
+                },
+
+                //复制
+                copy: function(item) {
+                    var that = this;
+                    var clipBoard = api.require('clipBoard');
+                    clipBoard.set({
+                        value: item
+                    }, function (ret, err) {
+                        if (ret) {
+                            that.$toast('复制成功');
+                        } else {
+                            // alert(JSON.stringify(err));
+                        }
+                    });
+                },
+
+
+                //获取列表
+                getlists:function () {
+                    var that = this;
+                    if(that.upLoading) { //上拉加载
+                        that.page ++;
+                    } else{
+                        that.page = 1; //刷新
+                        if(that.goodsList.length>10){
+                            that.finished = false;
+                        }
+                        that.$toast.loading({
+                            mask: true,
+                            loadingType:'spinner',
+                            message: '加载中...'
+                        });
+                        that.goodsList = [];
+                    }
+                    // console.log(status)
+                    // console.log(that.page);
+                    that.http(orderGet_taoke_order_list, 'post', {'page':that.page,'order_status':that.active}, function (res) {
+                        that.$toast.clear();
+                        console.log(JSON.stringify(res));
+                        if (res.code == 0) {
+                            if(res.data.length < 10) {
+                                that.finished = true;
+                            }else {
+                                that.finished = false;
+                            }
+                            if(that.upLoading) {
+                                that.goodsList = that.goodsList.concat(res.data);
+                                that.upLoading = false;
+                            }else {
+                                that.goodsList = res.data;
+                                that.downLoading = false;
+                            }
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                },
+
+                //获取优惠券链接
+                getlink:function(itemId,type){
+                    var that = this;
+                    var typevalue;
+                    if(type==1||type==2){
+                        typevalue=1
+                    }else if(type==3){
+                        typevalue=2
+                    }else if(type==4){
+                        typevalue=3
+                    }
+                    that.$toast.loading({
+                        mask: true,
+                        loadingType:'spinner',
+                        message: '加载中...'
+                    });
+                    that.http(taokeGet_coupon_url, 'post', {'itemId':itemId,'type':typevalue}, function (res) {
+                        that.$toast.clear();
+                        console.log(JSON.stringify(res));
+                        if (res.code == 0) {
+                            if(typevalue==1){
+                                // console.log('淘宝');
+                                var params = {
+                                    url: res.data.info.url,
+                                    mmpid: '',
+                                    nativeview: true
+                                };
+                                that.alibaichuan.showDetailByURL(params, function (ret, err) {
+                                    if (ret) {
+                                        // alert(JSON.stringify(ret));
+                                    } else {
+                                        // alert(JSON.stringify(err));
+                                    }
+                                });
+                            }else if(typevalue==2){
+                                // console.log('京东')
+                                that.jdapp.open_url({
+                                    url: res.data.info.url
+                                });
+                            }else if(typevalue==3){
+                                var browser = api.require('webBrowser');
+                                browser.open({
+                                    url: res.data.info.url
+                                });
+                            }else {
+                                that.$toast('无法打开');
+                            }
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                },
+
+            },
+        })
+    };
+</script>

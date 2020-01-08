@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="withdraw_alipay" v-cloak class="flex_col_between flex_items_stretch VH100">
+    <div class="header W_100 flex_shrink_0 bg_2B2B2B color_fff">
+        <div class="P_4 flex_rowC relative flex_shrink_0">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">提现到支付宝</span>
+        </div>
+    </div>
+
+
+    <div class="overflow_y flex_grow_1">
+        <div class="PTB_8 flex_rowC">
+            <img class="VW_10 VH_10" src="../../image/1111.jpg" alt="">
+            <img class="VW_10 VH_10 ML_3 MR_3" src="../../image/changjt.png" alt="">
+            <img class="VW_10 VH_10" src="../../image/zhibao.png" alt="">
+        </div>
+
+
+        <div class="flex_row_left BB_1_eeeeee P_5 W_100">
+            <div class="fontS_13">真实姓名&ensp;&ensp;</div>
+            <input type="text" disabled :placeholder="params.realname?params.realname:'无'" class="PTB_1 PL_8 W_70 fontS_10">
+        </div>
+
+
+        <div class="flex_row_between BB_1_eeeeee P_5 W_100">
+            <div class="flex_row_left">
+                <div class="fontS_13">到账支付宝</div>
+                <input type="text" disabled :placeholder="UserData.is_bind_alipay==1?params.alipay:'***先绑定'" class="PTB_1 PL_8 W_50 fontS_10">
+            </div>
+            <div v-if="UserData.is_bind_alipay=='0'" @click="toPage('bind_alipay','./bind_alipay.html')" class="PLR_3 PTB_1 B_1_eeeeee fontS_11 B_radius_10 borderColor_666">绑定支付宝</div>
+        </div>
+
+
+        <div class="flex_row_left BB_1_eeeeee P_5 W_100">
+            <div class="fontS_13">手机号码&ensp;&ensp;</div>
+            <input v-model="params.mobile" type="number" placeholder="请输入手机号码" class="PTB_1 PL_8 W_70 fontS_10">
+        </div>
+
+
+        <div class="flex_row_between BB_1_eeeeee P_5 W_100">
+            <div class="flex_row_left">
+                <div class="fontS_13">短信验证&ensp;&ensp;</div>
+                <input v-model="params.code" type="number" placeholder="请输入验证码" class="PTB_1 PL_8 color_666 W_50 fontS_10">
+            </div>
+            <div @click="fnAuthSendMsg" class="PLR_3 PTB_1 B_1_eeeeee borderColor_666 fontS_11 B_radius_10">
+                {{fnSendMsgText}}
+            </div>
+        </div>
+
+
+        <div class="flex_row_left BB_1_eeeeee P_5 W_100">
+            <div class="fontS_13">提现金额&ensp;&ensp;</div>
+            <input v-model="params.price" type="number" placeholder="请输入提现金额" class="PTB_1 PL_8 W_70 fontS_10">
+        </div>
+
+
+        <div class="flex_row_between BB_1_eeeeee P_5 W_100 fontS_11 color_999">
+            <div>可用余额：￥{{UserData.balance}}</div>
+            <div>{{UserData.withdraw_text2}}</div>
+        </div>
+
+        <div class="P_5 W_100 fontS_11 color_red">{{UserData.withdraw_text1}}</div>
+
+
+        <div class="W_80 MLR_auto MT_10 textC PTB_4 bg_F3CB7B B_radius_10" @click="oksub">提交申请</div>
+    </div>
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#withdraw_alipay',
+            data: {
+                downCount:0,
+                UserData:'',
+                params:{
+                    'realname':'',//真实姓名
+                    'alipay':'',//支付宝账号
+                    'mobile':'',//手机号
+                    'code':'',
+                    'type':'alipay',//提现类型
+                    'price':''
+                }
+            },
+            created: function() {
+                var that = this;
+                // that.getUserInfo();
+            },
+
+            computed: {
+                fnSendMsgText:function () {
+                    return this.downCount?'重新获取('+this.downCount+')':'获取验证码';
+                }
+            },
+
+            methods: {
+
+                //获取用户信息
+                getUserInfo:function(){
+                    var that = this;
+                    that.http(UserInfo,'post',{}, function(res) {
+                        console.log(JSON.stringify(res));
+                        if(res.code == 0) {
+                            that.UserData = res.data.info;
+                            that.params.realname = res.data.info.realname;
+                            that.params.alipay = res.data.info.alipay;
+                            that.params.mobile = res.data.info.mobile;
+                        }
+                    });
+                },
+
+
+                // 获取验证码
+                fnAuthSendMsg:function () {
+                    var that = this;
+                    // if(!that.params.mobile){
+                    //     that.$toast('请输入手机号');
+                    //     return false;
+                    // }
+                    // this.http(UserEndMsg,'post',{mobile: that.params.mobile}, function(res){
+                    //     console.log(JSON.stringify(res));
+                    //     that.$toast(res.msg);
+                    //     if(res.code==0){
+                            that.downCount = 60;
+                            var tempFn = setInterval(function (){
+                                if(that.downCount>0) {
+                                    that.downCount --;
+                                } else {
+                                    clearInterval(tempFn);
+                                }
+                            },1000);
+                    //     }
+                    // })
+                },
+
+
+                //提现
+                oksub:function () {
+                    var that = this;
+                    if(that.UserData.is_bind_alipay==0){
+                        that.$toast('请绑定支付宝');
+                        return;
+                    }
+                    if(!that.params.code){
+                        that.$toast('请输入验证码');
+                        return;
+                    }
+                    if(!that.params.price){
+                        that.$toast('请输入提现金额');
+                        return;
+                    }
+                    if(Number(that.params.price)<Number(that.UserData.min_withdraw_money)){
+                        that.$toast(that.UserData.withdraw_text2);
+                        return;
+                    }
+                    // console.log(that.params.price)
+                    // console.log(that.UserData.balance)
+                    if(Number(that.params.price)>Number(that.UserData.balance)){
+                        that.$toast('余额不足');
+                        that.params.price = '';
+                        return;
+                    }
+                    that.$toast.loading({
+                        mask: true,
+                        loadingType:'spinner',
+                        message: '加载中...'
+                    });
+                    that.http(UserWithdraw, 'post',that.params, function(res) {
+                        console.log(JSON.stringify(res));
+                        that.$toast(res.msg);
+                        if (res.code == 0) {
+                            api.execScript({//个人中心
+                                name: 'root',
+                                frameName: 'frame3',
+                                script: 'vm.getUserInfo()'
+                            });
+                            api.execScript({//我的钱包
+                                name: 'my_wallet',
+                                script: 'vm.getUserInfo()'
+                            });
+                            api.execScript({//我的余额记录
+                                name: 'my_walletInfo',
+                                script: 'vm.getlists()'
+                            });
+                            setTimeout(function () {
+                                that.goBack();
+                            },1000)
+                        }
+                    })
+                }
+
+            },
+        })
+    };
+</script>

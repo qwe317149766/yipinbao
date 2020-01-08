@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+    <link rel="stylesheet" href="../../lib/swiper/swiper.min.css">
+    <style>
+        .swiper-slide.swiper-slide-prev{
+            /*width: 20%!important;*/
+        }
+        .swiper-slide.swiper-slide-active{
+            /*width: 150%!important;*/
+            /*width: 60%!important;*/
+            /*text-align: center;*/
+        }
+        /*.swiper-slide.swiper-slide-next{*/
+            /*width: 20%!important;*/
+        /*}*/
+
+    </style>
+</head>
+<body>
+<div id="invited_share" v-cloak class="flex_col_between flex_items_stretch VH100">
+    <div class="header bg_2B2B2B W_100 flex_shrink_0">
+        <div class="P_4 color_fff flex_rowC relative flex_shrink_0 ">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">邀请分享</span>
+        </div>
+    </div>
+
+
+
+    <div class="overflow_y flex_grow_1 H_100">
+        <div class="VH_10"></div>
+        <div class="swiper-container VW_100 H_55">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide" v-for="item in bannerArr">
+                    <img :src="item" alt="" class="H_100 W_100 object_fit_cover">
+                </div>
+            </div>
+        </div>
+
+        <div class="P_5 MT_3">
+            <van-divider class="W_50 MLR_auto fontS_14" :style="{borderColor: '#666'}">邀请规则</van-divider>
+            <p style="line-height: 20px">1. 直接复制邀请码给好友下载APP注册填写
+            <br>2. 分享海报中的二维码已经包含您的邀请信息,好友通过您的邀请码或者包含邀请海报, 下载并使用APP后, 未来Ta的订单佣金您都有奖励, 会自动计入您的账户中</p>
+
+        </div>
+    </div>
+
+
+    <div class="W_100 flex_row_around flex_shrink_0 bg_fff PLR_5 PTB_3 BT_1_eeeeee">
+        <div class="W_40 textC PTB_4 color_fff B_radius_20 bg_999" @click="xitongShare">分享邀请海报</div>
+        <div class="W_40 textC PTB_4 color_fff B_radius_20 bg_FFC41C" @click="isShareTan=true">分享邀请链接</div>
+    </div>
+
+
+    <!--分享-->
+    <van-popup v-model="isShareTan" position="bottom" :duration="0.1">
+        <div class="bg_fff VW_100 VH_25 flex_row_between" @click.stop>
+            <div class="W_50 textC flex_col_start" @click="wechatShare('session')">
+                <img src="../../image/wechat.png" alt="" class="W_25">
+                <p class="PT_2">微信好友</p>
+            </div>
+            <div class="W_50 textC flex_col_start" @click="wechatShare('timeline')">
+                <img src="../../image/wechatquan.png" alt="" class="W_25">
+                <p class="PT_2">朋友圈</p>
+            </div>
+        </div>
+    </van-popup>
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../lib/swiper/swiper.min.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#invited_share',
+            data: {
+                bannerArr:['../../image/1111.jpg','../../image/222.png','../../image/home_bg.png'],
+
+                isShareTan:false,
+                downloadFiles:'http://tiantianpaiimg.vmall99.com/C4ySHywg4Y3W2DV1565682323.png!watermark',
+            },
+            created: function() {
+                var that = this;
+
+
+                that.$nextTick(function () {
+                    that.swiperInit();
+                })
+
+            },
+
+            methods: {
+                //初始化
+                swiperInit:function () {
+                    var mySwiper = new Swiper('.swiper-container',{
+                        effect : 'coverflow',
+                        slidesPerView: 2,
+                        centeredSlides: true,
+                        // initialSlide: 1,
+                    })
+                },
+
+
+                //系统分享
+                xitongShare:function(){
+                    var that = this;
+                    var inShare = api.require('inShare');
+                    that.$toast.loading({
+                        mask: true,
+                        loadingType:'spinner',
+                        message: '正在跳转中...'
+                    });
+                    that.isThere(that.downloadFiles,function () {
+                        inShare.shareImgsTo({
+                            imgPaths: 'fs://image/shareGoodsImg.png',
+                            sendPattern: 'ALL',
+                            dialogTitle: '分享到',
+                            needDecodePath:true
+                        }, function (ret, err) {
+                            that.$toast.clear();
+                            if (ret.status) {
+                                //alert(JSON.stringify(ret));
+                                that.$toast('分享成功');
+                            } else {
+                                //alert(ret.errorMessage);
+                                that.$toast('分享失败');
+                            }
+                        });
+                    })
+                },
+
+
+                //微信朋友圈分享
+                wechatShare:function(scene){
+                    var that = this;
+                    var wx = api.require('wx');
+                    that.isThere(that.downloadFiles,function () {
+                        wx.shareWebpage({
+                            apiKey: '',
+                            scene: scene,
+                            title: '易拼宝',
+                            description: '易拼宝很好用',
+                            thumb: 'fs://image/shareGoodsImg.png',
+                            contentUrl: 'www.baidu.com'
+                        }, function(ret, err) {
+                            if (ret.status) {
+                                that.$toast('分享成功');
+                            } else {
+                                that.$toast('分享失败');
+                            }
+                        });
+                    })
+                },
+
+                //判断分享图片
+                isThere:function (img,fn) {
+                    var that = this;
+                    var fs = api.require('fs');
+                    fs.exist({
+                            path: 'fs://image/shareGoodsImg.png'
+                        },
+                        function (ret, err) {
+                            // alert('检查文件是否存在')
+                            // alert(JSON.stringify(err))
+                            if (ret.exist) {
+                                // alert('文件存在')
+                                fs.remove({ //同步删除本地图片
+                                    path: 'fs://image/shareGoodsImg.png'
+                                }, function (ret, err) {
+                                    if (ret.status) {
+                                        api.download({
+                                            url: img, //网络图片下载 url
+                                            savePath: 'fs://image/shareGoodsImg.png', //图片存储路径
+                                            encodeL: false,
+                                            report: true,
+                                            cache: false,
+                                            allowResume: true
+                                        }, function (res, err) {
+                                            if (res.state == 1) {
+                                                fn();
+                                            }
+                                        });
+                                    } else {
+                                        that.$toast('分享失败');
+                                        // alert(JSON.stringify(err));
+                                    }
+                                });
+                            }
+                            else {
+                                api.download({
+                                    url: img, //网络图片下载 url
+                                    savePath: 'fs://image/shareGoodsImg.png', //图片存储路径
+                                    encodeL: false,
+                                    report: true,
+                                    cache: false,
+                                    allowResume: true
+                                }, function (res, err) {
+                                    if (res.state == 1) {
+                                        fn();
+                                    }
+                                });
+                            }
+                        })
+                },
+
+            },
+        })
+    };
+</script>

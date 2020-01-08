@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />
+</head>
+<body>
+<div id="frame4" v-cloak class="flex_col_start flex_items_stretch VH100 bg_f2f2f2">
+    <div class="PLR_4 bg_linearTB_5F5F5F_F2F2F2 PT_12">
+        <!--头部-->
+        <div class="flex_row_between W_100">
+            <div class="flex_row_left">
+                <img src="../image/1111.jpg" alt="" class="VW_15 VH_15 B_radius_circle B_2_eeeeee borderColor_fff">
+                <div class="PL_3">
+                    <div class="fontS_16 color_fff">没有昵称</div>
+                    <div @click="isstarshow=true" class="flex_row_left fontS_9 bg_eee PLR_2 PTB_1 B_radius_10 MT_2">
+                        <img src="../image/222.png" alt="" style="width: 20px;height: 14px">
+                        <span class="PL_1">3星</span>
+                        <div class="flex_row_left PL_1">会员
+                            <i class="iconfont iconfanhui1 fontS_9 color_FFC41C"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex_row_right color_fff flex_self_start MT_1">
+                <i class="iconfont iconshezhi fontS_20" @click="toPage('setting','./frame4/setting.html')"></i>
+                <i class="iconfont iconservice-fill PL_5 fontS_24" @click="toPage('customer_service','./frame4/customer_service.html')"></i>
+            </div>
+        </div>
+        <div class="flex_row_left MT_3">
+            <div class="flex_row_left fontS_9 bg_eee PLR_2 PTB_1 B_radius_10 MR_3">一星董事
+                <i class="iconfont iconfanhui1 fontS_9 color_FFC41C"></i>
+            </div>
+            <div class="flex_row_left fontS_9 bg_eee PLR_2 PTB_1 B_radius_10">服务商/商户
+                <i class="iconfont iconfanhui1 fontS_9 color_FFC41C"></i>
+            </div>
+        </div>
+
+        <!--收益-->
+        <div class="W_100 bg_fff MT_7 flex_row_between B_radius_10 PTB_3 relative">
+            <div class="W_33 textC BR_1_eeeeee">
+                <div class="fontS_15">456</div>
+                <div class="fontS_11 PT_1">累计收益</div>
+            </div>
+            <div class="W_33 textC BR_1_eeeeee">
+                <div class="fontS_15">123</div>
+                <div class="fontS_11 PT_1">即将到账</div>
+            </div>
+            <div class="W_33 textC">
+                <div class="fontS_15">789</div>
+                <div class="fontS_11 PT_1">余额</div>
+            </div>
+
+            <div @click="isshow=true" style="bottom:1rem" class="fontS_10 flex_rowC bg_orange_200 color_yellow_600 B_radiusL_20 PTB_1 PL_2 absoluteBR">
+                提现<i class="iconfont iconfanhui1 fontS_10"></i>
+            </div>
+        </div>
+
+        <!--平台会员收益-->
+        <div class="W_100 bg_fff MT_4 flex_row_between B_radius_10 PTB_4">
+            <div class="W_40 BR_1_eeeeee textC">
+                <div class="font_weight_bold fontS_16 color_F3CB7B">平台会员收益</div>
+                <div class="color_999 fontS_11 PT_1">收益价值2020元</div>
+            </div>
+            <div class="W_60 PLR_4">
+                <div class="flex_row_between">
+                    <div class="fontS_14 font_weight_bold">会员消费补贴</div>
+                    <div class="PLR_5 PTB_1 color_fff B_radius_20 bg_yellow_600" @click="toPage('water_droplets_library','./frame4/water_droplets_library.html')">水滴库</div>
+                </div>
+                <div class="fontS_10 PT_1">民心所向，福报于民，凝聚你我</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="PLR_4 bg_f2f2f2 PB_5">
+        <!--自营商城订单-->
+        <div class="W_100 bg_fff B_radius_10 PTB_3 MT_4">
+            <div class="PLR_5 PB_3 PT_2 BB_5_eeeeee fontS_14 flex_row_between">
+                <div class="font_weight_bold">自营商城订单</div>
+                <div class="color_999 fontS_10" @click="toPage('my_order','./frame4/my_order.html',{'type':0})">全部订单</div>
+            </div>
+            <div class="flex_row_between PT_5 PB_2">
+                <div class="W_25 textC" @click="toPage('my_order','./frame4/my_order.html',{'type':1})">
+                    <img src="../image/1111.jpg" alt="" class="VW_10 VH_10">
+                    <div class="fontS_11 PT_2">待付款</div>
+                </div>
+                <div class="W_25 textC" @click="toPage('my_order','./frame4/my_order.html',{'type':2})">
+                    <img src="../image/1111.jpg" alt="" class="VW_10 VH_10">
+                    <div class="fontS_11 PT_2">待发货</div>
+                </div>
+                <div class="W_25 textC" @click="toPage('my_order','./frame4/my_order.html',{'type':3})">
+                    <img src="../image/1111.jpg" alt="" class="VW_10 VH_10">
+                    <div class="fontS_11 PT_2">待收货</div>
+                </div>
+                <div class="W_25 textC" @click="toPage('my_order','./frame4/my_order.html',{'type':4})">
+                    <img src="../image/1111.jpg" alt="" class="VW_10 VH_10">
+                    <div class="fontS_11 PT_2">完成</div>
+                </div>
+            </div>
+        </div>
+
+        <!--加入代理立即开通-->
+        <div class="W_100 bg_fff flex_row_between B_radius_10 P_4 MT_4">
+            <div class="flex_row_left">
+                <img src="../image/1111.jpg" alt="" class="VW_30 VH_10">
+                <div class="PL_5">
+                    <div>加入代理享更多权益</div>
+                    <div class="fontS_10 PT_1">省钱 赚钱两不误</div>
+                </div>
+            </div>
+            <div class="color_FFC41C" @click="ljopen">立即开通</div>
+        </div>
+
+        <!--省钱达人中心-->
+        <div class="W_100 bg_fff B_radius_10 PTB_3 MT_4">
+            <div class="PLR_5 PB_3 PT_2 BB_5_eeeeee fontS_14 flex_row_between">
+                <div class="font_weight_bold">省钱达人中心</div>
+                <!--<div class="B_radius_20 color_FFC41C B_1_eeeeee borderColor_FFC41C PLR_2 PTB_1 fontS_10">推广赚钱</div>-->
+            </div>
+            <div class="flex_row_between PT_5 PB_2">
+                <div class="W_25 textC" @click="toPage('tk_earnings','./frame4/tk_earnings.html')">
+                    <img src="../image/1111.jpg" alt="" class="VW_10 VH_10">
+                    <div class="fontS_11 PT_2">淘客收益</div>
+                </div>
+                <div class="W_25 textC" @click="toPage('tk_order','./frame4/tk_order.html')">
+                    <img src="../image/1111.jpg" alt="" class="VW_10 VH_10">
+                    <div class="fontS_11 PT_2">淘客订单</div>
+                </div>
+                <div class="W_25 textC" @click="toPage('my_tkfans','./frame4/my_tkfans.html')">
+                    <img src="../image/1111.jpg" alt="" class="VW_10 VH_10">
+                    <div class="fontS_11 PT_2">粉丝</div>
+                </div>
+                <div class="W_25 textC" @click="toPage('invited_share','./frame0/invited_share.html')">
+                    <img src="../image/1111.jpg" alt="" class="VW_10 VH_10">
+                    <div class="fontS_11 PT_2">邀请好友</div>
+                </div>
+            </div>
+        </div>
+
+        <!---->
+        <div class="W_100 bg_fff B_radius_10 PB_3 MT_4">
+            <div class="flex_row_left flex_wrap PT_2 PB_2">
+                <div class="W_25 textC MT_5" v-for="item in moreArry" @click="toPage(item.name,item.url)">
+                    <img src="../image/1111.jpg" alt="" class="VW_10 VH_10">
+                    <div class="fontS_11 PT_1">{{item.title}}</div>
+                </div>
+            </div>
+        </div>
+
+
+        <!--平台合作者立即开通-->
+        <div class="W_100 bg_fff flex_row_between B_radius_10 P_4 MT_4">
+            <div class="flex_row_left" @click="toPage('audit_certification','./frame4/audit_certification.html',{'type':2})">
+                <img src="../image/1111.jpg" alt="" class="VW_30 VH_10">
+                <div class="PL_5">
+                    <div>加入平台合作者</div>
+                    <div class="fontS_10 PT_1">省钱 赚钱两不误</div>
+                </div>
+            </div>
+            <!--跳申请-->
+            <div class="color_FFC41C" @click="toPage('join_platform_partners','./frame4/join_platform_partners.html')">立即开通</div>
+        </div>
+
+        <!--平台合作中心-->
+        <div class="W_100 bg_fff B_radius_10 PTB_3 MT_4">
+            <div class="PLR_5 PB_3 PT_2 BB_5_eeeeee fontS_14 flex_row_between">
+                <div class="font_weight_bold">平台合作中心</div>
+                <div class="color_999 fontS_10" @click="toPage('platform_cooperation_center','./frame4/platform_cooperation_center.html')">查看更多</div>
+            </div>
+            <div class="flex_row_between PT_5 PB_2">
+                <div class="W_33 textC" @click="toPage('earnings_report','./frame4/earnings_report.html')">
+                    <img src="../image/1111.jpg" alt="" class="VW_10 VH_10">
+                    <div class="fontS_11 PT_2">收益报表</div>
+                </div>
+                <div class="W_33 textC" @click="toPage('fans_order','./frame4/fans_order.html')">
+                    <img src="../image/1111.jpg" alt="" class="VW_10 VH_10">
+                    <div class="fontS_11 PT_2">粉丝订单</div>
+                </div>
+                <div class="W_33 textC" @click="toPage('my_fans','./frame4/my_fans.html')">
+                    <img src="../image/1111.jpg" alt="" class="VW_10 VH_10">
+                    <div class="fontS_11 PT_2">自营粉丝</div>
+                </div>
+            </div>
+        </div>
+
+        <!--必备工具-->
+        <div class="W_100 bg_fff B_radius_10 PTB_3 MT_4">
+            <div class="PLR_5 PB_3 PT_2 fontS_16 flex_row_between">
+                <div class="font_weight_bold">必备工具</div>
+            </div>
+
+            <div class="flex_row_between flex_wrap">
+                <div @click="toPage('article_details','./frame4/article_details.html',{'title':item.title})" v-for="(item,index) in toolsArry" :class="index%2==0&&index==0?'BR_1_eeeeee BB_1_eeeeee':index%2==0?'BR_1_eeeeee':index<=1?'BB_1_eeeeee':''" class="flex_row_between W_50 PLR_5 PTB_3">
+                    <div>
+                        <div class="font_weight_bold fontS_14">{{item.title}}</div>
+                        <div class="fontS_11">{{item.desc}}</div>
+                    </div>
+                    <img src="../image/1111.jpg" alt="" class="VW_10 VH_10">
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!--提现弹框-->
+    <van-popup v-model="isshow" class="B_radius_10 VW_80 textC fontS_14">
+        <div class="PTB_5 flex_rowC BB_5_eeeeee">
+            <div>提现方式</div>
+            <i class="iconfont iconguanbi fontS_16 color_f59000 absoluteTR PR_3 PT_3" @click="isshow=false"></i>
+        </div>
+        <div class="PTB_5 BB_1_eeeeee" @click="isshow=false;toPage('withdraw_alipay','./frame4/withdraw_alipay.html')">支付宝提现</div>
+        <div class="PTB_5" @click="isshow=false;toPage('withdraw_bank','./frame4/withdraw_bank.html')">银行卡提现</div>
+    </van-popup>
+
+
+    <!--星级会员弹框-->
+    <van-popup v-model="isstarshow" class="VW_80 textC fontS_14 bg_transparent">
+        <i @click="isstarshow=false" class="iconfont iconguanbi color_FFC41C MB_5 flex_row_right fontS_18"></i>
+        <div class="bg_fff B_radius_10">
+            <div class="flex_row_between P_5" v-for="(xing,index) in starArry" :class="xing.dq==1?'color_red':''">
+                <div class="flex_row_left flex_self_end H_100 W_40 relative">
+                    <div class="W_80 textC">{{xing.title}}</div>
+                    <img src="../image/qq.png" alt="" class="W_20">
+                </div>
+
+                <div class="W_50 flex_row_around">
+                    <div>满￥{{xing.money}}</div>
+                    <div>{{xing.zhekou}}折</div>
+                </div>
+            </div>
+        </div>
+    </van-popup>
+
+</div>
+</body>
+</html>
+<script src="../script/api.js"></script>
+<script src="../lib/vue/vue.js"></script>
+<script src="../lib/vant/vant.min.js"></script>
+<script src="../lib/fastclick.min.js"></script>
+<script src="../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#frame4',
+            data: {
+                isstarshow:false,//提星级会员弹框
+                isshow:false,//提现弹框
+                moreArry:[
+                    {'title':'账单明细','name':'billing_details','url':'./frame4/billing_details.html'},
+                    {'title':'购物车','name':'shopping_cart','url':'./frame4/shopping_cart.html'},
+                    {'title':'找回订单','name':'back_orders','url':'./frame4/back_orders.html'},
+                    {'title':'商家中心','name':'business_center','url':'./frame4/business_center.html'},
+                    {'title':'收藏夹','name':'goods_collection','url':'./frame4/goods_collection.html'},
+                    {'title':'消息通知','name':'news','url':'./frame0/news.html'},
+                    {'title':'钱包','name':'my_wallet','url':'./frame4/my_wallet.html'},
+                ],
+
+                toolsArry:[
+                    {'title':'免费领券','desc':'免费领现金'},
+                    {'title':'改变未来','desc':'从易拼宝开始'},
+                    {'title':'关于水滴','desc':'送腾讯会员'},
+                    {'title':'推广规则','desc':'推广规则'},
+                ],
+
+                starArry:[
+                    {'title':'一星会员','money':'100','zhekou':'9.9','dq':0},
+                    {'title':'二星会员','money':'500','zhekou':'9.5','dq':0},
+                    {'title':'三星会员','money':'1000','zhekou':'8.0','dq':1},
+                    {'title':'四星会员','money':'10000','zhekou':'7.0','dq':0},
+                    {'title':'五星会员','money':'200000','zhekou':'5.5','dq':0},
+                ]
+            },
+
+            created:function () {
+                var that = this;
+
+            },
+
+            mounted:function(){
+                var that = this;
+
+            },
+
+            methods: {
+                //立即开通
+                ljopen:function () {
+                    api.execScript({
+                        name: "root",
+                        frameName:'tabBar',
+                        script:'vm.active = 1;'
+                    });
+                    api.execScript({
+                        name:'root',
+                        script:'vm.randomSwitchBtn(1);'
+                    });
+                }
+            },
+        })
+    }
+</script>
+
+
+
+

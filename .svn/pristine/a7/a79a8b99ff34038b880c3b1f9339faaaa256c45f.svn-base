@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>截取头像</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+    <style media="screen">
+        #printscreen {
+            height: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="printscreen" class="flex_row_between fixedBL PLR_5 W_100 fontS_16 bg_2B2B2B color_orange_400">
+        <span @click="callof()">取消</span>
+        <span @click="rest()">重置</span>
+        <span @click="goform()">确定</span>
+    </div>
+</body>
+
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/common.js"></script>
+<script type="text/javascript">
+    apiready = function() {
+        window.vm = new Vue({
+            el: "#printscreen",
+            data: {
+                FNImageClip: api.require('FNImageClip'),
+                type:''
+            },
+            created: function() {
+                var that = this;
+                if(api.pageParam.type){
+                    that.type = api.pageParam.type;
+                }
+                that.setupimg();
+
+            },
+            methods: {
+                //设置上传图片
+                setupimg:function(){
+                    var that = this;
+                    var fs = api.require('fs');
+                    fs.remove({
+                        path: 'fs://image/resu.png'
+                    }, function(ret, err) {
+                        if (ret.status) {
+                            // alert(JSON.stringify(ret));
+                        } else {
+                            // alert(JSON.stringify(err));
+                        }
+                    });
+
+                    api.getPicture({
+                        sourceType: 'album',
+                        encodingType: 'jpg',
+                        mediaValue: 'pic',
+                        destinationType: 'base64',
+                        allowEdit: true,
+                        quality: 50,
+                        targetWidth: '',
+                        targetHeight: '',
+                        saveToPhotoAlbum: false
+                    }, function(ret, err) {
+                        if (ret) {
+                            that.FNImageClip.open({
+                                rect: {
+                                    x: 0,
+                                    y: 0,
+                                    w: api.winWidth,
+                                    h: api.winHeight - 50
+                                },
+                                srcPath: ret.data,
+                                style: {
+                                    mask: 'rgba(52, 52, 52, .5)',
+                                    clip: {
+                                        w: 200,
+                                        h: 200,
+                                        x: api.winWidth / 2 - 100,
+                                        y: api.winHeight / 2 - 100,
+                                        borderColor: '#ff9600',
+                                        borderWidth: 1,
+                                        appearance: 'rectangle'
+                                    }
+                                },
+                                fixedOn: "",
+                                mode: 'image'
+                            }, function(ret, err) {
+                                if (ret) {
+
+                                } else {
+
+                                }
+                            });
+                        }
+                    });
+                },
+
+
+                //上传
+                goform: function() {
+                    var that = this;
+                    var timestamp = new Date().getTime();
+                    that.FNImageClip.save({
+                        destPath: 'fs://image/' + timestamp + '.png',
+                        copyToAlbum: false,
+                        quality: 1
+                    }, function(ret, err) {
+                        if (ret) {
+                            function convertImgToBase64(url, callback, outputFormat) {
+                                var canvas = document.createElement('CANVAS'),
+                                    ctx = canvas.getContext('2d'),
+                                    img = new Image;
+                                img.crossOrigin = 'Anonymous';
+                                img.onload = function() {
+                                    canvas.height = img.height;
+                                    canvas.width = img.width;
+                                    ctx.drawImage(img, 0, 0);
+                                    var dataURL = canvas.toDataURL(outputFormat || 'image/png');
+                                    callback.call(this, dataURL);
+                                    canvas = null;
+                                };
+                                img.src = url;
+                            }
+
+                            convertImgToBase64(ret.destPath, function(base64Img) {
+                                that.$toast.loading({
+                                    mask: true,
+                                    loadingType:'spinner',
+                                    message: '正在上传...'
+                                });
+
+                                that.http(userHeading, 'post', {
+                                    avatar: base64Img
+                                }, function(res) {
+                                    if (res.code == 0) {
+                                        that.FNImageClip.close();
+                                        // that.$toast.clear();
+                                        that.$toast('上传成功');
+                                        api.execScript({
+                                            name: 'personal_data',
+                                            script: 'vm.getUserInfo()'
+                                        });
+                                        api.execScript({
+                                            name: 'root',
+                                            frameName: 'frame3',
+                                            script: 'vm.getUserInfo()'
+                                        });
+                                        setTimeout(function () {
+                                            that.goBack();
+                                        },1000)
+                                    }
+                                })
+                            });
+                        } else {
+
+                        }
+                    });
+                },
+
+                //重置
+                rest: function() {
+                    var that = this;
+                    that.FNImageClip.reset();
+                },
+
+                // 取消
+                callof: function() {
+                    var that = this;
+                    that.goBack();
+                },
+            }
+        })
+    }
+</script>

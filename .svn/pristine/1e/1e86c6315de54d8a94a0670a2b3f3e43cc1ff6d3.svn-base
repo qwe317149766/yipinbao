@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width,viewport-fit=cover" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" href="lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="css/api.css" />
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+    <script src="../yitaijin_app/script/const.js"></script>
+</head>
+<body>
+<div id="app" v-cloak>
+
+</div>
+</body>
+<script src="lib/api.js"></script>
+<script src="script/const.js"></script>
+<script src="script/rsa.js"></script>
+<script src="script/aes.js"></script>
+<script src="lib/vue/vue.js"></script>
+<script src="script/common.js"></script>
+<script src="lib/fastclick.min.js"></script>
+<script src="lib/vant/vant.min.js"></script>
+<script src="lib/jquery-3.0.0.min.js"></script>
+<script type="text/javascript">
+    apiready = function(){
+        window.vm = new Vue({
+            el: '#app',
+            data: {
+                map:api.require('bMap'),
+                ajpush: api.require('ajpush')
+            },
+            created:function(){
+                var that = this;
+                // $api.setStorage('userInfo', {token:'111111'});
+                that.initEventListener();
+                that.initJpush();
+                that.getSdAuth();
+            },
+            mounted:function () {
+                var that = this;
+                that.funIniGroup();
+            },
+
+            methods: {
+                // 初始化 状态栏 返回监听
+                initEventListener: function() {
+                    var that = this;
+                    if(api.systemType === 'ios'){
+                        that.map.initMapSDK(function(ret,err) {
+                            if (ret.status) {
+                                // console.log('地图模块初始化成功!');
+                                that.getcity();
+                            }
+                        });
+                    }else {
+                        that.getcity();
+                    }
+                    api.addEventListener({ //关闭Window的事件
+                        name: 'keyback'
+                    }, function(ret, err){
+                        that.dbClickkExit();
+                    });
+
+                    // ios推送监听
+                    api.addEventListener({
+                        name: 'noticeclicked'
+                    }, function (ret, err){
+                        if (ret && ret.value) {
+                            var ajpush = ret.value;
+                            var extra = ajpush.extra;
+                            that.jpushSkip(extra);
+                        }
+                    });
+                    //Android 推送监听
+                    api.addEventListener({
+                        name: 'appintent'
+                    }, function (ret, err) {
+                        // console.log(JSON.stringify(ret));
+                        if (ret && ret.appParam.ajpush) {
+                            var ajpush = ret.appParam.ajpush;
+                            var extra = ajpush.extra;
+                            that.jpushSkip(extra);
+                        }
+                    })
+                },
+                //极光推送
+                initJpush: function() {
+                    var that = this;
+                    var appBundle = api.systemType;
+                    if (appBundle === 'android') {
+                        that.ajpush.init(function(ret) {
+                            console.log(JSON.stringify(ret));
+                            if (ret && ret.status) {
+                                that.bindJpush();
+                            } else {
+                                console.log("ajpush.init error");
+                            }
+                        });
+                    } else if (appBundle === 'ios') {
+                        that.bindJpush();
+                    }
+                    //打开软件时清除ios角标
+                    that.ajpush.setBadge({
+                        badge:0
+                    });
+
+                    //在前台时自行处理的回调
+                    that.ajpush.setListener(debounce(function (ret){
+                        console.log(JSON.stringify(ret));
+                        // console.log(JSON.stringify(that.userInfo))
+                        if ($api.getStorage('userInfo') && $api.getStorage('userInfo').token) {
+                            if (ret) {
+                                var content = ret['0'].content;
+                                var extra = ret['0'].extra;
+                                if(api.systemType === 'ios'){
+                                    api.confirm({
+                                        title: '提示',
+                                        msg: content,
+                                        buttons: ['是', '否']
+                                    }, function (ret, err) {
+                                        var index = ret.buttonIndex;
+                                        if (index == 1) {
+                                            that.jpushSkip(extra);
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    },3000));
+                    function debounce(func,wait) {
+                        var timeout;
+                        return function (ret) {
+                            if (timeout) clearTimeout(timeout);
+                            var callNow = !timeout;
+                            timeout = setTimeout(function() {
+                                timeout = null;
+                            }, wait);
+                            if (callNow) func.call(this, arguments, ret);
+                        }
+                    }
+                },
+                //设备id绑定极光推送
+                bindJpush: function() {
+                    var that = this;
+                    if ($api.getStorage('userInfo') && $api.getStorage('userInfo').token) {
+                        console.log('------------------------------------');
+                        that.ajpush.getRegistrationId(function (ret,err) {
+                            // console.log('1111111111111');
+                            console.log(JSON.stringify(ret));
+                            // console.log(JSON.stringify(err));
+                            if (ret && ret.id) {
+                                var registrationId = ret.id;
+                                that.http(UserAddJpushId, 'post', {registerID: registrationId}, function (res) {
+                                    console.log(JSON.stringify(res));
+                                    if (res.code == 0) {
+                                        var param = {
+                                            alias: registrationId,
+                                            tags: []
+                                        };
+                                        that.ajpush.bindAliasAndTags(param, function (ret) {
+
+                                            var statusCode = ret.statusCode;
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                },
+                //推送跳转的方法
+                jpushSkip: function(extra){
+                    var that = this;
+                    // console.log(JSON.stringify(extra));
+                    that.toPage('push_list','./html/frame4/push_list.html');
+                    that.ajpush.setBadge({
+                        badge:0
+                    });
+                },
+
+                //获取 存储 和定位权限
+                getSdAuth:function(){
+                    var that = this;
+                    var resultList = api.hasPermission({
+                        list:['storage','location']
+                    });
+                    if(!resultList[0].granted) {
+                        api.requestPermission({
+                            list:[resultList[0].name],
+                            code:1
+                        }, function(ret, err){
+                            if(!ret.list[0].granted && !ret.never) {
+                                return that.getSdAuth();
+                            }
+                        });
+                    }
+                },
+
+
+
+                //获取当前位置
+                getcity:function(){
+                    var that = this;
+                    that.map.getLocation({
+                        accuracy: '100m',
+                        autoStop: true,
+                        filter: 1
+                    }, function (ret, err) {
+                        // console.log(JSON.stringify(ret));
+                        if (ret.status) {
+                            that.map.getNameFromCoords({
+                                lon: ret.lon,
+                                lat: ret.lat
+                            }, function (res, err) {
+                                // console.log(JSON.stringify(res));
+                                // console.log(JSON.stringify(err));
+                                if (res.status) {
+                                    $api.setStorage('city', res.city);
+                                }
+                            });
+                        } else {
+                            $api.setStorage('city', '郑州市');
+                            // that.$toast('请打开手机定位');
+                            console.log(err.code);
+                        }
+                    });
+                },
+
+
+                //打开底部tabbar
+                opentabbar:function(){
+                    api.openFrame({
+                        name: 'tabBar',
+                        url: './html/tabBar.html',
+                        bounces:false,
+                        rect: {
+                            x: 0,
+                            y: api.winHeight - 60,
+                            w: 'auto',
+                            h: 60
+                        },
+                        pageParam: {}
+                    });
+                },
+
+
+                //跳转frame
+                randomSwitchBtn: function(idx) {
+                    var that = this;
+                    // that.active = idx;
+                    if((idx === 3 || idx === 4) && !($api.getStorage('userInfo') && $api.getStorage('userInfo').token)) {
+                        api.execScript({
+                            frameName:'tabBar',
+                            script:'vm.active=0'
+                        });
+                        api.setFrameGroupIndex({
+                            name: 'group',
+                            index: 0,
+                            reload: false
+                        });
+                        that.toPage('login','./html/login/login.html');
+                    }else {
+                        api.setFrameGroupIndex({
+                            name: 'group',
+                            index: idx,
+                            reload: false
+                        });
+                    }
+                },
+                //载入frame组
+                funIniGroup: function(){
+                    var that = this;
+                    var frames = [];
+                    for (var i = 0; i < 5; i++) {
+                        frames.push({
+                            name: 'frame'+i,
+                            url: './html/frame'+i+'.html',
+                            bounces:false,
+                            reload:true,
+                            bgColor: '#fff',
+                            pageParam: {}
+                        })
+                    }
+                    api.openFrameGroup({
+                        name: 'group',
+                        scrollEnabled: false,
+                        rect: {
+                            x: 0,
+                            y: 0,
+                            w: api.winWidth,
+                            // h: api.winHeight - $api.dom("#tabbar").offsetHeight
+                            h: api.winHeight - 50
+                        },
+                        index: 0,
+                        // preload: frames.length,
+                        preload: 2,
+                        frames: frames
+                    }, function (ret, err) {
+                        that.opentabbar();
+                    });
+                },
+            },
+        })
+    }
+</script>
+
+</html>

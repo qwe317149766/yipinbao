@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="my_fans" v-cloak class="flex_col_between flex_items_stretch VH100">
+    <div class="header W_100 flex_shrink_0 bg_2B2B2B color_fff">
+        <div class="P_4 flex_rowC relative flex_shrink_0">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">我的粉丝</span>
+        </div>
+    </div>
+
+
+    <div class="overflow_y flex_grow_1">
+        <div class="W_100">
+
+            <div v-if="list.length==0" class="fontS_16 color_999 absoluteTBLR M_auto VH_40 VW_50 flex_rowC">您还没有粉丝哦！</div>
+
+            <div class="P_4 BB_1_eeeeee" v-if="list.length>0" v-for="(item,index) in list">
+                <div class="flex_row_between ">
+                    <div class="flex_row_left">
+                        <img :src="item.img" alt="" class="VH_10 VW_10 B_radius_circle">
+                        <div class="PL_3">
+                            <div>{{item.username}}</div>
+                            <div class="PT_2">{{item.mobile}}</div>
+                        </div>
+                    </div>
+                    <div class="flex_row_right" onclick="addDom($(this))" :data="item.uid" :num="item.num">
+                        <div class="PR_3">团队人数：{{item.num}}</div>
+                        <div class="VH_5 VW_5" v-show="item.num>0">
+                            <i class="iconfont iconxia color_FFC41C font_weight_bold"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../lib/jquery-3.0.0.min.js"></script>
+<script src="../../script/rsa.js"></script>
+<script src="../../script/aes.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    function addDom(_this) {
+        // console.log(_this.parent());
+        if(_this.attr('isCheck')){
+            _this.removeAttr('isCheck');
+            _this.find('i').addClass('iconxia');
+            _this.find('i').removeClass('iconshang1');
+            for (var i=0; i< _this.attr('num');i++) {
+                _this.parent().next('div').remove();
+            }
+        }else {
+            // console.log(_this.find('i'));
+            var oData = {
+                uid: _this.attr('data')
+            };
+            if(_this.attr('num')<=0){
+                return false;
+            }
+            // console.log(JSON.stringify(oData));
+            _this.find('i').addClass('iconshang1');
+            _this.find('i').removeClass('iconxia');
+            _this.attr('isCheck', 'true');
+            vm.$toast.loading({
+                mask: true,
+                loadingType:'spinner',
+                message: '加载中...'
+            });
+            vm.http(shopPartnerFans, 'post',oData, function (res) {
+                console.log(JSON.stringify(res));
+                vm.$toast.clear();
+                if (res.code == 0) {
+                    var hh = res.data;
+                    var isShow = 'none';
+                    for (var i=0; i< hh.length;i++) {
+                        if(hh[i].num <= 0) {
+                            isShow = 'none'
+                        } else {
+                            isShow = 'block'
+                        }
+                        var oDiv = '<div class="PL_4 PT_3 animated fadeIn"><div class="flex_row_between"><div class="flex_row_left"><img src="'+hh[i].img+'" alt="" class="VH_10 VW_10 B_radius_circle"><div class="PL_3"><div>'+hh[i].username+'</div> <div class="PT_2">'+hh[i].mobile+'</div> </div> </div> <div class="flex_row_right" onclick=\'addDom($(this))\'  data="' + hh[i].uid + '" num="'+hh[i].num+'"> <div class="PR_3">团队人数：'+hh[i].num+'</div> <div class="VH_5 VW_5" style="display:' + isShow + '"><i class="iconfont iconxia color_FFC41C font_weight_bold"></i></div> </div> </div></div>';
+                        _this.parent().parent().append(oDiv);
+                    }
+                }else {
+                    vm.$toast(res.msg)
+                }
+            })
+        }
+        // console.log(_this.attr('isCheck'));
+    }
+</script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#my_fans',
+            data: {
+                list:[]
+            },
+            created: function() {
+                var that = this;
+                that.getdata();
+            },
+
+
+            methods: {
+                //数据
+                getdata:function(){
+                    var that = this;
+                    that.$toast.loading({
+                        mask: true,
+                        loadingType:'spinner',
+                        message: '加载中...'
+                    });
+                    that.http(shopPartnerFans, 'post', {}, function (res) {
+                        that.$toast.clear();
+                        console.log(JSON.stringify(res));
+                        if (res.code == 0) {
+                            that.list = res.data;
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                },
+
+            },
+        })
+    };
+</script>

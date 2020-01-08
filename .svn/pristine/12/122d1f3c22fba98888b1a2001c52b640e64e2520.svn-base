@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="tk_balance_detail" v-cloak class="flex_col_between flex_items_stretch VH100">
+    <div class="header W_100 flex_shrink_0 bg_2B2B2B color_fff">
+        <div class="P_4 flex_rowC relative flex_shrink_0">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">余额明细</span>
+        </div>
+    </div>
+
+
+    <div class="overflow_y flex_grow_1">
+        <div class="VH_30 flex_colC BB_6_eeeeee">
+            <div class="fontS_18 font_weight_bold">￥9999.99</div>
+            <div class="PT_4 fontS_13">余额</div>
+        </div>
+        <div class="W_100">
+            <van-tabs v-model="active" color="#F3CB7B" :border="false">
+                <van-tab v-for="item in navArry" :title="item"></van-tab>
+            </van-tabs>
+        </div>
+        <div class="BB_1_eeeeee P_6" v-for="item in 3">
+            <div class="fontS_14">淘宝订单佣金：165465464684654654654</div>
+            <div class="flex_row_between fontS_13 PT_2">
+                <div class="color_999">2019-09-08</div>
+                <div class="color_F3CB7B">+1.34</div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#tk_balance_detail',
+            data: {
+                active:0,
+                navArry:['淘宝','天猫','京东','拼多多']
+            },
+            created: function() {
+                var that = this;
+
+            },
+
+            methods: {
+
+
+
+            },
+        })
+    };
+</script>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="my_tkfans" v-cloak class="flex_col_between flex_items_stretch VH100">
+    <div class="header W_100 flex_shrink_0 bg_2B2B2B color_fff">
+        <div class="P_4 flex_rowC relative flex_shrink_0">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">我的粉丝</span>
+        </div>
+    </div>
+
+
+    <div class="overflow_y flex_grow_1">
+        <div class="flex_row_between bg_ccc PLR_3 PT_4 PB_2">
+            <div class="W_85 flex_row_left bg_fff B_radius_5 P_2">
+                <i class="iconfont iconsearch"></i>
+                <input type="search" placeholder="请输入查询的ID" class="PL_2 W_100">
+            </div>
+            <div class="fontS_15">搜索</div>
+        </div>
+
+        <div class="PTB_6 PLR_3 flex_row_left">
+            <div @click="active=index" class="flex_row_left W_25" v-for="(item,index) in typeArry">
+                <i :class="active==index?'iconyuan':'iconyuan1'" class="iconfont  color_F3CB7B VW_5 VH_5"></i>
+                <div class="PL_1">{{item}}</div>
+            </div>
+        </div>
+
+
+        <div class="BT_1_eeeeee borderColor_999 MT_3">
+            <div class="flex_row_between bg_f2f2f2 PTB_6 fontS_14 color_999">
+                <div class="textC W_25">账号ID</div>
+                <div class="textC W_25">用户名</div>
+                <div class="textC W_50">注册时间</div>
+            </div>
+            <div class="PTB_6 BB_1_eeeeee fontS_13 borderColor_999 flex_row_between" v-for="list in 3">
+                <div class="textC W_25">123132</div>
+                <div class="textC W_25">茉莉</div>
+                <div class="textC W_50">2019-08-12 23:00:00</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#my_tkfans',
+            data: {
+                active:0,
+                typeArry:['O2O小店','一级粉丝','二级粉丝','团队']
+            },
+            created: function() {
+                var that = this;
+
+            },
+
+            methods: {
+
+
+
+            },
+        })
+    };
+</script>

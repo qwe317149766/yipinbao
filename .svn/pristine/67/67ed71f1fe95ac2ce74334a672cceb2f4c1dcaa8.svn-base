@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="business_center" v-cloak class="flex_col_between flex_items_stretch VH100">
+    <div class="header W_100 flex_shrink_0 bg_2B2B2B color_fff">
+        <div class="P_4 flex_rowC relative flex_shrink_0">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">商家中心</span>
+        </div>
+    </div>
+
+
+    <div class="overflow_y flex_grow_1 bg_f2f2f2">
+        <div class="bg_fff">
+            <div class="bg_2B2B2B ">
+                <div class="flex_row_between PTB_5 PLR_7">
+                    <div class="flex_row_left">
+                        <img src="../../image/222.png" alt="" class="VW_15 VH_15 B_radius_circle">
+                        <div class="color_fff PL_2">
+                            <div class="fontS_14">特步旗舰店</div>
+                            <img src="../../image/1111.jpg" alt="" class="VW_30 VH_5 MT_3">
+                        </div>
+                    </div>
+
+                    <div class="flex_rowC PTB_2 PLR_3 bg_fff B_radius_20 color_FFC41C" @click="isshow=true">
+                        <i class="iconfont iconqianbao color_FFC41C"></i>
+                        <span class="PL_1">转入钱包</span>
+                    </div>
+                </div>
+                <div class="PTB_6 flex_row_between color_fff">
+                    <div class="textC W_33 fontS_13">
+                        <div class="color_ccc">订单收入(元)</div>
+                        <div class="PT_2">999.99</div>
+                    </div>
+                    <div class="textC W_33 fontS_13">
+                        <div class="color_ccc">已转钱包(元)</div>
+                        <div class="PT_2">0.00</div>
+                    </div>
+                    <div class="textC W_33 fontS_13">
+                        <div class="color_ccc">未结算(元)</div>
+                        <div class="PT_2">0.00</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex_row_between PLR_4 PTB_6">
+                <div><span class="BL_3_eeeeee borderColor_FFC41C PL_3 fontS_14">订单收益</span></div>
+            </div>
+        </div>
+
+        <div class="P_4 bg_fff M_2 MT_5 B_radius_10">
+            <div class="P_3 BB_1_eeeeee flex_row_between relative">
+                <div class="fontS_15">当天订单收益</div>
+            </div>
+            <div class="flex_row_between MT_6">
+                <div class="W_50 textC">
+                    <div class="color_999 fontS_13">当天订单数</div>
+                    <div class="PT_3">0</div>
+                </div>
+                <div class="W_50 textC">
+                    <div class="color_999 fontS_13">总订单数</div>
+                    <div class="PT_3">0</div>
+                </div>
+            </div>
+
+            <div class="P_3 BB_1_eeeeee flex_row_between MT_6">
+                <div class="fontS_15">总订单收益</div>
+            </div>
+            <div class="flex_row_between MT_6">
+                <div class="W_50 textC">
+                    <div class="color_999 fontS_13">当天收益</div>
+                    <div class="PT_3">￥0</div>
+                </div>
+                <div class="W_50 textC">
+                    <div class="color_999 fontS_13">总收益</div>
+                    <div class="PT_3">￥0</div>
+                </div>
+            </div>
+        </div>
+
+        <div @click="toPage('business_transfer_record','./business_transfer_record.html')" class="PTB_5 PLR_6 fontS_15 bg_fff MT_5">转入记录</div>
+    </div>
+
+    <!--转增弹框-->
+    <van-popup v-model="isshow" @closed="money=''" class="B_radius_5 VW_80 P_8 color_FFD490">
+        <div class="fontS_15 textC">请输入转出金额</div>
+
+        <div class="B_1_eeeeee borderColor_999 MT_10 PB_2">
+            <input type="number" v-model="money" placeholder="请输入金额" class="fontS_12 W_100 PTB_3 textC">
+        </div>
+
+        <div class="flex_row_between MT_5">
+            <div class="textC PTB_3 W_30 B_1_eeeeee borderColor_999 B_radius_5" @click="isshow=false">取消</div>
+            <div class="textC PTB_3 W_30 B_1_eeeeee borderColor_999 B_radius_5">确认</div>
+        </div>
+    </van-popup>
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#business_center',
+            data: {
+                isshow:false,
+                money:''
+            },
+            created: function() {
+                var that = this;
+
+            },
+
+            methods: {
+
+
+
+            },
+        })
+    };
+</script>

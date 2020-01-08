@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="online_goods_info" v-cloak class="flex_col_start flex_items_stretch VH100">
+    <div class="overflow_y flex_grow_1">
+        <!-- 轮播 -->
+        <div class="relative VH_90 W_100">
+            <van-swipe @change="onChange" :autoplay="3000" :show-indicators="false" class="H_100 W_100">
+                <van-swipe-item v-for="(item,idx) of bannerArr" :key="idx">
+                    <img :src="item.pic" alt="" class="W_100 H_100 object_fit_cover">
+                </van-swipe-item>
+            </van-swipe>
+            <div class="absoluteBR color_fff PLR_5 PTB_1 bg_rgba_000 B_radius_10" style="right: 1rem;bottom: 1rem">
+                {{ current + 1 }}/{{bannerArr.length}}
+            </div>
+        </div>
+
+
+        <!--商品信息-->
+        <div class="P_4">
+            <div class="flex_row_between">
+                <div class="color_red font_weight_bold fontS_16">&ensp;&yen;4556</div>
+                <div class="fontS_10 PLR_4 PTB_1 bg_F3CB7B B_radius_5 color_fff">包邮</div>
+            </div>
+
+            <div class="flex_row_between PT_4 fontS_10 color_666">
+                <div>价格：￥56.00</div>
+                <div>月销：200</div>
+            </div>
+
+            <div class="fontS_14 PT_2">啥范德萨范德萨发的广泛地的非官方的三个</div>
+
+        </div>
+
+
+        <div class="P_4 flex_row_between BB_8_eeeeee BT_8_eeeeee" @click="isshowgg=true">
+            <div>已选择：X{{shopnum}}</div>
+            <i class="iconfont iconfanhui1 color_FFC41C fontS_14"></i>
+        </div>
+
+
+        <!--店铺信息-->
+        <div class="W_100">
+            <div class="P_5 flex_row_between BB_3_eeeeee">
+                <div class="flex_row_left">
+                    <img src="../../image/1111.jpg" alt="" class="VW_10 VH_10">
+                    <div class="PL_4">
+                        <div class="PB_1">特步专卖店</div>
+                        <div class="PLR_2 PTB_1 textC MT_1 fontS_10 bg_2B2B2B color_fff B_radius_10">合作商户</div>
+                    </div>
+                </div>
+                <div class="flex_rowC color_999" @click="toPage('merchants_shop','../frame0/merchants_shop.html')">
+                    <span>查看店铺所有优惠</span>
+                    <i class="iconfont iconfanhui1 fontS_13"></i>
+                </div>
+            </div>
+        </div>
+
+
+        <!--商品详情-->
+        <div class="W_100">
+            <div class="PTB_4 PLR_6 flex_row_between BT_1_eeeeee BB_1_eeeeee">
+                <div class="fontS_14">查看宝贝详情</div>
+                <i class="iconfont " :class="isshow?'iconshang1':'iconxia'" @click="isshow=!isshow"></i>
+            </div>
+
+            <div class="W_100" v-if="isshow">
+                <img v-for="pic in bannerArr" :src="pic.pic" alt="">
+            </div>
+        </div>
+    </div>
+
+
+    <!--底部-->
+    <div class="W_95 MLR_auto flex_row_between flex_shrink_0 PTB_2 BT_1_eeeeee">
+        <div class="W_15 textC fontS_10">
+            <i class="iconfont iconai204 fontS_20 color_FFC41C"></i>
+            <p>店铺</p>
+        </div>
+        <div class="W_15 textC fontS_10" @click="issc=!issc">
+            <i class="iconfont fontS_20 color_FFC41C" :class="issc?'iconshoucang':'iconshoucang1'"></i>
+            <p>收藏</p>
+        </div>
+        <div class="W_100 flex_rowC color_fff">
+            <div class="textC W_49 bg_F3CB7B B_radiusL_20 PTB_4" @click="isshowgg=true">加入购物车</div>
+            <div class="textC W_49 bg_ff604a B_radiusR_20 PTB_4" @click="isshowgg=true">立即购买</div>
+        </div>
+    </div>
+
+    <div class="absoluteTL B_radius_circle VW_10 VH_10 flex_rowC" style="left: 1rem;top:2rem;background: rgba(0,0,0,.5)">
+        <i class="iconfont iconfanhui color_fff fontS_16" @click="goBack()"></i>
+    </div>
+
+
+    <!--选择规格-->
+    <van-popup v-model="isshowgg" @closed="" position="bottom" round>
+        <div class="P_5">
+            <div class="flex_row_left PB_5">
+                <img :src="goodsdata.images[0]" alt="" v-if="goodsdata.images" class="flex_shrink_0 VW_25 VH_25 object_fit_cover zwshangpin">
+                <div class="W_100 PL_5 flex_col_between VH_25">
+                    <div class="flex_row_right W_100">
+                        <i class="iconfont iconguanbi color_999" @click="isshowgg=!isshowgg"></i>
+                    </div>
+                    <div class="color_red fontS_16 font_weight_bold W_100">
+                        ￥<span>{{attrprice?attrprice:goodsdata.spe_price}}</span>
+                    </div>
+                    <div class="W_100 fontS_11">库存{{stock?stock:goodsdata.total}}件</div>
+                    <div class="W_100 fontS_11">选择规格{{(attr1||attr2)?('：'+attr1 +' '+ attr2):''}}</div>
+                </div>
+            </div>
+
+            <!--规格1-->
+            <div class="PTB_5" v-if="goodsdata.key_arr&&goodsdata.key_arr.length>0">
+                <div class="fontS_14">{{goodsdata.key_arr[0]?goodsdata.key_arr[0]:''}}</div>
+                <div class="PLR_5 PT_5 flex_row_left flex_wrap">
+                    <div class="PTB_2 PLR_5 B_radius_20 MR_3 MB_3" :class="attr1==item?'bg_F3CB7B':'bg_eee'" @click="clickSelectionAttr(item)" v-for="(item,index) in goodsdata.field_arr[0][0]">{{item}}</div>
+                </div>
+            </div>
+
+            <!--规格2-->
+            <div class="PTB_5" v-if="goodsdata.key_arr&&goodsdata.key_arr.length>0">
+                <div class="fontS_14">{{goodsdata.key_arr[1]?goodsdata.key_arr[1]:''}}</div>
+                <div class="PLR_5 PT_5 flex_row_left flex_wrap">
+                    <div class="PTB_2 PLR_5 B_radius_20 MR_3 MB_3" :class="attr2==item?'bg_F3CB7B':'bg_eee'" @click="clickSelectionAttr1(item)" v-for="(item,index) in goodsdata.field_arr[1][0]">{{item}}</div>
+                </div>
+            </div>
+
+
+            <!--数量-->
+            <div class="PTB_5 flex_row_between">
+                <div>购买数量</div>
+                <van-stepper v-model="shopnum" />
+            </div>
+
+            <div class="W_80 flex_rowC MLR_auto MT_5 flex_shrink_0">
+                <div class="W_50 textC PTB_4 B_radiusL_20 color_fff bg_F3CB7B" @click="">加入购物车</div>
+                <div class="W_50 textC PTB_4 B_radiusR_20 color_fff bg_ff604a" @click="okljgm">立即购买</div>
+            </div>
+        </div>
+    </van-popup>
+
+</div>
+</body>
+</html>
+<script src="../../script/const.js"></script>
+<script type="text/javascript" src="../../lib/api.js"></script>
+<script type="text/javascript" src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#online_goods_info',
+            data: {
+                bannerArr:[{'pic':'../../image/1111.jpg','bgcolor':'#B88C35'},{'pic':'../../image/222.png','bgcolor':'#E9CDB5'}],
+                current:0,//轮播
+                goodsdata:{},//详情内容
+                isshow:true,//详情内容判断
+                itemId:'',//商品id
+
+                issc:false,//是否收藏
+                shopnum:1,
+                isshowgg:false,//规格弹框
+                attrprice:'',//价格
+                stock:'',//库存
+                attr1:'',//规格1
+                attr2:'',//规格2
+            },
+            created: function() {
+                var that = this;
+                // that.itemId = api.pageParam.itemId;
+                that.getshop();
+            },
+
+            methods: {
+
+                //轮播索引
+                onChange(index) {
+                    var that = this;
+                    that.current = index;
+                },
+
+                //商品信息
+                getshop:function(){
+                    var that = this;
+                    that.goodsdata = {"goods_name":"麻辣烫","is_collect":0,"post_money":"10.00","field_arr":[[{"0":"麻辣","2":"辣微"}],[["小份","大份"]]],"key_arr":["口味","份量"],"total":120,"spe_price":"15.00","val_arr":[{"attr_id":4926,"spe_integral_limit":"0","taotal":11,"name":"麻辣小份","spe_price":"12.00"},{"attr_id":4927,"spe_integral_limit":"0","taotal":13,"name":"麻辣大份","spe_price":"12.00"},{"attr_id":4928,"spe_integral_limit":"0","taotal":12,"name":"辣微大份","spe_price":"12.00"},{"attr_id":4925,"spe_integral_limit":"0","taotal":13,"name":"辣微小份","spe_price":"12.00"}],"goods_id":420,"images":["http://mashangzhao.vmall99.com/upload/VGP6eQCE26C2mJm1562222796.jpeg","http://mashangzhao.vmall99.com/upload/QOpn1PegVbf0ig21562222796.jpeg","http://mashangzhao.vmall99.com/upload/UNJZMJ7qCE1J7Nr1562230828.jpeg"],"sales":12,"goods_desc":"很好吃","info":["http://mashangzhao.vmall99.com/upload/VGP6eQCE26C2mJm1562222796.jpeg","http://mashangzhao.vmall99.com/upload/QOpn1PegVbf0ig21562222796.jpeg","http://mashangzhao.vmall99.com/upload/UNJZMJ7qCE1J7Nr1562230828.jpeg"]};
+                    // that.$toast.loading({
+                    //     mask: true,
+                    //     loadingType:'spinner',
+                    //     message: '加载中...'
+                    // });
+                    // that.http(offlineGoodsDetail, 'post', {'goods_id':api.pageParam.goods_id}, function (res) {
+                    //     that.$toast.clear();
+                    //     console.log(JSON.stringify(res));
+                    //     if (res.code == 0) {
+                    //         that.goodsdata = res.data.info;
+                    //     }else {
+                    //         that.$toast(res.msg)
+                    //     }
+                    // })
+                },
+
+
+
+
+                //点击规格1
+                clickSelectionAttr:function(item){
+                    var that = this;
+                    that.attr1 = item;
+                    var attrdata = this.goodsdata.val_arr;
+                    for(var i in attrdata){
+                        if(attrdata[i].name == that.attr1 + that.attr2){
+                            // console.log(attrdata[i].id);
+                            that.attrprice = attrdata[i].spe_price;
+                            that.stock = attrdata[i].taotal;
+                            break;
+                        }
+                    }
+                },
+                //点击规格2
+                clickSelectionAttr1:function(item){
+                    var that = this;
+                    that.attr2 = item;
+                    var attrdata = this.goodsdata.val_arr;
+                    for(var i in attrdata){
+                        if(attrdata[i].name == this.attr1 + this.attr2){
+                            // console.log(attrdata[i].id);
+                            that.attrprice = attrdata[i].spe_price;
+                            that.stock = attrdata[i].taotal;
+                            break;
+                        }
+                    }
+                },
+
+                //立即购买
+                okljgm:function(){
+                    var that = this;
+                    if(that.goodsdata.key_arr.length>0){
+                        if(!(that.attr1 && that.attr2)){
+                            this.$toast('请选择商品属性');
+                            return false;
+                        }
+                    }
+                    that.toPage('affirm_order','./affirm_order.html');
+
+                    return;
+                    // console.log(this.attr1 + this.attr2)
+                    var attrdata = that.goodsdata.val_arr;
+                    var obj = {};
+                    for(var i in attrdata){
+                        if(attrdata[i].name == that.attr1 + that.attr2){
+                            // console.log(attrdata[i].id);
+                            obj.attr_id = attrdata[i].attr_id;
+                            break;
+                        }
+                    }
+                    obj.goods_id = api.pageParam.goods_id;
+                    obj.goods_nums = that.shopnum;
+                    if(!obj.attr_id){
+                        obj.attr_id = 0;
+                    }
+                    // console.log(JSON.stringify(obj))
+                    that.isshowgg = false;
+                    that.toPage('affirm_order','./affirm_order.html',{'obj':obj})
+                },
+
+
+            },
+        })
+    };
+</script>

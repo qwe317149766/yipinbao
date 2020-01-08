@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="audit_certification" v-cloak class="flex_col_between flex_items_stretch VH100">
+    <div class="header W_100 flex_shrink_0 bg_2B2B2B color_fff">
+        <div class="P_4 flex_rowC relative flex_shrink_0 ">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBacks()"></i>
+            <span class="fontS_15">审核认证</span>
+        </div>
+    </div>
+
+    <div class="overflow_hidden flex_grow_1 bg_f2f2f2">
+        <!--审核中-->
+        <div v-if="isshenhe==1" class="W_80 VH_90 M_auto absoluteTBLR bg_fff flex_col_around textC">
+            <img src="../../image/shing.png" alt="" class="VW_15">
+            <div>
+                <div class="fontS_18">资料已提交</div>
+                <div class="PT_4 fontS_13 color_999">请耐心等待后台审核，谢谢配合</div>
+            </div>
+            <div class="PTB_5 textC W_50 B_1_eeeeee borderColor_d43d3d" @click="goBacks()">我知道了</div>
+        </div>
+        <!--审核拒绝-->
+        <div v-if="isshenhe==2" class="W_80 VH_90 M_auto absoluteTBLR bg_fff flex_col_around textC">
+            <img src="../../image/shno.png" alt="" class="VW_15">
+            <div>
+                <div class="fontS_18">审核被驳回</div>
+                <div class="PT_4 fontS_13 color_999">后台审核未通过，请重新提交</div>
+            </div>
+            <div class="PTB_5 textC W_50 B_1_eeeeee borderColor_d43d3d" @click="gosub">重新申请</div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#audit_certification',
+            data: {
+                UserData:{},
+                isshenhe:api.pageParam.type,//1 审核中，2 拒绝
+            },
+            created: function() {
+                var that = this;
+                that.getUserInfo();
+                // console.log(api.pageParam.type);
+                api.addEventListener({
+                    name: 'keyback'
+                }, function(ret, err) {
+                    that.goBacks();
+                });
+            },
+
+
+            methods: {
+                //返回
+                goBacks:function () {
+                    var that = this;
+                    api.closeToWin({
+                        name: 'root'
+                    });
+                },
+
+                //获取用户信息
+                getUserInfo:function(){
+                    var that = this;
+                    that.http(UserInfo,'post',{}, function(res) {
+                        console.log(JSON.stringify(res));
+                        if(res.code == 0) {
+                            that.UserData = res.data.info;
+                        }
+                    });
+                },
+
+                //审核拒绝重新提交
+                gosub:function () {
+                    var that = this;
+                    that.toPage('join_platform_partners','./join_platform_partners.html',{'is_apply':that.UserData.is_apply});
+                }
+
+
+            },
+        })
+    };
+</script>

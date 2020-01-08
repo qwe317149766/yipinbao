@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="water_droplets_library" v-cloak class="flex_col_between flex_items_stretch relative">
+    <div class="header W_100 flex_shrink_0 z_index_300">
+        <div class="P_4 color_fff flex_rowC relative flex_shrink_0 ">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">平台分红</span>
+        </div>
+    </div>
+
+    <div class="absoluteTL W_100" style="height: 60vh">
+        <img src="../../image/sd_bg.png" alt="" class="W_100 H_100">
+        <div class="textC MLR_auto absoluteTLR W_95" style="top:6rem">
+            <img src="../../image/logo.png" alt="" class="VW_20 VH_20 B_radius_circle B_2_eeeeee borderColor_F3CB7B">
+            <div class="VH_50 MT_10" style="background-image: url('../../image/sd_bg1.png');background-size: 100% 100%">
+                <div class="color_orange_200 fontS_16 PT_7">补贴水滴 每日分红</div>
+                <div class="W_90 MLR_auto flex_rowC VH_20 MT_9 textC fontS_35 color_fff" style="background-image: url('../../image/sd_bg2.png');background-size: 100% 100%">
+                    <!--<span id="num">{{waterdata.pool}}</span>-->
+                    <span id="num">0</span>
+                </div>
+                <div class="flex_row_between color_orange_200 MT_5 W_85 MLR_auto">
+                    <div>昨日收益￥{{waterdata.yesterday}}</div>
+                    <div>累计收益￥{{waterdata.total}}</div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="W_100">
+            <div class="W_100 VH_30 color_fff textC relative" style="background-image: url('../../image/sd_bg4.png');background-size: 100% 100%">
+                <div class="flex_row_right P_4 fontS_14" @click="toPage('water_droplets_detail','./water_droplets_detail.html')">水滴明细></div>
+                <div class="flex_row_right fontS_14 PR_4">
+                    <img src="../../image/sdz.png" alt="" class="VW_10 VH_10" @click="ismoney=true">
+                </div>
+
+                <span class="bg_2B2B2B PTB_3 PLR_7 B_radius_20 fontS_16 D_inline_block" style="margin-top: -1rem">水滴转增好友</span>
+            </div>
+            <div class="W_100 VH_55 flex_col_around PTB_8">
+                <div class="flex_rowC W_60">
+                    <i class="iconfont iconzhanghao-touxiang color_F3CB7B fontS_18"></i>
+                    <input v-model="param.mobile" type="text" class="ML_5 textC borderColor_999 PTB_3 W_100 B_radius_20 B_1_eeeeee" placeholder="转增会员手机号">
+                </div>
+                <div class="flex_rowC W_60">
+                    <i class="iconfont iconzhuanru color_F3CB7B fontS_18"></i>
+                    <input v-model="param.num" type="text" class="ML_5 textC borderColor_999 PTB_3 W_100 B_radius_20 B_1_eeeeee" placeholder="转增数量">
+                </div>
+                <div class="flex_rowC W_60">
+                    <i class="iconfont iconbiaoqian color_F3CB7B fontS_18"></i>
+                    <input @click="oksub" type="button" class="ML_5 textC borderColor_999 color_666 PTB_3 W_100 B_radius_20 B_1_eeeeee" value="提交">
+                </div>
+            </div>
+        </div>
+
+
+        <img :src="waterdata.img" alt="">
+
+
+
+        <!--转增弹框-->
+        <van-popup v-model="isshow" @closed="param.pwd=''" class="B_radius_5 VW_80 PLR_8 PTB_5 color_FFD490">
+            <div class="fontS_14 ">
+                <div>温馨提示：</div>
+                <div class="fontS_10 MT_2" style="text-indent: 2rem">请使用易拼宝二级密码进行支付，一经转增无法撤销，平台不介入会员操作，请仔细核对！</div>
+            </div>
+
+            <div class="BB_1_eeeeee borderColor_999 MT_6 PB_2">
+                <input type="password" v-model="param.pwd" placeholder="请输入二级密码" class="fontS_16 W_100 textC">
+            </div>
+
+            <div class="flex_row_between MT_4">
+                <div class="textC PTB_2 W_30 B_1_eeeeee borderColor_999 B_radius_5" @click="isshow=false">取消</div>
+                <div class="textC PTB_2 W_30 B_1_eeeeee borderColor_999 B_radius_5" @click="okzz">确认</div>
+            </div>
+        </van-popup>
+
+        <!--转出金额弹框-->
+        <van-popup v-model="ismoney" @closed="money=''" class="B_radius_5 VW_80 PLR_8 PTB_5 color_FFD490">
+            <div class="fontS_15 textC">请输入转入余额</div>
+
+            <div class="B_1_eeeeee borderColor_999 MT_6 PB_2">
+                <input type="number" v-model="money" placeholder="请输入金额" class="fontS_12 W_100 PTB_2 textC">
+            </div>
+
+            <div class="flex_row_between MT_4">
+                <div class="textC PTB_2 W_30 B_1_eeeeee borderColor_999 B_radius_5" @click="ismoney=false">取消</div>
+                <div class="textC PTB_2 W_30 B_1_eeeeee borderColor_999 B_radius_5" @click="oksubye">确认</div>
+            </div>
+            <div class="PT_3 fontS_11">*转入后的余额不会受到水滴补贴</div>
+        </van-popup>
+    </div>
+
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/rsa.js"></script>
+<script src="../../script/aes.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#water_droplets_library',
+            data: {
+                isshow:false,//转增弹框
+                ismoney:false,//转出金额弹框
+                param:{//转增信息
+                    mobile:'',
+                    num:'',
+                    pwd:'',//密码
+                },
+
+                money:'',//转出金额
+                waterdata:{},
+
+                // userdata:{//水滴变换
+                //     water_money:1,
+                //     one_second_red_money:0.008,
+                //     water_num:1
+                // },
+            },
+            created: function() {
+                var that = this;
+                that.getdata();
+                // that.setintv(that.userdata);
+            },
+
+            methods: {
+                //页面信息
+                getdata:function(){
+                    var that = this;
+                    that.http(UserGiveGoldInfo,'post',{}, function(res) {
+                        console.log(JSON.stringify(res));
+                        if(res.code == 0) {
+                            that.waterdata = res.data;
+                            setTimeout(function () {
+                                that.NumAutoPlusAnimation("num", {
+                                    time: 3000, //总时间--毫秒为单位
+                                    num: that.waterdata.pool,//要显示的真实数值
+                                    regulator: 55.59 //调速器，改变regulator的数值可以调节数字改变的速度
+                                },0)
+                            },500)
+                        }
+                    });
+                },
+
+                //提交
+                oksub:function () {
+                    var that = this;
+                    if(!that.param.mobile){
+                        that.$toast('请输入转增会员手机号');
+                        return false;
+                    }
+                    if(!that.param.num){
+                        that.$toast('请输入转增数量');
+                        return false;
+                    }
+                    that.isshow = true;
+                },
+
+                //转增好友
+                okzz:function(){
+                    var that = this;
+                    if(!that.param.pwd){
+                        that.$toast('请输入二级密码');
+                        return false;
+                    }
+                    // console.log(JSON.stringify(that.param))
+                    that.http(UserGiveGold,'post',that.param, function(res) {
+                        console.log(JSON.stringify(res));
+                        if(res.code == 0) {
+                            that.isshow = false;
+                            that.$dialog.alert({
+                                message: '转增成功！'
+                            }).then(() => {
+                                // on close
+                            });
+                        }else {
+                            that.$toast(res.msg);
+                        }
+                    });
+                },
+
+
+                //转余额
+                oksubye:function () {
+                    var that = this;
+                    if(!that.money){
+                        that.$toast('请输入转入余额');
+                        return false;
+                    }
+                    that.$toast.loading({
+                        mask: true,
+                        loadingType:'spinner',
+                        message: '加载中...',
+                    });
+                    that.http(shopGoldExcBal, 'post', {'price':that.money}, function (res) {
+                        console.log(JSON.stringify(res));
+                        that.$toast(res.msg);
+                        if (res.code == 0) {
+                            that.ismoney=false;
+                        }
+                    });
+                },
+
+
+                //分红余额切换
+                setintv:function(res) {
+                    var that=this;
+                    var sd = Number(res.water_money);
+                    var myDate2 = new Date();
+                    // console.log(myDate2.getHours());
+                    var s = myDate2.getHours()*3600 + myDate2.getMinutes()*60 + myDate2.getSeconds();
+                    that.userdata.water_money = (Number(res.one_second_red_money)*res.water_num*s+sd).toFixed(2);
+                    setInterval(function() {
+                        var myDate = new Date();
+                        var s = myDate.getHours()*3600+myDate.getMinutes()*60+myDate.getSeconds();
+                        var qw=(Number(res.one_second_red_money)*res.water_num*s+sd).toFixed(2);
+
+                        that.NumAutoPlusAnimation("num", {
+                            time: 1500, //总时间--毫秒为单位
+                            num: qw,//要显示的真实数值
+                            regulator: 50 //调速器，改变regulator的数值可以调节数字改变的速度
+                        },sd)  //sd为基础值
+                    },3000)
+                },
+                NumAutoPlusAnimation: function(targetEle, options , conunt) {
+                    /*可以自己改造下传入的参数，按照自己的需求和喜好封装该函数*/
+                    //不传配置就把它绑定在相应html元素的data-xxxx属性上吧
+                    options = options || {};
+                    var $this = document.getElementById(targetEle),
+                        time = options.time || $this.data('time'), //总时间--毫秒为单位
+                        finalNum = options.num || $this.data('value'), //要显示的真实数值
+                        regulator = options.regulator || 100, //调速器，改变regulator的数值可以调节数字改变的速度
+
+                        step =Number(((finalNum-conunt)/(time/regulator)).toFixed(2)),
+                        /*每30ms增加的数值--*/
+                        count = conunt, //计数器
+                        initial = 0;
+                    var timer = setInterval(function () {
+                        count = count + step;
+                        if (count >= finalNum) {
+                            clearInterval(timer);
+                            count = finalNum;
+                        }
+                        //t未发生改变的话就直接返回
+                        //避免调用text函数，提高DOM性能
+                        var t = Number(count);
+                        // console.log(t);
+                        if(t == initial) return;
+                        initial = t.toFixed(2);
+                        $this.innerHTML = initial;
+                    }, 30);
+                },
+
+
+            },
+        })
+    };
+</script>

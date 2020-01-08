@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="setting" v-cloak class="flex_col_between flex_items_stretch VH100">
+    <div class="header W_100 flex_shrink_0 bg_2B2B2B color_fff">
+        <div class="P_4 flex_rowC relative flex_shrink_0">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">设置</span>
+        </div>
+    </div>
+
+
+    <div class="overflow_y flex_grow_1 color_777">
+        <div class="PTB_4 flex_col_center bg_white">
+            <img :src="UserData.headImg" alt="" class="VW_20 VH_20 object_fit_cover B_radius_circle" @click="toPage('printscreen','./printscreen.html')">
+            <span class="fontS_10 color_999 PT_4" @click="toPage('printscreen','./printscreen.html')">点击修改头像</span>
+        </div>
+        <div class="BB_5_eeeeee W_100">
+            <div class="fontS_13 flex_row_between W_90 MLR_auto PTB_5 BB_1_eeeeee BT_1_eeeeee">
+                <div>昵称</div>
+                <div class="flex_row_right color_999" @click="toPage('change_nickname','./change_nickname.html',{'nickname':UserData.nickname})">
+                    <span>{{UserData.nickname}}</span>
+                    <i class="iconfont iconfanhui1 fontS_14 PL_2"></i>
+                </div>
+            </div>
+            <div class="fontS_13 flex_row_between W_90 MLR_auto PTB_5 BB_1_eeeeee" @click="toPage('address_list','../frame1/address_list.html')">
+                <div>收货地址</div>
+                <i class="iconfont iconfanhui1 color_999 fontS_14"></i>
+            </div>
+
+            <div class="fontS_13 flex_row_between W_90 MLR_auto PTB_5">
+                <div>邀请码</div>
+                <div class="flex_row_right color_999">
+                    <span>{{UserData.number}}</span>
+                    <span @click="copy(UserData.number)" class="fontS_10 text_decoration_underline PL_2">点我复制</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="BB_5_eeeeee W_100">
+            <div class="fontS_13 flex_row_between W_90 MLR_auto PTB_5 BB_1_eeeeee">
+                <div>绑定支付宝</div>
+                <div class="flex_row_right color_999" @click="toPage('bind_alipay','./bind_alipay.html')">
+                    <span>{{UserData.is_bind_alipay==1?'已绑定':'未绑定'}}</span>
+                    <i class="iconfont iconfanhui1 fontS_14 PL_2"></i>
+                </div>
+            </div>
+            <div class="fontS_13 flex_row_between W_90 MLR_auto PTB_5">
+                <div>绑定银行卡</div>
+                <div class="flex_row_right color_999" @click="toPage('bind_bank','./bind_bank.html')">
+                    <span>{{UserData.is_bind_bank==1?'已绑定':'未绑定'}}</span>
+                    <i class="iconfont iconfanhui1 fontS_14 PL_2"></i>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="BB_5_eeeeee W_100">
+            <div class="fontS_13 flex_row_between W_90 MLR_auto PTB_5" @click="toPage('change_pay_password','./change_pay_password.html',{'mobile':UserData.mobile})">
+                <div>设置二级密码</div>
+                <div class="flex_row_right color_999">
+                    <span></span>
+                    <i class="iconfont iconfanhui1 fontS_14 PL_2"></i>
+                </div>
+            </div>
+            <!--<div class="fontS_13 flex_row_between W_90 MLR_auto PTB_5">-->
+                <!--<div>修改密码</div>-->
+                <!--<div class="flex_row_right color_999" @click="toPage('change_password','./change_password.html')">-->
+                    <!--<span>修改</span>-->
+                    <!--<i class="iconfont iconfanhui1 fontS_14 PL_2"></i>-->
+                <!--</div>-->
+            <!--</div>-->
+        </div>
+
+        <div class="BB_5_eeeeee W_100">
+            <div class="fontS_13 flex_row_between W_90 MLR_auto PTB_5 BB_1_eeeeee">
+                <div>清除缓存</div>
+                <div class="flex_row_right color_999" @click="fncacheSize">
+                    <span>{{cacheSize}}</span>
+                    <!--<i class="iconfont iconfanhui1 fontS_14 PL_2"></i>-->
+                </div>
+            </div>
+            <div class="fontS_13 flex_row_between W_90 MLR_auto PTB_5">
+                <div>检查更新</div>
+                <div class="flex_row_right color_999" @click="checkVersion">
+                    <span>{{localVersion}}</span>
+                    <!--<i class="iconfont iconfanhui1 fontS_14 PL_2"></i>-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="W_100 flex_rowC textC fontS_14 PTB_5 bg_F3CB7B" @click='logout()'>退出登录</div>
+
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/rsa.js"></script>
+<script src="../../script/aes.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#setting',
+            data: {
+                localVersion:'0.0.1',
+                cacheSize:'0.00',//缓存
+                UserData:{}
+            },
+            created: function() {
+                var that = this;
+                that.localVersion = api.appVersion;
+                that.getcacheSize();
+                that.getUserInfo();
+            },
+
+            methods: {
+
+                //获取用户信息
+                getUserInfo:function(){
+                    var that = this;
+                    that.http(UserInfo,'post',{}, function(res) {
+                        // console.log(JSON.stringify(res));
+                        if(res.code == 0) {
+                            that.UserData = res.data.info;
+                        }
+                    });
+                },
+
+                //复制
+                copy: function(data) {
+                    var that = this;
+                    var clipBoard = api.require('clipBoard');
+                    clipBoard.set({
+                        value: data
+                    }, function (ret, err) {
+                        if (ret) {
+                            that.$toast('复制成功');
+                        } else {
+                            // alert(JSON.stringify(err));
+                        }
+                    });
+                },
+
+                //获取缓存大小
+                getcacheSize:function(){
+                    var that = this;
+                    var cacheSize = api.getCacheSize({sync: true});
+                    that.cacheSize = (cacheSize/1024/1024).toFixed(2) + 'M';
+                },
+
+                //清除缓存
+                fncacheSize:function (){
+                    var that = this;
+                    that.$dialog.confirm({
+                        message: '确认清空缓存？'
+                    }).then(() => {
+                        that.$toast.loading({
+                            mask: true,
+                            loadingType:'spinner',
+                            message: '正在清除...'
+                        });
+                        api.clearCache(function() {
+                            that.$toast('清除完成');
+                            that.cacheSize = '0.00';
+                        });
+                    }).catch(() => {
+                        // on cancel
+                    });
+
+                },
+
+                //检查更新
+                checkVersion: function() {
+                    var that = this;
+                    that.$toast.loading({
+                        mask: true,
+                        loadingType:'spinner',
+                        message: '检查更新中...'
+                    });
+                    var mam = api.require('mam');
+                    mam.checkUpdate(function(ret, err) {
+                        if (ret) {
+                            that.$toast.clear();
+                            var result = ret.result;
+                            if (result.update == true && result.closed == false) {
+                                var str = '新版本型号:' + result.version + ';\n 更新提示语:' + result.updateTip + ';\n发布时间:' + result.time;
+                                api.confirm({
+                                    title : '有新的版本,是否下载并安装 ',
+                                    msg : str,
+                                    buttons : ['确定', '取消']
+                                }, function(ret, err) {
+                                    if (ret.buttonIndex == 1) {
+                                        if (api.systemType == "android") {
+                                            api.download({
+                                                url : result.source,
+                                                report : true
+                                            }, function(ret, err) {
+                                                if (ret && 0 == ret.state) {/* 下载进度 */
+                                                    that.$toast("正在下载应用" + ret.percent + "%");
+                                                    // api.toast({
+                                                    //     msg : "正在下载应用" + ret.percent + "%",
+                                                    //     duration : 2000
+                                                    // });
+                                                }
+                                                if (ret && 1 == ret.state) {/* 下载完成 */
+                                                    var savePath = ret.savePath;
+                                                    api.installApp({
+                                                        appUri : savePath
+                                                    });
+                                                }
+                                            });
+                                        }
+                                        if (api.systemType == "ios") {
+                                            api.openWin({
+                                                name: 'iosUrl',
+                                                url: result.source
+                                            });
+                                        }
+                                    }
+                                });
+                            } else {
+                                that.$dialog.alert({message: '暂无更新'})
+                            }
+                        } else {
+                            that.$dialog.alert({message: err.msg})
+                            // api.alert({msg : err.msg});
+                        }
+                    });
+                },
+
+                //退出登录
+                logout: function() {
+                    var that = this;
+                    api.actionSheet({
+                        cancelTitle: '取消',
+                        destructiveTitle: '确认退出'
+                    }, function(ret, err) {
+                        var index = ret.buttonIndex;
+                        if (index == 1) {
+                            $api.rmStorage('userInfo');
+                            that.toPageios('login','widget://html/login/login.html');
+                            // api.openWin({
+                            //     name: "login",
+                            //     url: 'widget://html/login/login.html',
+                            //     reload: true,
+                            //     bgColor:'#fff',
+                            //     slidBackEnabled: false
+                            // });
+                        }
+                    });
+                }
+            },
+        })
+    };
+</script>

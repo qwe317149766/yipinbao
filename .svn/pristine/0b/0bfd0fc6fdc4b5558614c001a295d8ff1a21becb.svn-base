@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/animate.css">
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <style>
+
+    </style>
+</head>
+<body>
+<div id="app" class="flex_col_between flex_items_stretch VH100">
+    <div class="header bg_2B2B2B W_100 flex_shrink_0">
+        <div class="P_4 color_fff flex_rowC relative flex_shrink_0 ">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">共享影视</span>
+        </div>
+    </div>
+    <div class="overflow_y flex_grow_1 W_100">
+        <!-- 轮播 -->
+        <van-swipe :autoplay="3000" indicator-color="white" class="VH_50 W_100">
+            <van-swipe-item v-for="item in shareVideo.banner">
+                <img :src="item.img" alt="" srcset="" class="WH_100" @click="gourl(item.jump)">
+            </van-swipe-item>
+        </van-swipe>
+        <!--<div class="VH_10 flex_rowC W_90 MLR_auto MT_8">-->
+            <!--<div class="B_1_eeeeee B_radiusL_5 color_999 flex_rowL H_90 W_80 PLR_3">-->
+                <!--<i class="iconfont iconsearch"></i>-->
+                <!--<input type="text" v-model="word" class="PL_2 fontS_12 H_100 flex_grow_1" placeholder="请输入关键词">-->
+            <!--</div>-->
+            <!--<button class="fontS_14 H_90 W_30 bg_F3CB7B B_radiusR_5 P_2" @click="goSearch()">搜索</button>-->
+        <!--</div>-->
+        <div class="MT_8 B_radius_5 VH_20 W_90 MLR_auto PLR_6 flex_col_around bg_size_100" style="background-image: url('../../image/gxysbg.png')">
+            <div class="W_100">您当前的观影特权<b>{{shareVideo.show==1?'已激活':'未激活'}}</b></div>
+            <div class="W_100 flex_row_left">
+                <div class="W_50">
+                    <span class="color_ff604a">激活方式：</span>
+                    <span>等级特权</span>
+                </div>
+                <div class="W_50 textR" v-if="shareVideo.show==1">
+                    <span class="color_red">有效期：</span>
+                    <span class="color_999">长期</span>
+                </div>
+            </div>
+        </div>
+        <div class="flex_row_between PLR_7 MT_8 PB_4 BB_1_f2f2f2">
+            <div class="flex_rowL W_40">
+                <img src="../../image/vip.png" alt="" class="W_20">
+                <h4 class="fontS_16 PL_4">全网VIP</h4>
+            </div>
+            <div class="color_999 fontS_11 W_60 textR">主流视频平台VIP视频免费看</div>
+        </div>
+        <div class="flex flex_wrap PLR_4 flex_shrink_0">
+            <div class="flex_col_c W_25 PT_12 flex_shrink_0" v-for="(item,idx) of shareVideo.list" @click="goplay(item.link,'v')">
+                <img :src="item.img" alt="" class="VW_15 flex_shrink_0">
+                <span class="PT_3">{{item.title}}</span>
+            </div>
+            <!--<div class="flex_col_c W_25 PT_12" @click="isShowMore=!isShowMore">-->
+                <!--<img src="../../image/222.png" alt="" class="VW_10 VH_10">-->
+                <!--<div class="PT_3">-->
+                    <!--{{isShowMore?'收起':'展开'}}-->
+                    <!--<i class="iconfont color_FFC41C" :class="isShowMore?'iconshang1':'iconxia'"></i>-->
+                <!--</div>-->
+            <!--</div>-->
+        </div>
+        <!-- 视频 -->
+        <div class="MB_3">
+            <div class="flex_row_between PLR_4 MT_8 PB_4 BB_1_f2f2f2">
+                <div class="flex_rowL">
+                    <img src="../../image/border.png" alt="" class="VW_5">
+                    <div class="fontS_16">全网VIP</div>
+                </div>
+                <!--<div class="color_999 fontS_11" @click="toPage('share_movie_more','share_movie_more.html')">-->
+                    <!--更多<i class="iconfont iconfanhui1 color_FFC41C fontS_12"></i>-->
+                <!--</div>-->
+            </div>
+            <div class="flex_row_left flex_wrap PLR_5 W_100">
+                <div @click="goplay(item1.url)" class="W_33 PLR_2 PT_4 flex_col_c" v-for="(item1,idx1) of video_list">
+                    <img :src="item1.img" alt="" class="W_100 VH_45 B_radius_5">
+                    <span class="PT_2 W_100 text_overflow_1">{{item1.title}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/rsa.js"></script>
+<script src="../../script/aes.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#app',
+            data: {
+                isShowMore:false,
+                word:'',
+
+                shareVideo:{},
+                video_list:[],//视频列表
+            },
+
+            // computed: {
+            //     retVideosArr:function () {
+            //         return this.isShowMore?this.videosArr:this.videosArr.slice(0,7);
+            //     }
+            // },
+            created:function () {
+                var that = this;
+                that.getlunbo();
+                that.getvideo();
+            },
+
+            methods: {
+
+                //获取轮播图
+                getlunbo:function(){
+                    var that = this;
+                    that.http(SharevideoGet_banner_list, 'post', {}, function (res) {
+                        console.log(JSON.stringify(res));
+                        if (res.code == 0) {
+                            that.shareVideo = res.data;
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                },
+
+                //轮播图跳转
+                gourl:function(url){
+                    if(!url){
+                        return false;
+                    }
+                    var browser = api.require('webBrowser');
+                    browser.open({
+                        url: url
+                    });
+                },
+
+
+                //获取video
+                getvideo:function(){
+                    var that = this;
+                    that.http(SharevideoVideoList, 'post', {}, function (res) {
+                        console.log(JSON.stringify(res));
+                        if (res.code == 0) {
+                            that.video_list = res.data;
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                },
+
+
+                //跳转播放
+                goplay:function(link,type){
+                    var that = this;
+                    if(that.shareVideo.show==1){
+                        that.toPage('video_url','video_url.html',{'link':link,'type':type})
+                    }else {
+                        that.$toast('您暂无权限');
+                    }
+                },
+
+                //搜索
+                goSearch:function() {
+                    var that = this;
+                    if(that.word){
+                        that.toPage('share_movie_search','./share_movie_search.html',{'word':that.word})
+                    }else {
+                        that.$toast({message:'请输入关键词',duration:1000});
+                    }
+                },
+            },
+        })
+    }
+</script>

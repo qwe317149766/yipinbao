@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="tk_earnings" v-cloak class="flex_col_between flex_items_stretch VH100">
+    <div class="header W_100 flex_shrink_0 bg_2B2B2B color_fff">
+        <div class="P_4 flex_rowC relative flex_shrink_0 ">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">淘客收益</span>
+            <i @click="toPage('tk_rule','./tk_rule.html',{'cont':tadata.pro_rule})" class="iconfont iconyiwen absolute PR_4 fontS_16 color_F3CB7B" style="right: 0"></i>
+        </div>
+    </div>
+
+    <div class="overflow_hidden flex_grow_1 bg_f2f2f2">
+        <div class="P_8 bg_2B2B2B">
+            <div class="flex_row_between">
+                <div class="fontS_14">
+                    <div class="color_fff">账户余额</div>
+                    <div class="color_f59000 MT_2 fontS_16">￥{{tadata.balance}}</div>
+                </div>
+                <!--<div class="flex_row_left B_radius_15 PTB_2 PLR_5 bg_fff">-->
+                    <!--<i class="iconfont iconqianbao color_F3CB7B PR_1"></i>-->
+                    <!--去提现-->
+                <!--</div>-->
+            </div>
+        </div>
+        <div class=" PB_10 bg_2B2B2B flex_row_between">
+            <div class="textC W_33">
+                <div class="color_ccc">累计收入(元)</div>
+                <div class="PT_3 color_fff">{{tadata.total_acc_price}}</div>
+            </div>
+            <div class="textC W_33">
+                <div class="color_ccc">已提现(元)</div>
+                <div class="PT_3 color_fff">{{tadata.withdraw}}</div>
+            </div>
+            <div class="textC W_33">
+                <div class="color_ccc">未结算(元)</div>
+                <div class="PT_3 color_fff">{{tadata.noaccount}}</div>
+            </div>
+        </div>
+
+        <div class="W_100">
+            <van-tabs v-model="active" color="#2b2b2b" :border="false">
+                <van-tab v-for="item in navArry" :title="item"></van-tab>
+            </van-tabs>
+        </div>
+
+        <div class="P_4 bg_fff M_2 MT_5 B_radius_10">
+            <div class="P_3 BB_1_eeeeee flex_row_between relative">
+                <div class="fontS_15">我的订单收益</div>
+                <div @click="isshow=!isshow">{{tktypeArry[tktype-1]}}
+                    <i :class="isshow?'iconshang1':'iconxia'" class="iconfont PL_1 fontS_12 color_F3CB7B font_weight_bold"></i>
+                </div>
+
+                <div style="top: 3rem;" v-show="isshow" class="B_radius_5 VW_20 bg_fff absoluteTR B_1_eeeeee">
+                    <div class="PTB_4 textC BB_1_eeeeee" v-for="(item,index) in tktypeArry" @click="tktype=index+1;isshow=false">{{item}}</div>
+                </div>
+            </div>
+            <div class="flex_row_between MT_6">
+                <div class="W_50 textC">
+                    <div class="color_999 fontS_13">付款笔数</div>
+                    <div class="PT_3" v-show="active==0">{{tadata.today_num}}</div>
+                    <div class="PT_3" v-show="active==1">{{tadata.yesterday_num}}</div>
+                    <div class="PT_3" v-show="active==2">{{tadata.now_num}}</div>
+                    <div class="PT_3" v-show="active==3">{{tadata.last_num}}</div>
+                </div>
+                <div class="W_50 textC">
+                    <div class="color_999 fontS_13">预估笔数</div>
+                    <div class="PT_3" v-show="active==0">{{tadata.today_yg}}</div>
+                    <div class="PT_3" v-show="active==1">{{tadata.yesterday_yg}}</div>
+                    <div class="PT_3" v-show="active==2">{{tadata.yesterday_yg}}</div>
+                    <div class="PT_3" v-show="active==3">{{tadata.last_yg}}</div>
+                </div>
+            </div>
+
+            <div class="P_3 BB_1_eeeeee flex_row_between MT_6">
+                <div class="fontS_15">团队订单收益</div>
+            </div>
+            <div class="flex_row_between MT_6">
+                <div class="W_50 textC">
+                    <div class="color_999 fontS_13">付款笔数</div>
+                    <div class="PT_3" v-show="active==0">{{tadata.today_num_team}}</div>
+                    <div class="PT_3" v-show="active==1">{{tadata.yesterday_num_team}}</div>
+                    <div class="PT_3" v-show="active==2">{{tadata.now_num_team}}</div>
+                    <div class="PT_3" v-show="active==3">{{tadata.last_num_team}}</div>
+                </div>
+                <div class="W_50 textC">
+                    <div class="color_999 fontS_13">预估笔数</div>
+                    <div class="PT_3" v-show="active==0">{{tadata.today_yg_team}}</div>
+                    <div class="PT_3" v-show="active==1">{{tadata.yesterday_yg_team}}</div>
+                    <div class="PT_3" v-show="active==2">{{tadata.now_yg_team}}</div>
+                    <div class="PT_3" v-show="active==3">{{tadata.last_yg_team}}</div>
+                </div>
+            </div>
+        </div>
+
+
+        <!--<div @click="toPage('tk_balance_detail','./tk_balance_detail.html')" class="PTB_5 PLR_6 fontS_15 bg_fff MT_5">余额明细 <span class="fontS_13">结算订单明细</span></div>-->
+        <!--<div @click="toPage('tk_withdrawal_record','./tk_withdrawal_record.html')" class="PTB_5 PLR_6 fontS_15 bg_fff MT_5">提现记录</div>-->
+    </div>
+
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/rsa.js"></script>
+<script src="../../script/aes.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#tk_earnings',
+            data: {
+                active:0,
+                navArry:['今日收益','昨日收益','本月收益','上月收益'],
+
+                isshow:false,//淘客类型弹框
+                tktype:1,
+                tktypeArry:['淘宝','京东','拼多多'],
+
+                tadata:{}
+            },
+            created: function() {
+                var that = this;
+                that.getdata();
+            },
+
+            watch:{
+                tktype:function (value) {
+                    // console.log(value);
+                    var that = this;
+                    that.tktype = value;
+                    that.getdata();
+                }
+            },
+
+
+            methods: {
+                getdata:function () {
+                    var that = this;
+                    that.$toast.loading({
+                        mask: true,
+                        loadingType:'spinner',
+                        message: '加载中...'
+                    });
+                    that.http(UserMyEarn,'post',{'type':that.tktype}, function(res) {
+                        console.log(JSON.stringify(res));
+                        that.$toast.clear();
+                        if(res.code == 0) {
+                            that.tadata = res.data;
+                        }else {
+                            that.$toast(res.msg);
+                        }
+                    });
+                }
+
+            },
+        })
+    };
+</script>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="affirm_referrer" v-cloak class="flex_col_start flex_items_stretch VH100 bg_2B2B2B">
+    <div class="header W_100 flex_shrink_0">
+        <div class="P_4 flex_row_left relative flex_shrink_0">
+            <i class="iconfont iconfanhui fontS_20 color_fff" @click="goBack()"></i>
+        </div>
+    </div>
+
+    <div class="overflow_hidden flex_grow_1 W_85 MLR_auto">
+        <div class="flex_row_left fontS_16 color_fff MT_8">
+            <div>确认推荐人</div>
+            <i class="iconfont iconfanhui1"></i>
+        </div>
+        <div class="MT_6">
+            <div class="flex_row_left">
+                <i class="iconfont iconweiixn color_FFC41C PR_2"></i>
+                <i class="iconfont iconshouji color_FFC41C PR_2"></i>
+                <!--<i class="iconfont iconfuzhi color_FFC41C PR_2"></i>-->
+                <div class="color_fff">已有推荐人</div>
+                <!--<div class="color_fff">没有推荐人</div>-->
+            </div>
+            <div class="flex_row_left PTB_3 BB_1_eeeeee borderColor_666 MT_5">
+                <input type="number"  class="W_100 color_fff" placeholder="请输入手机号">
+                <i class="iconfont iconwen color_F3CB7B"></i>
+            </div>
+        </div>
+
+
+        <div class="flex_row_between MT_10">
+            <div class="flex_row_left W_50" @click="wxorsj=0">
+                <i class="iconfont color_FFC41C VH_5 VW_5" :class="wxorsj==0?'iconyuan':'iconyuan1'"></i>
+                <div class="fontS_10 color_999 PL_2">微信推荐人邀请码</div>
+            </div>
+            <div class="flex_row_left W_50" @click="wxorsj=1">
+                <i class="iconfont color_FFC41C VH_5 VW_5" :class="wxorsj==1?'iconyuan':'iconyuan1'"></i>
+                <div class="fontS_10 color_999 PL_2">手机号推荐人邀请码</div>
+            </div>
+        </div>
+
+
+        <div class="MLR_auto MT_20 flex_rowC W_100 bg_F3CB7B PTB_4 B_radius_10 fontS_13" @click="fnAuthMobileLogin">确认绑定</div>
+    </div>
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#affirm_referrer',
+            data: {
+                wxorsj:0
+            },
+            created: function() {
+
+            },
+
+            methods: {
+                //登录
+                fnAuthMobileLogin:function () {
+                    var that = this;
+                    return;
+                    if(!that.params.mobile){
+                        that.$toast('请输入手机号');
+                        return false;
+                    }
+                    if(!that.params.password){
+                        that.$toast('请输入密码');
+                        return false;
+                    }
+                    that.http(AuthLogin,'post',that.params, function(res) {
+                        that.$toast(res.msg);
+                        if(res.code == 0) {
+                            $api.setStorage('userInfo', res.data);
+                            setTimeout(function(){
+                                api.execScript({
+                                    name:'root',
+                                    script:'vm.randomSwitchBtn(0);'
+                                });
+                                api.sendEvent({
+                                    name: 'isgetUserInfo',
+                                    extra: {'isgetUserInfo':true}
+                                });
+                                api.openWin({
+                                    name: 'root',
+                                    url: '../../index.html',
+                                    reload: true,
+                                    bgColor:'#0B0B0B',
+                                    slidBackEnabled: false
+                                });
+                            },1000);
+                        }
+                    });
+                },
+
+            },
+        })
+    };
+</script>

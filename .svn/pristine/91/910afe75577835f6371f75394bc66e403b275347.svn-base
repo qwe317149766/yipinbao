@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="water_droplets_detail" v-cloak class="flex_col_between flex_items_stretch VH100">
+    <div class="header W_100 flex_shrink_0 bg_2B2B2B color_fff">
+        <div class="P_4 flex_rowC relative flex_shrink_0">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">水滴明细</span>
+        </div>
+    </div>
+
+
+    <div class="overflow_y flex_grow_1">
+        <div class="P_5">
+            <div class="B_1_eeeeee borderColor_999 B_radius_10">
+                <img src="../../image/222.png" alt="" class="W_100 VH_40 object_fit_cover B_radiusT_10">
+                <div class="P_4 flex_row_between">
+                    <div>小水滴，大作用</div>
+                    <div>点点滴滴：凝聚你我</div>
+                </div>
+            </div>
+
+            <div class="B_radius_10 B_1_eeeeee borderColor_999 flex_row_between PTB_5 MT_8">
+                <div class="textC W_25 BR_1_eeeeee borderColor_999">
+                    <div>累计水滴</div>
+                    <div class="PT_3">199.99</div>
+                </div>
+                <div class="textC W_25 BR_1_eeeeee borderColor_999">
+                    <div>剩余水滴</div>
+                    <div class="PT_3">199.99</div>
+                </div>
+                <div class="textC W_25 BR_1_eeeeee borderColor_999">
+                    <div>购物水滴</div>
+                    <div class="PT_3">199.99</div>
+                </div>
+                <div class="textC W_25">
+                    <div>消费水滴</div>
+                    <div class="PT_3">199.99</div>
+                </div>
+            </div>
+
+
+            <div class="B_radius_10 B_1_eeeeee borderColor_999 MT_8">
+                <div class="flex_row_between bg_f2f2f2 PTB_5 B_radiusT_10">
+                     <div class="W_33 textC">日期</div>
+                     <div class="W_33 textC">水滴来源</div>
+                     <div class="W_33 textC">剩余水滴</div>
+                </div>
+
+                <div class="flex_row_between PTB_4 ML_2 MR_2 BB_1_eeeeee" v-for="item in 5">
+                    <div class="W_33 textC">
+                        <div>平台补贴</div>
+                        <div class="color_999 fontS_11">2019-09-09</div>
+                    </div>
+                    <div class="W_33 textC">+199</div>
+                    <div class="W_33 textC">489</div>
+                </div>
+
+
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#water_droplets_detail',
+            data: {
+
+            },
+            created: function() {
+                var that = this;
+
+            },
+
+            methods: {
+
+
+
+            },
+        })
+    };
+</script>

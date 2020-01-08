@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="my_wallet" v-cloak class="flex_col_between flex_items_stretch VH100">
+    <div class="header W_100 flex_shrink_0 bg_2B2B2B color_fff">
+        <div class="P_4 flex_rowC relative flex_shrink_0">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">钱包</span>
+            <span class="absolute PR_4 fontS_11" style="right: 0" @click="isshowtx=true">去提现</span>
+        </div>
+
+        <div class="PTB_12 flex_col_c color_fff fontS_16">
+            <div>账户余额（元）</div>
+            <div class="PT_3">￥{{UserData.balance}}</div>
+        </div>
+    </div>
+
+
+    <div class="overflow_y flex_grow_1">
+        <!--<div @click="toPage('tk_withdrawal_record','./tk_withdrawal_record.html')" class="P_4 flex_row_between BB_1_eeeeee fontS_14">-->
+            <!--<div>提现记录</div>-->
+            <!--<i class="iconfont iconfanhui1 color_666"></i>-->
+        <!--</div>-->
+        <div class="P_4 BB_5_eeeeee fontS_15"><span class="BL_3_eeeeee borderColor_FFC41C PL_2">提现明细</span></div>
+        <van-list
+                v-model="upLoading"
+                :finished="finished"
+                finished-text="没有更多了"
+                @load="getlists"
+                :immediate-check="false">
+            <div class="flex_row_between P_5 BB_1_eeeeee" v-for="item in goodsList">
+                <div class="W_70">
+                    <div class="fontS_14" v-if="item.status==0">申请中</div>
+                    <div class="fontS_14" v-if="item.status==1">已完成</div>
+                    <div class="fontS_14" v-if="item.status==2">已驳回</div>
+                    <div class="fontS_10 color_999 PT_2">{{item.create_time}}</div>
+                </div>
+                <div class="color_F3CB7B fontS_14">{{item.price}}</div>
+            </div>
+        </van-list>
+
+    </div>
+
+    <!--提现弹框-->
+    <van-popup v-model="isshowtx" class="B_radius_10 VW_80 textC fontS_14">
+        <div class="PTB_5 flex_rowC BB_5_eeeeee">
+            <div>提现方式</div>
+            <i class="iconfont iconguanbi fontS_16 color_f59000 absoluteTR PR_3 PT_3" @click="isshowtx=false"></i>
+        </div>
+        <div class="PTB_5 BB_1_eeeeee" @click="isshowtx=false;toPage('withdraw_alipay','./withdraw_alipay.html')">支付宝提现</div>
+        <div class="PTB_5" @click="isshow=false;toPage('withdraw_bank','./withdraw_bank.html')">银行卡提现</div>
+    </van-popup>
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/rsa.js"></script>
+<script src="../../script/aes.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#my_wallet',
+            data: {
+                isshowtx:false,//提现弹框
+                UserData:{},
+
+                goodsList:[],
+                page:1,
+                // downLoading:false,
+                upLoading:false,
+                finished:false,
+            },
+            created: function() {
+                var that = this;
+                that.getUserInfo();
+                that.getlists();
+            },
+
+            methods: {
+                //获取用户信息
+                getUserInfo:function(){
+                    var that = this;
+                    that.http(UserInfo,'post',{}, function(res) {
+                        // console.log(JSON.stringify(res));
+                        if(res.code == 0) {
+                            that.UserData = res.data.info;
+                        }
+                    });
+                },
+
+
+                //提现记录列表
+                getlists:function () {
+                    var that = this;
+                    if(that.upLoading) { //上拉加载
+                        that.page ++;
+                    } else{
+                        that.$toast.loading({
+                            mask: true,
+                            loadingType:'spinner',
+                            message: '加载中...'
+                        });
+                        that.page = 1; //刷新
+                        if(that.goodsList.length>10){
+                            that.finished = false;
+                        }
+                    }
+                    that.http(UserBalaWithList, 'post', {'page':that.page}, function (res) {
+                        that.$toast.clear();
+                        console.log(JSON.stringify(res));
+                        if (res.code == 0) {
+                            if(res.data.length < 10) {
+                                that.finished = true;
+                            }else {
+                                that.finished = false;
+                            }
+                            if(that.upLoading) {
+                                that.goodsList = that.goodsList.concat(res.data);
+                                that.upLoading = false;
+                            }else {
+                                that.goodsList = res.data;
+                                // that.downLoading = false;
+                            }
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                },
+
+            },
+        })
+    };
+</script>

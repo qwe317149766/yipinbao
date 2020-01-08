@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />
+</head>
+<body>
+<div id="select_frame">
+    <div class="header W_100 flex_shrink_0 BB_1_eeeeee bg_2B2B2B">
+        <div class="flex_row_between P_4 setsearchHeader">
+            <i class="iconfont iconfanhui color_fff fontS_20" @click="goBack()"></i>
+            <div class="flex_center color_999 bg_fff B_radius_15 PTB_2 W_80">
+                <i class="iconfont iconsearch PL_5"></i>
+                <input class="W_100 fontS_12 PLR_2" placeholder="城市/拼音" v-model="keyword" @input="search(keyword)" @keyup.enter="search(keyword)">
+            </div>
+            <div class="color_fff fontS_14">
+                <p>搜索</p>
+            </div>
+        </div>
+
+        <div class="flex_row_left P_5 bg_eee">
+            <i class="iconfont iconweizhi color_FFC41C PR_2"></i>
+            <div>{{positionCity?positionCity:'定位失败'}}</div>
+        </div>
+        <div class="flex_row_between P_5 bg_fff fontS_14">
+            <div >当前选择：{{select ? select : '无'}}</div>
+            <div @click="openCate()">切换县区
+                <i class="iconfont color_FFC41C" :class="isShow?'iconshang1':'iconxia'"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+</html>
+<script type="text/javascript" src="../res/district.js"></script>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../lib/vue/vue.js"></script>
+<script src="../lib/vant/vant.min.js"></script>
+<script src="../script/rsa.js"></script>
+<script src="../script/aes.js"></script>
+<script type="text/javascript" src="../script/common.js"></script>
+<script type="text/javascript" src="../script/const.js"></script>
+<script>
+apiready = function () {
+    var select_frame = new Vue({
+        el: '#select_frame',
+        data: {
+            keyword: '',
+            addressList: [],
+            searchList: [],
+            isShow: false,
+            city: '',
+            height: 0,
+            positionCity: '',
+            select: '',
+            area: []
+        },
+        created: function () {
+            var that = this;
+            if (api.pageParam) {
+                that.positionCity = api.pageParam.city;
+                that.select = api.pageParam.select;
+            }
+            // console.log(JSON.stringify(api.pageParam))
+            that.cityList();
+
+            /***********   接收选择city_frame传过来的id   **************/
+            api.readFile({
+                path: 'widget://res/UICityList.json'
+            }, function (ret, err) {
+                if (ret.status) {
+                    var data = ret.data;
+                    that.addressList = $api.strToJson(data).citys;
+                } else {
+                    that.addressList = []
+                }
+            });
+        },
+
+        mounted:function(){
+
+        },
+
+        methods: {
+            //输入框搜索
+            search: function (keyword) {
+                //字符串方法indexOf模糊搜索
+                var that = this;
+                that.searchList = [];
+                for (var i = 0; i < that.addressList.length; i++) {
+                    //如果字符串中不包含目标字符会返回-1
+                    if (that.addressList[i].city.indexOf(keyword) >= 0) {
+                        that.searchList.push(that.addressList[i]);
+                    } else if (that.addressList[i].pinyin.indexOf(keyword) >= 0) {
+                        that.searchList.push(that.addressList[i]);
+                    } else {
+                        // return 0;
+                    }
+                }
+                if (that.searchList != []) {
+                    api.openFrame({
+                        name: 'searchAddress_frame',
+                        url: 'searchAddress_frame.html',
+                        reload: true,
+                        bgColor:'#fff',
+                        rect: {
+                            x: 0,
+                            y: $api.dom('.setsearchHeader').offsetHeight +20,
+                            w: 'auto',
+                            h: 'auto'
+                        },
+                        pageParam: {
+                            searchList: that.searchList
+                        },
+                    });
+                }
+            },
+
+            //根据市获取区
+            openCate: function () {
+                var that = this;
+                // console.log(that.select);
+                if (!that.isShow) {
+                    that.http(o2oGetChildArea, 'post', {
+                            city: that.select,
+                        },
+                        function (res) {
+                            console.log(JSON.stringify(res));
+                            if (res.code == 0) {
+                                that.area = res.data.list;
+                                that.height = Math.ceil(that.area.length / 3) * 60; //计算category所占高度
+                                that.isShow = true;
+                                api.openFrame({
+                                    name: 'city_frame',
+                                    url: './city_frame.html',
+                                    reload: true,
+                                    rect: {
+                                        x: 0,
+                                        y: $api.dom('.header').offsetHeight - 5,
+                                        w: 'auto',
+                                        h: that.height
+                                    },
+                                    bgColor:'#fff',
+                                    pageParam: {
+                                        select: that.select,
+                                        area: that.area
+                                    },
+                                });
+                            } else {
+                                that.isShow = false;
+                                that.$toast(res.msg);
+                            }
+                        },
+                        function (err) {}
+                    )
+                } else {
+                    that.isShow = false;
+                    api.closeFrame({
+                        name: 'city_frame'
+                    });
+                }
+            },
+
+            //点击地址列表
+            cityList: function () {
+                var that = this;
+                var UICityList = api.require('UICityList');
+                UICityList.open({
+                    rect: {
+                        x: 0,
+                        y: $api.dom('.header').offsetHeight + 20,
+                        w: api.frameWidth,
+                        h: api.frameHeight - $api.dom('.header').offsetHeight,
+                    },
+                    resource: 'widget://res/UICityList.json',
+                    styles: {
+                        searchBar: {
+                            // bgColor: '#696969',
+                            // cancelColor: '#E3E3E3',
+                            hidden: true
+                        },
+                        location: {
+                            color: '#696969',
+                            size: 12
+                        },
+                        sectionTitle: {
+                            bgColor: '#F0F1F8',
+                            color: '#000',
+                            size: 14
+                        },
+                        item: {
+                            bgColor: '#fff',
+                            activeBgColor: '#F2F2F2',
+                            color: '#000',
+                            size: 16,
+                            height: 50,
+                            boardColor: 'rgba(0,0,0,0)'
+                        },
+                        indicator: {
+                            bgColor: '#fff',
+                            color: '#999'
+                        }
+                    },
+                    // currentCity: '北京',
+                    locationWay: 'GPS',
+                    hotTitle: '热门城市',
+                    fixedOn: api.frameName,
+                }, function (ret, err) {
+                    if (ret) {
+                        if (ret.eventType == "selected") {
+                            var newparams = {
+                                pov: ret.cityInfo.city,
+                            };
+                            $api.setStorage('city', ret.cityInfo.city);
+                            api.execScript({
+                                name:'offline_store',
+                                // frameName: 'frame2',
+                                script:'vm.getcity('+JSON.stringify(newparams)+')'
+                            });
+                            that.goBack();
+                        }
+                    } else {
+                        // alert(JSON.stringify(err));
+                    }
+                });
+            },
+
+        }
+    });
+}
+</script>

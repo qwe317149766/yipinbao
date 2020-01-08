@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="buy_as_agent" v-cloak class="flex_col_between flex_items_stretch relative bg_2B2B2B" style="min-height: 100vh">
+    <div class="header W_100 flex_shrink_0 z_index_300">
+        <div class="P_4 color_fff flex_rowC relative flex_shrink_0 ">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">购买商品成为代理</span>
+        </div>
+    </div>
+
+
+    <div class="absoluteTL W_100">
+        <img :src="joindaili" alt="" class="W_100">
+        <div class="bg_2B2B2B PT_4 PB_2" style="margin-top: -4px">
+            <div class="P_4 flex_row_between" v-for="item in splist.list1" @click="okljgm(item.id)">
+                <img :src="item.img" alt="" class="VH_30 VW_30 B_radius_10 object_fit_cover flex_shrink_0">
+                <div class="W_100 VH_30 flex_col_between PL_4">
+                    <div class="color_fff text_overflow_2 PT_2 W_100">{{item.goods_name}}</div>
+                    <div class="W_100 PB_2">
+                        <div class="fontS_14 color_F3CB7B">
+                            <span class="font_weight_bold">￥{{item.spe_price}}</span>
+                            <!--<span class="fontS_10 text_decoration_line-through color_999 PL_2">198.00</span>-->
+                        </div>
+                        <div class="flex_row_between W_100 PT_1">
+                            <div class="fontS_10 color_999">{{item.sales}}人已买</div>
+                            <div class="PTB_1 PLR_4 B_radius_5 bg_F3CB7B fontS_10">购买</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="color_fff MB_4 textC">
+                <div class="fontS_22 PT_6 color_FFC41C font_weight_bold" id="setdiv">成为店掌柜</div>
+                <div class="PT_2">成功购买指定区商品即可申请成为店掌柜</div>
+            </div>
+            <div class="B_radius_5 ML_2 MR_2 H_100 bg_fff">
+                <div class="P_4" v-for="list in splist.list2" @click="okljgm(list.id)">
+                    <img :src="list.img" alt="" class="W_100 VH_40 B_radius_5 object_fit_cover">
+                    <div>
+                        <div class="PTB_2">{{list.goods_name}}</div>
+                        <!--<div class="fontS_10">淡粉色乳房的的风景地方</div>-->
+                        <div class="flex_row_between PT_3">
+                            <div class="color_red font_weight_bold fontS_14">￥{{list.spe_price}}</div>
+                            <img src="../../image/zypic.png" alt="" class="VW_40">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/rsa.js"></script>
+<script src="../../script/aes.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#buy_as_agent',
+            data: {
+                joindaili:api.pageParam.img,
+                splist:[]
+            },
+            created: function() {
+                var that = this;
+            },
+            mounted:function(){
+                var that = this;
+                that.getList();
+            },
+
+
+            methods: {
+                //商品列表
+                getList:function(){
+                    var that = this;
+                    that.http(shopJoinList, 'post', {}, function (res) {
+                        // console.log(JSON.stringify(res));
+                        if (res.code == 0) {
+                            that.splist = res.data;
+                            //滚动到指定位置
+                            if(api.pageParam.gobuy){
+                                setTimeout(function () {
+                                    document.getElementById("setdiv").scrollIntoView();
+                                },200)
+
+                            }
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                },
+
+
+
+                //立即购买
+                okljgm:function(id){
+                    var that = this;
+                    let obj = {'goods_id':id,'goods_num':1,'attr_id':0,'cart_id':0};
+                    that.toPage('affirm_order','./affirm_order.html',{'obj':[obj]});
+                },
+            },
+        })
+    };
+</script>

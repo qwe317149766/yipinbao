@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="fans_order" v-cloak class="flex_col_between flex_items_stretch VH100">
+    <div class="header W_100 flex_shrink_0 bg_2B2B2B color_fff">
+        <div class="P_4 flex_rowC relative flex_shrink_0">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">粉丝订单</span>
+        </div>
+    </div>
+
+
+    <div class="overflow_y flex_grow_1">
+        <div class="W_90 MLR_auto MT_5 PTB_2 B_1_eeeeee borderColor_999 B_radius_5 textC" @click="istime=true">{{currentDates}}</div>
+
+        <!-- 列表显示 -->
+        <div class="BB_1_eeeeee P_5" v-for="(item,index) in 5" :key="index">
+            <div class="flex_row_between">
+                <div class="flex_row_left">
+                    <img src="../../image/222.png" alt="" class="VW_10 VH_10 flex_shrink_0 B_radius_circle">
+                    <div class="PL_5 fontS_11">
+                        <div>用户名称</div>
+                        <div class="PT_2">18433246546</div>
+                    </div>
+                </div>
+                <div class="textR">
+                    <div class="fontS_11">2019-09-09</div>
+                    <div class="PT_2 fontS_13 font_weight_bold color_FFC41C">￥99.99</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <van-popup v-model="istime" position="bottom">
+        <van-datetime-picker v-model="currentDate" type="date" @confirm="getdata" @cancel="istime=false"/>
+    </van-popup>
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#fans_order',
+            data: {
+                istime:false,
+                currentDate: new Date(),
+            },
+            created: function() {
+                var that = this;
+                that.getdata(that.currentDate);
+            },
+
+            methods: {
+                //获取行业类型
+                getdata(value) {
+                    var that = this;
+                    that.istime=false;
+                    var seperator1 = "-";
+                    var year = value.getFullYear();
+                    var month = value.getMonth() + 1;
+                    var strDate = value.getDate();
+                    if (month >= 1 && month <= 9) {
+                        month = "0" + month;
+                    }
+                    if (strDate >= 0 && strDate <= 9) {
+                        strDate = "0" + strDate;
+                    }
+                    that.currentDates = year + seperator1 + month + seperator1 + strDate;
+                    console.log(that.currentDates)
+                },
+            },
+        })
+    };
+</script>

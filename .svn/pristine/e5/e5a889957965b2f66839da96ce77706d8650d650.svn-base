@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../lib/animate.css">
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />
+    <style>
+        .semicircle_bg {
+            background-repeat: no-repeat;
+            background-size: 100% 80%;
+            background-image: url(../image/frame0_bg1.png);
+            background-position: 0 140px;
+        }
+        .fenlei .van-swipe__indicator{
+            width: 30px;
+            height: 5px;
+            border-radius: 0;
+            border: 1px solid lightgray;
+        }
+        .itemss {
+            width: 2rem;
+            height: 2rem;
+            background-color: #F3CB7B;
+        }
+        .brbtomtime::after{
+            content: '';
+            width: 30px;
+            height: 3px;
+            background: black;
+            position: absolute;
+            margin: auto;
+            bottom: -5px;
+            left: 0;
+            right: 0;
+        }
+        .bkzq .van-swipe__indicator{
+            opacity: 1;
+            border: 1px solid lightgray;
+            background: white;
+        }
+        .bkzq .van-swipe__indicator--active{
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="frame0" v-cloak class="semicircle_bg flex_col_start flex_items_stretch VH100"  :style="{'background-color':bgyanse}">
+    <div class="header PLR_4 W_100 flex_shrink_0">
+        <div class="flex_row_between PT_2">
+            <i class="iconfont iconsao color_fff fontS_20" @click="fnScanner"></i>
+            <div class="flex_center color_999 bg_fff B_radius_15 PTB_2 W_80" @click="toPage('search','./frame0/search.html')">
+                <i class="iconfont iconsearch"></i>
+                <span class="fontS_12">搜索商品名或粘贴宝贝标题</span>
+            </div>
+            <i class="iconfont iconxinxi1 color_fff fontS_20" @click="toPage('news','./frame0/news.html')"></i>
+        </div>
+
+        <div class="flex W_100">
+            <div ref="navEl" class="cate_scroll fontS_14 flex_rowL color_fff PTB_5">
+                <div class="PLR_4 relative" v-for="(item,idx) in navArr" :class="nav_ac==idx?'color_FFC41C':''" @click="nav_ac=idx">{{item}}</div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="overflow_y flex_grow_1 W_100 H_100">
+        <van-pull-refresh v-model="downLoading" @refresh="getlists">
+            <van-list
+                    v-model="upLoading"
+                    :finished="finished"
+                    finished-text="没有更多了"
+                    @load="getlists"
+                    :immediate-check="false">
+                <!--综合-->
+                <div class="W_100" v-show="nav_ac==0">
+                    <!-- 轮播 -->
+                    <van-swipe @change="fnIndicators" :autoplay="3000" indicator-color="white" class="VH_35 W_90 MLR_auto B_radius_5" :show-indicators="true">
+                        <van-swipe-item v-for="(item,idx) in bannerArr" :key="idx">
+                            <img :src="item.pic" alt="" class="W_100 H_100 object_fit_cover">
+                        </van-swipe-item>
+                    </van-swipe>
+
+                    <!--分类-->
+                    <van-swipe @change="fnfenlei" :loop="false" indicator-color="#FFC41C" class="W_100 VH_50 MLR_auto fenlei bg_fff" :show-indicators="true">
+                        <van-swipe-item>
+                            <div class="W_100 flex_row_left flex_wrap bg_fff">
+                                <div class="textC W_20 MT_6 fontS_11" v-for="list in tktype" @click="toPage(list.name,list.url,{'type':list.title})">
+                                    <img src="../image/tb1.png" alt="" class="W_60">
+                                    <p>{{list.title}}</p>
+                                </div>
+                            </div>
+                        </van-swipe-item>
+                        <van-swipe-item>
+                            <div class="W_100 H_80 MT_5">
+                                <img src="../image/222.png" alt="" class="W_100 H_100 object_fit_cover">
+                            </div>
+                        </van-swipe-item>
+                    </van-swipe>
+
+
+                    <!--通知公告-->
+                    <div class="flex_row_left bg_eee P_4">
+                        <div class="VH_5 flex_row_left" @click="toPage('login','./login/login.html')">通知公告：</div>
+                        <van-swipe :autoplay="3000" :show-indicators="false" :touchable="false" vertical class="W_80 VH_5">
+                            <van-swipe-item v-for="(item,index) in 3" :key="index">
+                                <div class="PL_1 text_overflow_1 W_100 VH_5">易拼宝项目即将上线了</div>
+                            </van-swipe-item>
+                        </van-swipe>
+                    </div>
+
+                    <!--轮播图首页1-->
+                    <div class="W_100 animated fadeIn bg_fff" v-show="lunboidx==0">
+                        <!-- 邀请好友商学院 -->
+                        <div class="flex_row_between W_100 PTB_5">
+                            <div class="flex_grow_1 PLR_5 BR_1_eeeeee W_50" @click="toPage('invited_share','./frame0/invited_share.html')">
+                                <div class="flex_rowL">
+                                    <img src="../image/u_cart.png" style="width: 22px;height:22px;" alt="">
+                                    <h4 class="fontS_16 PL_1">邀请好友</h4>
+                                </div>
+                                <div class="flex_row_between">
+                                    <div>
+                                        <div class="fontS_11 PB_6">独乐乐不如众乐乐</div>
+                                        <span class="B_radius_10 bg_linearLR_ED80FE_BF54FF fontS_11 PTB_1 PLR_3 color_fff">
+                                        点击进入>
+                                    </span>
+                                    </div>
+                                    <img src="../image/222.png" class="flex_shrink_0 VW_15 VH_15" alt="">
+                                </div>
+                            </div>
+                            <div class="flex_grow_1 PLR_5 W_50" @click="toPage('commercia_college','./frame0/commercia_college.html')">
+                                <div class="flex_rowL">
+                                    <img src="../image/u_shop.png" style="width: 22px;height:22px;" alt="">
+                                    <h4 class="fontS_16 PL_1">商学院</h4>
+                                </div>
+                                <div class="flex_row_between">
+                                    <div>
+                                        <div class="fontS_11 PB_6">新手必看</div>
+                                        <span class="B_radius_10 bg_linearLR_AA9FFF_6773FF fontS_11 PTB_1 PLR_3 color_fff">点击进入></span>
+                                    </div>
+                                    <img src="../image/222.png" class="flex_shrink_0 VW_15 VH_15" alt="">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--加盟-->
+                        <img src="../image/222.png" class="flex_shrink_0 W_100 VH_25" alt="">
+
+
+                        <!--时间倒计时-->
+                        <div class="P_4 W_100">
+                            <div class="W_100 VH_20 flex_row_between PLR_5" style="background-image: url('../image/1111.jpg');background-size: 100% 100%">
+                                <img src="../image/222.png" alt="" class="VW_20 VH_10">
+                                <div class="flex_row_right">
+                                    <div class="color_fff PR_5 font_weight_bold">距离结束还剩</div>
+                                    <van-count-down :time="timevalue" class="flex_rowC fontS_14 color_fff">
+                                        <template v-slot="timeData">
+                                            <span class="itemss flex_rowC">{{timeData.hours}}</span>
+                                            <span class="PLR_2">:</span>
+                                            <span class="itemss flex_rowC">{{timeData.minutes}}</span>
+                                            <span class="PLR_2">:</span>
+                                            <span class="itemss flex_rowC">{{timeData.seconds}}</span>
+                                        </template>
+                                    </van-count-down>
+                                </div>
+                            </div>
+
+                            <div class="flex W_100 MTB_3">
+                                <div ref="navEltime" class="cate_scroll fontS_10 flex_rowL PB_2 W_100">
+                                    <div class="PLR_5 relative textC" v-for="(item,idx) in timeArr" :class="timeactive==idx?'brbtomtime':'color_999'" @click="timeactive=idx">
+                                        <p class="fontS_14 font_weight_800" :class="timeactive==idx?'fontS_18':''">{{item.time}}</p>
+                                        <p class="fontS_14">{{item.title}}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--商品列表-->
+                            <div class="flex_row_between PTB_4" v-for="item in 10" @click="toPage('goods_detail','./frame0/goods_detail.html')">
+                                <img src="../image/1111.jpg" alt="" class="VW_30 VH_30 B_radius_5">
+                                <div class="VH_30 flex_col_around W_100 PL_5">
+                                    <div class="text_overflow_2 W_100">驱蚊器翁无群二群翁无群二无群二无群二阿士</div>
+                                    <div class="flex_row_left W_100 fontS_10">
+                                        <div class="B_1_eeeeee color_red PLR_2 PTB_1 B_radius_5 MR_2">分享赚：￥1.55</div>
+                                        <div class="B_1_eeeeee color_red PLR_2 PTB_1 B_radius_5">自购赚：￥1.55</div>
+                                    </div>
+                                    <div class="flex_row_between W_100">
+                                        <div>
+                                            <span class="font_weight_bold fontS_15">￥198.00</span>
+                                            <span class="text_decoration_line-through color_999 fontS_11">199.00</span>
+                                        </div>
+                                        <div style="width: 60px;height: 25px;background: url('../image/quanjian.png')no-repeat;background-size: 100% 100%;" class="color_red flex_rowC">￥12</div>
+                                    </div>
+                                    <div class="color_999 W_100 fontS_10">1290人已买 天猫</div>
+
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!--商品图-->
+                        <div class="PLR_4">
+                            <img src="../image/1111.jpg" alt="" class="B_radius_5 W_100 VH_30">
+                            <div class="flex_row_between MT_2">
+                                <div class="W_32" v-for="item in 3">
+                                    <img src="../image/222.png" alt="" class="W_100 VH_30 B_radius_5">
+                                    <p class="text_overflow_1 fontS_11 MT_1">撒的发生大发送到欧尼</p>
+                                    <div class="flex_row_between MT_2">
+                                        <div style="width: 50px;height: 22px;background: url('../image/quanjian.png')no-repeat;background-size: 100% 100%;" class="color_red flex_rowC">￥12</div>
+                                        <div class="font_weight_bold">￥14</div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="P_4 W_100">
+                            <!--为你推荐-->
+                            <div class="W_100 flex_rowC">
+                                <img src="../image/wntj.png" class="W_60 MLR_auto" alt="">
+                            </div>
+
+                            <!--商品列表-->
+                            <div class="flex_row_between PTB_4" v-for="item in 10">
+                                <img src="../image/1111.jpg" alt="" class="VW_30 VH_30 B_radius_5">
+                                <div class="VH_30 flex_col_around W_100 PL_5">
+                                    <div class="text_overflow_2 W_100">驱蚊器翁无群二群翁无群二无群二无群二阿士</div>
+                                    <div class="flex_row_left W_100 fontS_10">
+                                        <div class="B_1_eeeeee color_red PLR_2 PTB_1 B_radius_5 MR_2">分享赚：￥1.55</div>
+                                        <div class="B_1_eeeeee color_red PLR_2 PTB_1 B_radius_5">自购赚：￥1.55</div>
+                                    </div>
+                                    <div class="flex_row_between W_100">
+                                        <div>
+                                            <span class="font_weight_bold fontS_15">￥198.00</span>
+                                            <span class="text_decoration_line-through color_999 fontS_11">199.00</span>
+                                        </div>
+                                        <div style="width: 60px;height: 25px;background: url('../image/quanjian.png')no-repeat;background-size: 100% 100%;" class="color_red flex_rowC">￥12</div>
+                                    </div>
+                                    <div class="color_999 W_100 fontS_10">1290人已买 天猫</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--轮播图首页2-->
+                    <div class="W_100 animated fadeIn bg_fff" v-show="lunboidx==1">
+                        <!--集市视频-->
+                        <div class="P_4">
+                            <div class="flex_row_left">
+                                <img src="../image/tb1.png" alt="" class="VH_10 VW_10">
+                                <div class="fontS_14 PL_3">集市视频</div>
+                            </div>
+
+                            <div class="MT_5">
+                                <div class="cate_scroll fontS_10">
+                                    <div class="VW_35 VH_50 D_inline_block MR_3 relative" @click="toPage('video_detail','./frame0/video_detail.html')" v-for="item in 5">
+                                        <img src="../image/1111.jpg" alt="" class="W_100 H_100 B_radius_10">
+                                        <p class="color_fff absoluteBLR text_overflow_1 P_4 fontS_14">文字标题问我玩儿翁</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!--爆款专区-->
+                        <div class="W_100">
+                            <div class="flex_row_left PLR_4">
+                                <img src="../image/tb1.png" alt="" class="VH_10 VW_10">
+                                <div class="fontS_14 PL_3">爆款专区</div>
+                            </div>
+
+                            <!-- 爆款商品 -->
+                            <van-swipe :autoplay="3000" v-if="lunboidx==1" indicator-color="gray" class="W_100 VH_40 bkzq" :show-indicators="true">
+                                <van-swipe-item class="PLR_4 W_100 H_100" v-for="item in 5">
+                                    <div class="flex_row_between PTB_4">
+                                        <img src="../image/1111.jpg" alt="" class="VW_30 VH_30 B_radius_5 D_block">
+                                        <div class="VH_30 flex_col_around W_100 PL_5">
+                                            <div class="text_overflow_2 W_100">驱蚊器翁无群二群翁无群二无群二无群二阿士</div>
+                                            <div class="flex_row_left W_100 fontS_10">
+                                                <div class="B_1_eeeeee color_red PLR_2 PTB_1 B_radius_5 MR_2">分享赚：￥1.55</div>
+                                                <div class="B_1_eeeeee color_red PLR_2 PTB_1 B_radius_5">自购赚：￥1.55</div>
+                                            </div>
+                                            <div class="flex_row_between W_100">
+                                                <div>
+                                                    <span class="font_weight_bold fontS_15">￥198.00</span>
+                                                    <span class="text_decoration_line-through color_999 fontS_11">199.00</span>
+                                                </div>
+                                                <div style="width: 60px;height: 25px;background: url('../image/quanjian.png')no-repeat;background-size: 100% 100%;" class="color_red flex_rowC">￥12</div>
+                                            </div>
+                                            <div class="color_999 W_100 fontS_10">1290人已买 天猫</div>
+                                        </div>
+                                    </div>
+                                </van-swipe-item>
+                            </van-swipe>
+                        </div>
+
+                        <!--自营商品-->
+                        <div class="W_100 MT_3">
+                            <img src="../image/222.png" alt="" class="VH_25 W_100 object_fit_cover">
+
+                            <!--商品列表-->
+                            <div class="flex_row_left flex_wrap PLR_3 bg_eee PB_4">
+                                <div class="W_50 PT_4" v-for="(item,index) in 10" :class="index%2==0?'PR_2':'PL_2'">
+
+                                    <img src="../image/1111.jpg" alt="" class="W_100 VH_45 B_radiusT_5">
+                                    <div class="bg_fff P_3 B_radiusB_5" style="margin-top: -3px">
+                                        <div class="text_overflow_1">驱蚊器翁无群二群阿士大夫撒地方收到</div>
+
+                                        <div class="flex_row_left PT_2 W_100">
+                                            <div class="color_red fontS_13 font_weight_bold">￥456</div>
+                                            <div class="color_999 fontS_10 PL_3">已售：120</div>
+                                        </div>
+
+                                        <img src="../image/222.png" alt="" class="VH_5 W_100">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--为你推荐-->
+                        <div class="P_4 W_100">
+                            <div class="W_100 flex_rowC">
+                                <img src="../image/wntj.png" class="W_60 MLR_auto" alt="">
+                            </div>
+
+                            <!--商品列表-->
+                            <div class="flex_row_between PTB_4" v-for="item in 10">
+                                <img src="../image/1111.jpg" alt="" class="VW_30 VH_30 B_radius_5">
+                                <div class="VH_30 flex_col_around W_100 PL_5">
+                                    <div class="text_overflow_2 W_100">驱蚊器翁无群二群翁无群二无群二无群二阿士</div>
+                                    <div class="flex_row_left W_100 fontS_10">
+                                        <div class="B_1_eeeeee color_red PLR_2 PTB_1 B_radius_5 MR_2">分享赚：￥1.55</div>
+                                        <div class="B_1_eeeeee color_red PLR_2 PTB_1 B_radius_5">自购赚：￥1.55</div>
+                                    </div>
+                                    <div class="flex_row_between W_100">
+                                        <div>
+                                            <span class="font_weight_bold fontS_15">￥198.00</span>
+                                            <span class="text_decoration_line-through color_999 fontS_11">199.00</span>
+                                        </div>
+                                        <div style="width: 60px;height: 25px;background: url('../image/quanjian.png')no-repeat;background-size: 100% 100%;" class="color_red flex_rowC">￥12</div>
+                                    </div>
+                                    <div class="color_999 W_100 fontS_10">1290人已买 天猫</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!--其他分类-->
+                <div class="W_100 bg_fff" v-show="nav_ac!=0">
+                    <!--筛选条件-->
+                    <div class="W_100 flex_row_around PTB_5 fontS_12 BB_1_eeeeee bg_fff">
+                        <div class="flex_center" :class="sort==0?'color_FFC41C':'color_666'" @click="settj(0)">
+                            <span>综合</span>
+                        </div>
+                        <div class="flex_center" :class="(sort==1||sort==2)?'color_FFC41C':'color_666'" @click="settj(1)">
+                            <span>价格</span>
+                            <div class="flex_col_c" style="padding-top: 1px">
+                                <i class="iconfont iconshang fontS_8" :class="sort==2?'color_FFC41C':'color_666'" style="margin-bottom: -3px"></i>
+                                <i class="iconfont iconxia1 fontS_8" :class="sort==1?'color_FFC41C':'color_666'"></i>
+                            </div>
+                        </div>
+                        <div class="flex_center" :class="(sort==3||sort==4)?'color_FFC41C':'color_666'" @click="settj(2)">
+                            <span>佣金</span>
+                            <div class="flex_col_c" style="padding-top: 1px">
+                                <i class="iconfont iconshang fontS_8" :class="sort==4?'color_FFC41C':'color_666'" style="margin-bottom: -3px"></i>
+                                <i class="iconfont iconxia1 fontS_8" :class="sort==3?'color_FFC41C':'color_666'"></i>
+                            </div>
+                        </div>
+                        <div class="flex_center" :class="(sort==5||sort==6)?'color_FFC41C':'color_666'" @click="settj(3)">
+                            <span>销量</span>
+                            <div class="flex_col_c" style="padding-top: 1px">
+                                <i class="iconfont iconshang fontS_8" :class="sort==6?'color_FFC41C':'color_666'" style="margin-bottom: -3px"></i>
+                                <i class="iconfont iconxia1 fontS_8" :class="sort==5?'color_FFC41C':'color_666'"></i>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!--商品列表-->
+                    <div class="flex_row_left flex_wrap PLR_3 bg_eee PB_4">
+                        <div class="W_50 PT_4" v-for="(item,index) in 10" :class="index%2==0?'PR_2':'PL_2'">
+
+                            <img src="../image/1111.jpg" alt="" class="W_100 VH_45 B_radiusT_5">
+                            <div class="bg_fff P_3 B_radiusB_5" style="margin-top: -3px">
+                                <div class="text_overflow_1 PB_2">驱蚊器翁无群二群阿士大夫撒地方收到</div>
+
+                                <div class="flex_row_between W_100">
+                                    <div class="fontS_10">
+                                        <span class="color_red fontS_14">￥198.00</span>
+                                        <span class="text_decoration_line-through color_999">199.00</span>
+                                        <span class="color_red">赚2.50</span>
+                                    </div>
+                                    <img src="../image/tb.png" alt="" style="width: 16px;height: 16px">
+                                </div>
+
+                                <div class="flex_row_between PT_2 W_100">
+                                    <div style="width: 60px;height: 25px;background: url('../image/quanjian.png')no-repeat;background-size: 100% 100%;" class="color_red flex_rowC">10元券</div>
+                                    <div class="color_999 fontS_11">已售：120</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </van-list>
+        </van-pull-refresh>
+    </div>
+</div>
+</body>
+</html>
+<script src="../script/api.js"></script>
+<!--<script src="../lib/fastclick.min.js"></script>-->
+<script src="../lib/vue/vue.js"></script>
+<script src="../lib/swiper/swiper.min.js"></script>
+<script src="../lib/vant/vant.min.js"></script>
+<script src="../lib/Tween.min.js"></script>
+<script src="../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#frame0',
+            data: {
+                nav_ac:0,
+                navArr:['精选','男装','女装','护肤','家居','母婴','数码','户外','内衣'],
+
+                tktype:[
+                    {'title':'淘宝','name':'taokeList','url':'./frame0/taokeList.html'},
+                    {'title':'京东','name':'taokeList','url':'./frame0/taokeList.html'},
+                    {'title':'拼多多','name':'taokeList','url':'./frame0/taokeList.html'},
+                    {'title':'9.9包邮','name':'taokeList','url':'./frame0/taokeList.html'},
+                    {'title':'多用户商家','name':'more_user_shops','url':'./frame0/more_user_shops.html'},
+                    {'title':'天猫','name':'taokeList','url':'./frame0/taokeList.html'},
+                    {'title':'信用卡'},
+                    {'title':'好货专场','name':'good_choice','url':'./frame0/good_choice.html'},
+                    {'title':'共享影视','name':'share_movie','url':'./frame0/share_movie.html'},
+                    {'title':'O2O小店','name':'offline_store','url':'./frame1/offline_store.html'}
+                ],//首页淘客类型
+
+                bannerArr:[{'pic':'../image/1111.jpg','bgcolor':'#B88C35'},{'pic':'../image/222.png','bgcolor':'#E9CDB5'}],
+
+                bgyanse:'#fff',//背景颜色
+
+                lunboidx:0,//分类轮播下标
+                timevalue:123456465,//时间倒计时
+
+                timeactive:2,//时间下标
+                timeArr:[
+                    {'time':'10:00','title':'抢购中'},
+                    {'time':'12:00','title':'抢购中'},
+                    {'time':'14:00','title':'抢购中'},
+                    {'time':'18:00','title':'抢购中'},
+                    {'time':'20:00','title':'抢购中'},
+                    {'time':'22:00','title':'抢购中'},
+                    {'time':'24:00','title':'抢购中'},
+                ],//时间
+
+                sort:0,//搜索条件
+
+                downLoading:false,
+                upLoading:false,
+                finished:false,
+            },
+
+            mounted:function(){
+                var that = this;
+                that.bgyanse = that.bannerArr[0].bgcolor;
+            },
+
+
+            watch: {
+                nav_ac:function (value) {
+                    var that = this;
+                    // console.log(that.nav_ac)
+                    $api.dom('.overflow_y').scrollTop = 0; //回到顶部
+                    // that.finished = false;
+                    var el = that.$refs.navEl;
+                    var start = el.scrollLeft;
+                    var end = el.children[that.nav_ac].offsetLeft + el.children[0].offsetWidth/2 - el.offsetWidth/2 ; //横向滚动条点击元素居中
+                    that.fnAnimate(el,start,end,TWEEN.Easing.Quadratic.Out);
+                },
+
+                timeactive:function (value) {
+                    var that = this;
+                    var el = that.$refs.navEltime;
+                    var start = el.scrollLeft;
+                    var end = el.children[that.timeactive].offsetLeft + el.children[0].offsetWidth/2 - el.offsetWidth/2 ;                               //横向滚动条点击元素居中
+                    that.fnAnimate(el,start,end,TWEEN.Easing.Quadratic.Out);
+                },
+            },
+
+            methods: {
+                //动画
+                fnAnimate:function (el,start,end,easing,attr) {
+                    var that = this;
+                    var position = { x: start }; // position 对应初始位置 也就是left 是0px
+                    var tweenA = new TWEEN.Tween(position)// new TWEEN.Tween里面放置初始位置，也就是left 是0px
+                        .to({ x: end }, 300) // to函数第一个参数里面放置要到哪里 也就是left:500px的地方 to函数第二个参数是要花多少时间，也就是1000毫秒
+                        .easing(easing) //贝塞尔曲线公式
+                        .onUpdate(function(){ // onUpdate函数放置这段时间我们做什么，也就是div的left值不断变化，
+                            el[attr?attr:'scrollLeft'] = position.x; // position.x就是上面说的不断变化的left值，
+                        });
+                    tweenA.start(); // 启动这个动画
+                    function animate(){
+                        requestAnimationFrame(animate); // requestAnimationFrame可以看成setTimeout(animate, 17)
+                        TWEEN.update(); // 每隔一段时间，update方法会调用上面的onUpdate函数 位置变化
+                    }
+                    animate();
+                },
+
+                //轮播指示器索引
+                fnIndicators:function(idx) {
+                    var that = this;
+                    that.bgyanse = that.bannerArr[idx].bgcolor;
+                },
+                //分类指示器
+                fnfenlei:function(idx){
+                    var that = this;
+                    // $api.dom('.overflow_y').scrollTop = 0; //回到顶部
+                    that.lunboidx = idx;
+                },
+
+                //搜索条件
+                settj:function (index) {
+                    var that = this;
+                    $api.dom('.overflow_y').scrollTop = 0; //回到顶部
+                    if(index==0){//综合
+                        that.sort = 0;
+                    }else if(index==1){ //高低价格
+                        if(that.sort===2){
+                            that.sort = 1;
+                        }else {
+                            that.sort = 2;
+                        }
+                    }else if(index==2){ //佣金
+                        if(that.sort===4){
+                            that.sort = 3;
+                        }else {
+                            that.sort = 4;
+                        }
+                    }else if(index==3){ //销量
+                        if(that.sort===6){
+                            that.sort = 5;
+                        }else {
+                            that.sort = 6;
+                        }
+                    }
+                    console.log(that.sort)
+                    // that.getlists();
+                },
+
+
+                //商品列表
+                getlists:function () {
+                    var that = this;
+                    setTimeout(function () {
+                        that.downLoading = false;
+                        that.upLoading = false;
+                        that.finished = true;
+                    },2000)
+                },
+
+                //扫码
+                fnScanner:function (){
+                    var resultList = api.hasPermission({
+                        list:['camera']
+                    });
+                    // console.log(JSON.stringify(resultList[0].granted));
+                    // console.log(JSON.stringify(resultList[0].undetermined));
+                    if(!resultList[0].granted) {
+                        api.requestPermission({
+                            list:['camera'],
+                            code:1
+                        }, function(ret, err){
+                            console.log(JSON.stringify(ret));
+                        });
+                    }
+                    var FNScanner = api.require('FNScanner');
+                    FNScanner.openScanner({
+                        autorotation: true
+                    }, function(ret, err) {
+                        if (ret) {
+                            console.log(JSON.stringify(ret));
+                            // if(ret.content) {
+                            //     api.openWin({
+                            //         name: 'code_pay',
+                            //         url: 'community/code_pay.html',
+                            //         bounces: false,
+                            //         pageParam: {
+                            //             info: ret.content
+                            //         }
+                            //     });
+                            // }
+                        } else {
+                            console.log(JSON.stringify(err));
+                        }
+                    });
+                },
+
+            },
+        })
+    }
+</script>

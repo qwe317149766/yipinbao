@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+    <style>
+        .van-address-item--disabled .van-address-item__name{
+            color: #323233;
+        }
+        .van-button--danger{
+            background: #F3CB7B;
+            border: 0;
+            height: 40px;
+            line-height: 40px;
+            color: black;
+            width: 90%;
+            border-radius: 10px;
+            margin: auto;
+            left: 0;
+            right: 0;
+            bottom: 1rem;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+<div id="address_list" v-cloak class="flex_col_start VW_100 flex_items_stretch VH100">
+    <div class="header W_100 flex_shrink_0 bg_2B2B2B color_fff">
+        <div class="P_4 flex_rowC relative flex_shrink_0">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">我的收货地址</span>
+        </div>
+    </div>
+
+    <div class="overflow_y flex_grow_1">
+        <van-address-list
+            v-model="chosenAddressId"
+            :list="isdizhi?list:[]"
+            :disabled-list="isdizhi?[]:list"
+            @add="onAdd"
+            @edit="onEdit"
+            @edit-disabled="onEditDisabled"
+            @select="onSelect"
+            add-button-text="添加新地址"/>
+
+        <div v-if="list.length==0" class="fontS_13 color_999 absoluteTBLR M_auto VH_50 VW_50 flex_rowC">
+            还没有收货地址呢！
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
+<script type="text/javascript" src="../../lib/api.js"></script>
+<script type="text/javascript" src="../../lib/vue/vue.js"></script>
+<script type="text/javascript" src="../../script/const.js"></script>
+<!--<script src="../../lib/fastclick.min.js"></script>-->
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/rsa.js"></script>
+<script src="../../script/aes.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#address_list',
+            data: {
+                chosenAddressId: '',
+                list: [],
+
+                isdizhi:true
+            },
+            created: function() {
+                var that = this;
+                if(api.pageParam.selectId){
+                    that.isdizhi = true;
+                    that.chosenAddressId = api.pageParam.selectId;
+                }else {
+                    that.isdizhi = false
+                }
+                that.getdzlist();
+            },
+
+            mounted:function(){
+
+            },
+
+            methods: {
+                //新增地址
+                onAdd: function() {
+                    var that = this;
+                    that.toPage('address_edit','./address_edit.html');
+                },
+                //修改地址
+                onEdit: function(item, index) {
+                    // console.log(JSON.stringify(item));
+                    // console.log(index);
+                    var that = this;
+                    that.toPage('address_edit','./address_edit.html',{usermsg:item});
+                },
+
+                //修改地址
+                onEditDisabled: function(item, index) {
+                    // console.log(JSON.stringify(item));
+                    // console.log(index);
+                    var that = this;
+                    that.toPage('address_edit','./address_edit.html',{usermsg:item});
+                },
+
+
+                // 获取地址列表
+                getdzlist:function () {
+                    var that = this;
+                    that.$toast.loading({
+                        mask: true,
+                        loadingType:'spinner',
+                        message: '加载中...'
+                    });
+                    that.http(PostaddrList_address, 'post', {}, function (res) {
+                        // console.log(JSON.stringify(res));
+                        that.$toast.clear();
+                        if (res.code == 0) {
+                            var arealist = [];
+                            var dzdata = res.data;
+                            for(var i in dzdata){
+                                var obj = {};
+                                obj.id = dzdata[i].id;
+                                obj.name = dzdata[i].userName;
+                                obj.tel = dzdata[i].mobile;
+                                obj.isDefault = dzdata[i].is_default==1?true:false;
+                                obj.province = dzdata[i].province;
+                                obj.city = dzdata[i].city;
+                                obj.county = dzdata[i].country;
+                                obj.addressDetail = dzdata[i].detail;
+                                obj.areaCode = dzdata[i].code;
+                                obj.address = dzdata[i].province+dzdata[i].city+dzdata[i].country+dzdata[i].detail;
+                                arealist.push(obj);
+                            }
+                            that.list = arealist;
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                },
+
+
+                // 选中地址
+                onSelect:function (item,index) {
+                    // console.log(JSON.stringify(item));
+                    // console.log(index)
+                    var that = this;
+                    api.execScript({
+                        name: 'affirm_order',
+                        script:'vm.setdizhi('+JSON.stringify(item)+');'
+                    });
+
+                    setTimeout(function () {
+                        that.goBack();
+                    },300)
+                }
+
+            },
+        })
+    };
+</script>

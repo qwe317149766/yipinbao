@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="my_tkfans" v-cloak class="flex_col_between flex_items_stretch VH100">
+    <div class="header W_100 flex_shrink_0 bg_2B2B2B color_fff">
+        <div class="P_4 flex_rowC relative flex_shrink_0">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">我的粉丝</span>
+        </div>
+    </div>
+
+
+    <div class="overflow_y flex_grow_1">
+        <div class="flex_row_between bg_ccc PLR_3 PT_4 PB_2">
+            <div class="W_85 flex_row_left bg_fff B_radius_5 P_2">
+                <i class="iconfont iconsearch"></i>
+                <input type="search" v-model="keyword" placeholder="请输入查询的用户名" class="PL_2 W_100">
+            </div>
+            <div class="fontS_15" @click="getlists">搜索</div>
+        </div>
+
+        <div class="PTB_6 PLR_3 flex_row_left">
+            <div @click="active=index" class="flex_row_left PR_3" v-for="(item,index) in typeArry">
+                <i :class="active==index?'iconyuan':'iconyuan1'" class="iconfont color_F3CB7B VW_5 VH_5"></i>
+                <div class="PL_1">{{item}}</div>
+            </div>
+            <div class="color_red PL_4">{{count}}人</div>
+        </div>
+
+
+        <div class="BT_1_eeeeee borderColor_999 MT_3">
+            <div class="flex_row_between bg_f2f2f2 PTB_6 fontS_14 color_999">
+                <div class="textC W_25">账号ID</div>
+                <div class="textC W_35">用户名</div>
+                <div class="textC W_40">注册时间</div>
+            </div>
+            <van-list
+                    v-model="upLoading"
+                    :finished="finished"
+                    finished-text="没有更多了"
+                    @load="getlists(true)"
+                    :immediate-check="false">
+                <div class="PTB_6 BB_1_eeeeee fontS_13 borderColor_999 flex_row_between" v-for="(list,index) in goodsList" :key="index">
+                    <div class="textC W_25">{{list.mobile}}</div>
+                    <div class="textC W_35">{{list.nickname}}</div>
+                    <div class="textC W_40 fontS_10">{{list.create_time}}</div>
+                </div>
+            </van-list>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/rsa.js"></script>
+<script src="../../script/aes.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#my_tkfans',
+            data: {
+                active:0,
+                typeArry:['推广商户','一级粉丝','二级粉丝','团队'],
+
+                keyword:'',
+                page:1,
+                goodsList:[],
+                upLoading:false,
+                finished:false,
+                count:0
+            },
+            created: function() {
+                var that = this;
+                that.getnum();
+                that.getlists();
+            },
+
+            watch:{
+                active:function (value) {
+                    var that = this;
+                    that.active = value;
+                    that.$toast.loading({
+                        mask: true,
+                        loadingType:'spinner',
+                        message: '加载中...'
+                    });
+                    that.goodsList = [];
+                    that.getlists();
+                }
+            },
+
+            methods: {
+                //团队数
+                getnum:function(){
+                    var that = this;
+                    that.http(userGetTeamCount, 'post', {}, function (res) {
+                        console.log(JSON.stringify(res));
+                        if (res.code == 0) {
+                            that.count = res.data.count;
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                },
+
+                //获取列表
+                getlists:function (load) {
+                    var that = this;
+                    if(load){
+                        if(that.upLoading) { //上拉加载
+                            that.page ++;
+                        }
+                    }else {
+                        that.page = 1; //刷新
+                        if(that.goodsList.length>15){
+                            that.finished = false;
+                        }
+                    }
+                    var typename;
+                    if(that.active==0){
+                        typename = 'o2o';
+                    }else if(that.active==1){
+                        typename = 'son';
+                    }else if(that.active==2){
+                        typename = 'grandson';
+                    }else if(that.active==3){
+                        typename = 'team';
+                    }
+                    that.http(UserMyFans, 'post', {'page':that.page,'keyword':that.keyword,'type':typename}, function (res) {
+                        that.$toast.clear();
+                        console.log(JSON.stringify(res));
+                        if (res.code == 0) {
+                            if(res.data.length < 15) {
+                                that.finished = true;
+                            }else {
+                                that.finished = false;
+                            }
+                            if(load){
+                                if(that.upLoading) {
+                                    that.goodsList = that.goodsList.concat(res.data);
+                                    that.upLoading = false;
+                                }
+                            } else {
+                                that.goodsList = res.data;
+                                that.downLoading = false;
+                            }
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                },
+            },
+        })
+    };
+</script>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" href="../../lib/animate.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+</head>
+<body>
+<div id="merchants_shop_search" v-cloak class="flex_col_start flex_items_stretch VH100">
+    <div class="header PLR_4 W_100 flex_shrink_0 bg_2B2B2B">
+        <div class="flex_row_between PTB_4">
+            <i class="iconfont iconfanhui color_fff fontS_20" @click="goBack()"></i>
+            <div class="flex_center color_999 bg_fff B_radius_15 PTB_2 W_80">
+                <i class="iconfont iconsearch PL_5"></i>
+                <input class="W_100 fontS_12 PLR_2" type="search" v-model="word" placeholder="搜索店铺名称">
+            </div>
+            <div class="color_fff fontS_14">搜索</div>
+        </div>
+    </div>
+
+
+    <div class="overflow_y flex_grow_1 H_100">
+        <div v-for="item in 5">
+            <div class="flex_row_left fontS_14 font_weight_bold PT_4 PB_2 bg_eee PL_4">店铺名称</div>
+            <div class="cate_scroll BB_1_eeeeee P_4">
+                <div class="VW_35 VH_35 D_inline_block MR_3 relative" v-for="item in 5">
+                    <img src="../../image/1111.jpg" alt="" class="W_100 H_100">
+                    <div class="flex_row_left PT_1">
+                        <div class="font_weight_bold">￥79.9</div>
+                        <div class="color_999 fontS_10 PL_2">已售150</div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex_row_between P_4" @click="toPage('merchants_shop','./merchants_shop.html')">
+                <div>点击进入商家</div>
+                <i class="iconfont iconfanhui1 color_999"></i>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script src="../../script/const.js"></script>
+<script src="../../lib/api.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#merchants_shop_search',
+            data: {
+                word:''
+            },
+
+            created:function () {
+                var that = this;
+
+            },
+
+            methods: {
+
+
+
+            },
+        })
+    }
+</script>

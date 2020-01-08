@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="platform_cooperation_center" v-cloak class="flex_col_between flex_items_stretch VH100">
+    <div class="header W_100 flex_shrink_0 bg_2B2B2B color_fff">
+        <div class="P_4 flex_rowC relative flex_shrink_0">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">平台合作中心</span>
+        </div>
+    </div>
+
+
+    <div class="overflow_y flex_grow_1">
+        <div class="PLR_3 PTB_5">
+            <div style="box-shadow: 0 4px 5px 0 rgba(255,0,0,.2);" class="bg_4dbdff B_radius_15 bg_linearLR_FC5957_FD9660">
+                <div class="flex_row_left PTB_5 PLR_7 BB_1_eeeeee">
+                    <img :src="userdata.headImg||'../../image/logo.png'" alt="" class="VW_15 VH_15 B_radius_circle">
+                    <div class="PL_5 color_fff">
+                        <div class="PB_3 fontS_13">{{userdata.nickname}}</div>
+                        <div class="flex_row_left fontS_11">
+                            <div class="bg_2B2B2B B_radius_15 PTB_1 PLR_3 MR_3" v-if="userdata.is_zhanggui==1">{{userdata.zhanggui_text}}</div>
+                            <div class="bg_2B2B2B B_radius_15 PTB_1 PLR_3 MR_3" v-if="userdata.is_o2o==1">{{userdata.o2o_text}}</div>
+                            <div class="bg_2B2B2B B_radius_15 PTB_1 PLR_3 MR_3" v-if="userdata.is_areashop==1">{{userdata.areashop_text}}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="PTB_6 flex_row_between color_fff">
+                    <div class="textC W_33 fontS_14">
+                        <div>￥{{userdata.total}}</div>
+                        <div class="PT_2">累计收入</div>
+                    </div>
+                    <div class="textC W_33 fontS_14">
+                        <div>{{userdata.fansorder}}</div>
+                        <div class="PT_2">粉丝订单</div>
+                    </div>
+                    <div class="textC W_33 fontS_14">
+                        <div>{{userdata.fans}}</div>
+                        <div class="PT_2">累计粉丝</div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="PT_12 flex_row_between">
+                <div class="textC W_25 fontS_13" @click="toPage('earnings_report','./earnings_report.html')">
+                    <img src="../../image/pthz1.png" alt="" class="VH_15 VW_15">
+                    <div class="PT_2">收益报表</div>
+                </div>
+                <div class="textC W_25 fontS_13" @click="toPage('fans_order','./fans_order.html')">
+                    <img src="../../image/pthz2.png" alt="" class="VH_15 VW_15">
+                    <div class="PT_2">粉丝订单</div>
+                </div>
+                <div class="textC W_25 fontS_13" @click="toPage('my_fans','./my_fans.html')">
+                    <img src="../../image/pthz3.png" alt="" class="VH_15 VW_15">
+                    <div class="PT_2">我的粉丝</div>
+                </div>
+                <div v-if="userdata.spid" class="textC W_25 fontS_13" @click="toPage('receipt_qrcode','./receipt_qrcode.html',{'id':userdata.spid})">
+                    <img src="../../image/pthz4.png" alt="" class="VH_15 VW_15">
+                    <div class="PT_2">收款二维码</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/rsa.js"></script>
+<script src="../../script/aes.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#platform_cooperation_center',
+            data: {
+                userdata:{}
+            },
+            created: function() {
+                var that = this;
+                that.getdata();
+            },
+
+            methods: {
+                //数据
+                getdata:function(){
+                    var that = this;
+                    that.http(shopPartnerInfo, 'post', {}, function (res) {
+                        console.log(JSON.stringify(res));
+                        if (res.code == 0) {
+                            that.userdata = res.data.info;
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                },
+
+
+            },
+        })
+    };
+</script>

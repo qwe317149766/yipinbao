@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />
+</head>
+
+<body>
+    <div id="searchAddress_frame" v-cloak>
+        <div class="W_100 BB_1_eeeeee fontS_16 P_5" v-for="item in searchList" @click="select(item.city)">{{item.city}}</div>
+    </div>
+</body>
+
+</html>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../lib/vue/vue.js"></script>
+<script type="text/javascript" src="../script/common.js"></script>
+<script type="text/javascript" src="../script/const.js"></script>
+<script type="text/javascript">
+    apiready = function () {
+        var searchAddress_frame = new Vue({
+            el: "#searchAddress_frame",
+            data: {
+                searchList: []
+            },
+            created: function () {
+                var that = this;
+                if (api.pageParam.searchList&&api.pageParam.searchList.length>0) {
+                    that.searchList = api.pageParam.searchList;
+                } else {
+                    that.searchList = [];
+                }
+            },
+            methods: {
+                select: function (pov) {
+                    var that = this;
+                    var newparams = {
+                        pov: pov,
+                    };
+                    $api.setStorage('city', pov);
+                    api.execScript({
+                        name:'offline_store',
+                        // frameName: 'frame2',
+                        script:'vm.getcity('+JSON.stringify(newparams)+')'
+                    });
+                    that.goBack();
+                }
+            }
+        })
+    }
+</script>

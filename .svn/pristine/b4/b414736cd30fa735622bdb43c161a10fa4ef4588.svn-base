@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="binding_phone" v-cloak class="flex_col_start flex_items_stretch VH100 bg_2B2B2B">
+    <div class="header W_100 flex_shrink_0">
+        <div class="P_4 flex_row_left relative flex_shrink_0">
+            <i class="iconfont iconfanhui fontS_20 color_fff" @click="goBack()"></i>
+        </div>
+    </div>
+
+    <div class="overflow_hidden flex_grow_1 W_85 MLR_auto">
+        <div class="flex_row_left fontS_16 color_fff MT_8">
+            <div>绑定手机号</div>
+            <i class="iconfont iconfanhui1"></i>
+        </div>
+        <div class="MT_6">
+            <div class="color_fff">手机号码</div>
+            <div class="flex_row_left PTB_3 BB_1_eeeeee borderColor_666">
+                <div class="color_fff BR_1_eeeeee borderColor_F3CB7B PR_3">+86</div>
+                <input type="number" v-model="params.mobile" class="W_100 PL_4 color_fff" placeholder="请输入手机号">
+            </div>
+
+            <div class="flex_row_between BB_1_eeeeee borderColor_666 PTB_2 MT_4">
+                <div class="flex_row_left W_75">
+                    <!--<div class="fontS_13 W_35 color_fff PL_3">图片验证码</div>-->
+                    <input v-model="picCode" type="text" placeholder="请输入图片验证码" class="PL_3 color_fff W_60">
+                </div>
+                <img :src="Imgs" @click="updateImg" alt="" class="W_25 MB_1">
+            </div>
+
+
+            <div class="flex_row_between BB_1_eeeeee borderColor_666 PTB_4 MT_4">
+                <div class="flex_row_left W_70">
+                    <input v-model="params.code" type="number" placeholder="请输入验证码" class="PL_3 color_fff W_100">
+                </div>
+                <div @click="fnAuthSendMsg" class="W_30 PTB_2 bg_F3CB7B fontS_12 B_radius_5 textC">{{fnSendMsgText}}</div>
+            </div>
+        </div>
+
+
+        <div class="MLR_auto MT_20 flex_rowC W_100 bg_F3CB7B PTB_4 B_radius_10 fontS_13" @click="fnAuthRegister">确认绑定</div>
+    </div>
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/rsa.js"></script>
+<script src="../../script/aes.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#binding_phone',
+            data: {
+                downCount:0,
+                params:{
+                    mobile: '',
+                    code: '',
+                    unionid:api.pageParam.unionid
+                },
+                picCode:'',
+                Imgs:''
+            },
+            created: function() {
+                var that = this;
+                that.updateImg();
+            },
+            computed: {
+                fnSendMsgText:function () {
+                    return this.downCount?'重新获取('+this.downCount+')':'获取验证码';
+                }
+            },
+            methods: {
+                //获取图片验证
+                updateImg: function () {
+                    var that = this;
+                    that.Imgs = baseUrl + 'User/getCode?time=' + new Date().getTime()
+                },
+
+                // 获取验证码
+                fnAuthSendMsg:function () {
+                    var that = this;
+                    if(!that.params.mobile){
+                        that.$toast('请输入手机号');
+                        return false;
+                    }
+                    if(!that.picCode){
+                        that.$toast('请输入图片验证码');
+                        return false;
+                    }
+                    that.http(UserSendMsg,'post',{mobile: that.params.mobile,'picCode':that.picCode},
+                    function(res){
+                        that.$toast(res.msg);
+                        if(res.code == 0) {
+                            that.downCount = 60;
+                            var tempFn = setInterval(function () {
+                                if (that.downCount > 0) {
+                                    that.downCount--;
+                                } else {
+                                    clearInterval(tempFn);
+                                }
+                            }, 1000);
+                        }
+                    })
+                },
+
+                //提交注册表单
+                fnAuthRegister:function () {
+                    var that = this;
+                    if(!that.params.mobile){
+                        that.$toast('请输入手机号');
+                        return false;
+                    }
+                    if(!that.params.code){
+                        that.$toast('请输入验证码');
+                        return false;
+                    }
+                    that.$toast.loading({
+                        mask: true,
+                        loadingType:'spinner',
+                        message: '加载中...'
+                    });
+                    // console.log(JSON.stringify(that.params));
+                    that.http(UserGetUserNum,'post',that.params, function(res){
+                        that.$toast.clear();
+                        console.log(JSON.stringify(res));
+                        if(res.code == 0) {
+                            var dataobj = {
+                                unionid: api.pageParam.unionid,
+                                nickname:api.pageParam.nickname,
+                                headimgurl:api.pageParam.headimgurl,
+                                mobile:that.params.mobile,
+                                tjdata:res.data
+                            };
+                            that.toPage('affirm_referrer','./affirm_referrer.html',dataobj);
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    });
+                }
+            },
+        })
+    };
+</script>

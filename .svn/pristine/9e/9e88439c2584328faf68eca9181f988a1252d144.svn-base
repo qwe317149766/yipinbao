@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="pay" v-cloak class="flex_col_start VW_100 flex_items_stretch VH100">
+    <div class="header bg_2B2B2B W_100 flex_shrink_0">
+        <div class="P_4 color_fff flex_rowC relative flex_shrink_0 ">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">支付</span>
+        </div>
+    </div>
+
+    <div class="overflow_y flex_grow_1 bg_f2f2f2">
+        <div class="flex_row_between PTB_6 PLR_5 BB_10_f2f2f2 bg_fff">
+            <span class="fontS_14">订单金额</span>
+            <span class="color_F3CB7B">￥{{price}}</span>
+        </div>
+        <div class="PLR_5 bg_fff">
+            <div class="PTB_5 BB_1_f2f2f2">
+                选择支付方式
+            </div>
+            <div @click="pay_ac = index" v-for="(item, index) in payArr" :key="index" class="flex_row_between PTB_5 BB_1_f2f2f2">
+                <div class="flex_rowL">
+                    <img :src="item.icon" class="VW_10 VH_10" alt="">
+                    <span class="PL_5">{{item.title}}</span>
+                </div>
+                <i :class="pay_ac == index?'iconxuanze1 color_F3CB7B':'iconwo color_999'" class="iconfont fontS_24"></i>
+            </div>
+        </div>
+        <button class="color_fff B_radius_10 bg_F3CB7B W_85 PTB_4 MT_20 fontS_14 MLR_auto textC D_block" @click="buyNow">立即支付</button>
+        <!--<button class="color_fff B_radius_10 bg_F3CB7B W_85 PTB_4 MT_20 fontS_14 MLR_auto textC D_block" @click="buyNowTest">立即支付（测试）</button>-->
+    </div>
+
+</div>
+</body>
+</html>
+<script type="text/javascript" src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script type="text/javascript" src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script src="../../script/rsa.js"></script>
+<script src="../../script/aes.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#pay',
+            data: {
+                pay_ac:0,
+                payArr:[//支付方式
+                    {title: '支付宝支付', icon:'../../image/alPay.png',},
+                    {title: '微信支付', icon:'../../image/wechat.png',},
+                    {title: '水滴支付', icon:'../../image/water.png',}
+                ],
+                price:api.pageParam.price,//付款金额
+
+                paydata:{//支付时传入数据
+                    payId:api.pageParam.payId,
+                    paySite:api.pageParam.paySite,
+                    payType:'alipay'
+                },
+
+                payname:'',//支付类型名称
+            },
+            created: function() {
+                var that = this;
+                that.payname = api.pageParam.payname;
+            },
+            mounted:function(){
+                var that = this;
+
+            },
+
+            methods: {
+
+                // 立即购买
+                buyNow:function () {
+                    var that = this;
+                    if(that.pay_ac==0){
+                        that.paydata.payType = 'alipay';
+                        that.getpay_sign();
+                    }else if(that.pay_ac==1){
+                        that.paydata.payType = 'wechat';
+                        that.getpay_sign();
+                    }else if(that.pay_ac==2){
+                        that.paydata.payType = 'waterdrop';
+                        that.waterdrop_pay();
+                    }
+                    console.log(JSON.stringify(that.paydata));
+                },
+
+                //生成支付签名（支付宝 微信支付）
+                getpay_sign:function(){
+                    var that = this;
+                    that.$toast.loading({
+                        mask: true,
+                        loadingType:'spinner',
+                        message: '支付中...'
+                    });
+                    that.http(PayGet_pay_sign_str, 'post', that.paydata, function (res) {
+                        that.$toast.clear();
+                        console.log(JSON.stringify(res));
+                        if (res.code == 0) {
+                            if (that.pay_ac == 0) {
+                                that.aliPay(res.data.info.pay_sign_str);
+                            } else if (that.pay_ac == 1) {
+                                that.wxPay(res.data.info.pay_sign_str);
+                            }
+                        }else {
+                            that.$toast(res.msg);
+                        }
+                    },
+                    function (err) {
+                        console.log($api.jsonToStr(err))
+                    });
+                },
+
+                //水滴支付
+                waterdrop_pay:function(){
+                    var that = this;
+                    that.$toast.loading({
+                        mask: true,
+                        loadingType:'spinner',
+                        message: '支付中...'
+                    });
+                    that.http(PayGoldNotify, 'post', that.paydata, function (res) {
+                        console.log(JSON.stringify(res));
+                        that.$toast(res.msg);
+                        if (res.code == 0) {
+                            setTimeout(function () {
+                                that.paySuccess();
+                            },1000)
+                        }else {
+                            setTimeout(function () {
+                                that.payfailure();
+                            },1000)
+                        }
+                    },
+                    function (err) {
+                        console.log($api.jsonToStr(err))
+                    });
+                },
+
+
+                //测试
+                buyNowTest:function(){
+                    var that = this;
+                    if(that.pay_ac==0){
+                        that.paydata.payType = 'alipay'
+                    }else if(that.pay_ac==1){
+                        that.paydata.payType = 'wechat';
+                    }else if(that.pay_ac==2){
+                        that.paydata.payType = 'waterdrop';
+                    }
+                    console.log(JSON.stringify(that.paydata));
+                    that.$toast('支付尚未接通');
+                    setTimeout(function () {
+                        that.goBack();
+                    },1000);
+                },
+
+
+
+                // 支付宝支付
+                aliPay: function (params) {
+                    //   console.log(res.data.info.pay_sign_str)
+                    // var params = $api.strToJson(params);
+                    var that = this;
+                    var aliPayTradePlus = api.require('aliPayTradePlus');
+                    aliPayTradePlus.payOrder({
+                        orderInfo: params
+                    }, function (ret, err) {
+                        // alert($api.jsonToStr(ret));
+                        // console.log($api.jsonToStr(ret));
+                        if (ret.code == 9000) {
+                            that.paySuccess();
+                        } else {
+                            that.payfailure();
+                        }
+                    });
+                },
+                //微信支付
+                wxPay: function (params) {
+                    // console.log(params);
+                    var that = this;
+                    var params = $api.strToJson(params);
+                    // console.log(params);
+                    var wxPay = api.require('wxPay');
+                    wxPay.payOrder({
+                        apiKey: params.appid,
+                        orderId: params.prepayid,
+                        mchId: params.partnerid,
+                        nonceStr: params.noncestr,
+                        timeStamp: params.timestamp,
+                        package: params.package,
+                        sign: params.sign
+                    }, function (ret, err) {
+                        // alert($api.jsonToStr(ret));
+                        console.log($api.jsonToStr(ret));
+                        if (ret.status) {
+                            that.paySuccess();
+                        } else {
+                            that.payfailure();
+                        }
+                    });
+                },
+
+
+                //支付成功的方法
+                paySuccess:function (){
+                    var that = this;
+                    that.$toast('支付成功');
+                    // 订单支付（商品详情里或购物车 确认订单）
+                    // 线下订单支付（O2O小店线下支付）
+                    // 订单列表支付（我的订单列表里）
+                    // 订单详情支付（订单详情里）
+                    // 自营订单列表支付（我的自营订单列表里）
+                    if (that.payname == '订单支付') {
+                        that.toPageios('root','../../index.html');
+                        setTimeout(function () {
+                            api.execScript({
+                                name: "root",
+                                frameName:'tabBar',
+                                script:'vm.setBtn(3);vm.active=3'
+                            });
+                            api.execScript({// 刷新列表
+                                name:'root',
+                                frameName: 'frame3',
+                                script: 'vm.typeactive=2;vm.getlist()'
+                            });
+                        },300)
+                    }else if (that.payname == '订单列表支付') {
+                        api.execScript({// 刷新列表
+                            name:'root',
+                            frameName: 'frame3',
+                            script: 'vm.typeactive=2;vm.getlist()'
+                        });
+                    } else if(that.payname == '订单详情支付'){
+                        api.execScript({// 刷新详情
+                            name:'order_detail',
+                            script: 'vm.getorderdata()'
+                        });
+                        api.execScript({// 刷新列表
+                            name:'root',
+                            frameName: 'frame3',
+                            script: 'vm.typeactive=2;vm.getlist()'
+                        });
+                        api.execScript({// 刷新列表
+                            name:'my_order',
+                            script: 'vm.typeactive=2;vm.getlist()'
+                        });
+                    } else if(that.payname == '自营订单列表支付'){
+                        api.execScript({// 刷新列表
+                            name:'my_order',
+                            script: 'vm.typeactive=2;vm.getlist()'
+                        });
+                    } else if(that.payname == '线下订单支付'){
+                        api.closeToWin({
+                            name: 'offline_store_info'
+                        });
+                    }else {
+                        that.goBack();
+                    }
+                },
+                //支付失败的方法
+                payfailure:function (){
+                    var that = this;
+                    that.$toast('支付失败');
+                    if (that.payname == '订单支付') {
+                        that.toPageios('root','../../index.html');
+                        setTimeout(function () {
+                            api.execScript({
+                                name: "root",
+                                frameName:'tabBar',
+                                script:'vm.setBtn(3);vm.active=3'
+                            });
+                            api.execScript({// 刷新列表
+                                name:'root',
+                                frameName: 'frame3',
+                                script: 'vm.typeactive=1;vm.getlist()'
+                            });
+                        },300)
+                    }
+                    that.goBack();
+                },
+            },
+        })
+    };
+</script>

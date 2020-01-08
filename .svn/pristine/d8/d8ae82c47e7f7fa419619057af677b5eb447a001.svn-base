@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="classification_goods" v-cloak class="flex_col_between flex_items_stretch VH100">
+    <div class="header bg_2B2B2B W_100 flex_shrink_0">
+        <div class="P_4 color_fff flex_rowC relative flex_shrink_0 ">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">{{title}}</span>
+        </div>
+    </div>
+
+
+
+    <div class="overflow_y flex_grow_1 bg_f2f2f2">
+        <van-list
+                v-model="upLoading"
+                :finished="finished"
+                finished-text="没有更多了"
+                @load="getlists"
+                :immediate-check="false">
+            <!--商品列表-->
+            <div class="flex_row_left flex_wrap PLR_3 bg_f2f2f2 PB_4">
+                <div @click="toPage('online_goods_info','../frame1/online_goods_info.html',{'id':item.id})" class="W_50 PT_4" v-for="(item,index) in goodsList" :class="index%2==0?'PR_2':'PL_2'">
+
+                    <img :src="item.img" alt="" class="W_100 VH_45 B_radiusT_5">
+                    <div class="bg_fff P_3 B_radiusB_5" style="margin-top: -3px">
+                        <div class="text_overflow_1">{{item.goods_name}}</div>
+
+                        <div class="flex_row_left PT_2 W_100">
+                            <div class="color_red fontS_13 font_weight_bold">￥{{item.spe_price}}</div>
+                            <div class="color_999 fontS_10 PL_3">已售：{{item.sales}}</div>
+                        </div>
+
+                        <img src="../../image/zypic.png" alt="" class="W_100">
+                    </div>
+                </div>
+            </div>
+        </van-list>
+    </div>
+
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/rsa.js"></script>
+<script src="../../script/aes.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#classification_goods',
+            data: {
+                title:'',
+
+                page:1,
+                goodsList:[],
+                downLoading:false,
+                upLoading:false,
+                finished:false,
+            },
+            created: function() {
+                var that = this;
+                that.title = api.pageParam.name;
+                that.getlists();
+            },
+
+            methods: {
+
+                //商品列表
+                getlists:function () {
+                    var that = this;
+                    if(that.upLoading) { //上拉加载
+                        that.page ++;
+                    } else{
+                        that.page = 1; //刷新
+                        if(that.goodsList.length>10){
+                            that.finished = false;
+                        }
+                    }
+                    // console.log(that.page);
+                    that.http(zyZyGoodsList, 'post', {'page':that.page,'cate_id':api.pageParam.cate_id}, function (res) {
+                        // that.$toast.clear();
+                        // console.log(JSON.stringify(res));
+                        if (res.code == 0) {
+                            if(res.data.length < 10) {
+                                that.finished = true;
+                            }else {
+                                that.finished = false;
+                            }
+                            if(that.upLoading) {
+                                that.goodsList = that.goodsList.concat(res.data);
+                                that.upLoading = false;
+                            }else {
+                                that.goodsList = res.data;
+                                that.downLoading = false;
+                            }
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                },
+
+
+            },
+        })
+    };
+</script>

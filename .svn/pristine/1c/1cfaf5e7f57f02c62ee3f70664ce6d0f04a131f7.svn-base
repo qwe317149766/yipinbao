@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="online_goods_info" v-cloak class="flex_col_start flex_items_stretch VH100">
+    <div class="overflow_y flex_grow_1">
+        <!-- 轮播 -->
+        <div class="relative VH_90 W_100">
+            <van-swipe @change="onChange" :autoplay="3000" :show-indicators="false" class="H_100 W_100">
+                <van-swipe-item v-for="(item,idx) of goodsdata.images" :key="idx">
+                    <img :src="item" alt="" class="W_100 H_100 object_fit_cover">
+                </van-swipe-item>
+            </van-swipe>
+            <div v-if="goodsdata.images" class="absoluteBR color_fff PLR_5 PTB_1 bg_rgba_000 B_radius_10" style="right: 1rem;bottom: 1rem">
+                {{ current + 1 }}/{{goodsdata.images.length}}
+            </div>
+        </div>
+
+
+        <!--商品信息-->
+        <div class="P_4">
+            <div class="flex_row_between">
+                <div class="color_red font_weight_bold fontS_16">&ensp;&yen;{{goodsdata.spe_price}}</div>
+                <div class="fontS_10 PLR_4 PTB_1 bg_F3CB7B B_radius_5 color_fff">{{goodsdata.post_money>0?goodsdata.post_money:'包邮'}}</div>
+            </div>
+
+            <div class="flex_row_between PT_4 fontS_10 color_666">
+                <!--<div class="color_blue">原价：<span class="text_decoration_line-through">￥{{goodsdata.ex_price}}</span></div>-->
+                <div></div>
+                <div>月销：{{goodsdata.sales}}</div>
+            </div>
+
+            <div class="fontS_14 PT_2">{{goodsdata.goods_desc}}</div>
+
+        </div>
+
+
+        <div v-if="goodsdata.key_arr&&goodsdata.key_arr.length>0" class="P_4 flex_row_between BB_8_eeeeee BT_8_eeeeee" @click="isshowgg=true">
+            <div>已选择：X{{shopnum}} {{(attr1||attr2)?(attr1 +' '+ attr2):''}}</div>
+            <i class="iconfont iconfanhui1 color_FFC41C fontS_14"></i>
+        </div>
+
+
+        <!--店铺信息-->
+        <div class="W_100" v-if="goodsdata.shop&&goodsdata.shop.id">
+            <div class="P_5 flex_row_between BB_3_eeeeee">
+                <div class="flex_row_left">
+                    <img :src="goodsdata.shop.img" alt="" class="VW_10 VH_10">
+                    <div class="PL_4">
+                        <div class="PB_1">{{goodsdata.shop.title}}</div>
+                        <span class="PLR_2 PTB_1 textC MT_1 fontS_10 bg_2B2B2B color_fff B_radius_10">合作商户</span>
+                    </div>
+                </div>
+                <div class="flex_rowC color_999" @click="toPage('merchants_shop','../frame0/merchants_shop.html',{'id':goodsdata.shop.id})">
+                    <span>查看店铺所有优惠</span>
+                    <i class="iconfont iconfanhui1 fontS_13"></i>
+                </div>
+            </div>
+        </div>
+
+
+        <!--商品详情-->
+        <div class="W_100">
+            <div class="PTB_4 PLR_6 flex_row_between BT_1_eeeeee BB_1_eeeeee">
+                <div class="fontS_14">查看宝贝详情</div>
+                <!--<i class="iconfont " :class="isshow?'iconshang1':'iconxia'" @click="isshow=!isshow"></i>-->
+            </div>
+
+            <div class="W_100" v-if="isshow">
+                <p v-html="goodsdata.info"></p>
+            </div>
+        </div>
+    </div>
+
+
+    <!--底部-->
+    <div class="W_100 MLR_auto flex_row_between flex_shrink_0 PTB_2 BT_1_eeeeee" v-if="istype==1">
+        <div class="W_100 flex_rowC color_fff">
+            <div class="textC W_90 bg_ff604a B_radius_20 PTB_4" @click="isshowgg=true">立即购买</div>
+        </div>
+    </div>
+    <div class="W_100 MLR_auto flex_row_between flex_shrink_0 P_2 BT_1_eeeeee" v-else>
+        <div class="W_15 textC fontS_10" v-if="goodsdata.shop&&goodsdata.shop.id" @click="toPage('merchants_shop','../frame0/merchants_shop.html',{'id':goodsdata.shop.id})">
+            <i class="iconfont iconai204 fontS_20 color_FFC41C"></i>
+            <p>店铺</p>
+        </div>
+        <div class="W_15 textC fontS_10" @click="setshoucang">
+            <i class="iconfont fontS_20 color_FFC41C" :class="goodsdata.is_collect==1?'iconshoucang':'iconshoucang1'"></i>
+            <p>收藏</p>
+        </div>
+        <div class="W_100 flex_rowC color_fff">
+            <div class="textC W_49 bg_F3CB7B B_radiusL_20 PTB_4" @click="isshowgg=true">加入购物车</div>
+            <div class="textC W_49 bg_ff604a B_radiusR_20 PTB_4" @click="isshowgg=true">立即购买</div>
+        </div>
+    </div>
+
+    <div class="absoluteTL B_radius_circle VW_10 VH_10 flex_rowC" style="left: 1rem;top:2rem;background: rgba(0,0,0,.5)">
+        <i class="iconfont iconfanhui color_fff fontS_16" @click="goBack()"></i>
+    </div>
+
+
+    <!--选择规格-->
+    <van-popup v-model="isshowgg" @closed="" position="bottom" round>
+        <div class="P_5">
+            <div class="flex_row_left PB_5">
+                <img :src="goodsdata.images[0]" alt="" v-if="goodsdata.images" class="flex_shrink_0 VW_25 VH_25 object_fit_cover zwshangpin">
+                <div class="W_100 PL_5 flex_col_between VH_25">
+                    <div class="flex_row_right W_100">
+                        <i class="iconfont iconguanbi color_999" @click="isshowgg=!isshowgg"></i>
+                    </div>
+                    <div class="color_red fontS_16 font_weight_bold W_100">
+                        ￥<span>{{attrprice?attrprice:goodsdata.spe_price}}</span>
+                    </div>
+                    <div class="W_100 fontS_11">库存{{stock?stock:goodsdata.total}}件</div>
+                    <div class="W_100 fontS_11" v-if="goodsdata.key_arr&&goodsdata.key_arr.length>0">选择规格{{(attr1||attr2)?('：'+attr1 +' '+ attr2):''}}</div>
+                </div>
+            </div>
+
+            <!--规格1-->
+            <div class="PTB_5" v-if="goodsdata.key_arr&&goodsdata.key_arr.length>0">
+                <div class="fontS_14">{{goodsdata.key_arr[0]?goodsdata.key_arr[0]:''}}</div>
+                <div class="PLR_5 PT_5 flex_row_left flex_wrap">
+                    <div class="PTB_2 PLR_5 B_radius_20 MR_3 MB_3" :class="attr1==item?'bg_F3CB7B':'bg_eee'" @click="clickSelectionAttr(item)" v-for="(item,index) in goodsdata.field_arr[0][0]">{{item}}</div>
+                </div>
+            </div>
+
+            <!--规格2-->
+            <div class="PTB_5" v-if="goodsdata.key_arr&&goodsdata.key_arr.length>0&&goodsdata.key_arr[1]">
+                <div class="fontS_14">{{goodsdata.key_arr[1]?goodsdata.key_arr[1]:''}}</div>
+                <div class="PLR_5 PT_5 flex_row_left flex_wrap">
+                    <div class="PTB_2 PLR_5 B_radius_20 MR_3 MB_3" :class="attr2==item?'bg_F3CB7B':'bg_eee'" @click="clickSelectionAttr1(item)" v-for="(item,index) in goodsdata.field_arr[1][0]">{{item}}</div>
+                </div>
+            </div>
+
+
+            <!--数量-->
+            <div class="PTB_5 flex_row_between">
+                <div>购买数量</div>
+                <van-stepper v-model="shopnum" />
+            </div>
+
+            <div class="W_80 flex_rowC MLR_auto MT_5 flex_shrink_0" v-if="istype==1">
+                <div class="W_100 textC PTB_4 B_radius_20 color_fff bg_ff604a" @click="okljgm(2)">立即购买</div>
+            </div>
+            <div class="W_80 flex_rowC MLR_auto MT_5 flex_shrink_0" v-else>
+                <div id="end" class="W_50 textC PTB_4 B_radiusL_20 color_fff bg_F3CB7B" @click="okljgm(1)">加入购物车</div>
+                <div class="W_50 textC PTB_4 B_radiusR_20 color_fff bg_ff604a" @click="okljgm(2)">立即购买</div>
+            </div>
+        </div>
+    </van-popup>
+
+</div>
+</body>
+</html>
+<script src="../../script/const.js"></script>
+<script type="text/javascript" src="../../lib/api.js"></script>
+<script type="text/javascript" src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/rsa.js"></script>
+<script src="../../script/aes.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../lib/jquery-3.0.0.min.js"></script>
+<script type="text/javascript" src="../../lib/jquery.fly.min.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#online_goods_info',
+            data: {
+                current:0,//轮播
+                goodsdata:{
+                    shop:'',
+                    images:[]
+                },//详情内容
+                isshow:true,//详情内容展开
+                id:'',//商品id
+
+                shopnum:1,
+                isshowgg:false,//规格弹框
+                attrprice:'',//价格
+                stock:'',//库存
+                attr1:'',//规格1
+                attr2:'',//规格2
+                istype:'',//成为代理商品
+            },
+            created: function() {
+                var that = this;
+                that.id = api.pageParam.id;
+                if (api.pageParam.istype){
+                    that.istype = api.pageParam.istype;
+                }
+                that.getshop();
+            },
+
+            methods: {
+
+                //轮播索引
+                onChange(index) {
+                    var that = this;
+                    that.current = index;
+                },
+
+                //商品信息
+                getshop:function(){
+                    var that = this;
+                    that.$toast.loading({
+                        mask: true,
+                        loadingType:'spinner',
+                        message: '加载中...'
+                    });
+                    that.http(shopGoodsDetail, 'post', {'goods_id':api.pageParam.id}, function (res) {
+                        that.$toast.clear();
+                        console.log(JSON.stringify(res));
+                        if (res.code == 0) {
+                            that.goodsdata = res.data.info;
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                },
+
+
+                //收藏取消收藏
+                setshoucang:function(){
+                    var that = this;
+                    that.http(shopCollect, 'post', {'goods_id':api.pageParam.id}, function (res) {
+                        console.log(JSON.stringify(res));
+                        if (res.code == 0) {
+                            if(that.goodsdata.is_collect==1){
+                                that.goodsdata.is_collect=0;
+                                that.$toast('取消收藏');
+                            }else {
+                                that.goodsdata.is_collect=1;
+                                that.$toast('已收藏');
+                            }
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                },
+
+
+
+                //点击规格1
+                clickSelectionAttr:function(item){
+                    var that = this;
+                    that.attr1 = item;
+                    var attrdata = this.goodsdata.val_arr;
+                    for(var i in attrdata){
+                        if(attrdata[i].name == that.attr1 + that.attr2){
+                            // console.log(attrdata[i].id);
+                            that.attrprice = attrdata[i].spe_price;
+                            that.stock = attrdata[i].taotal;
+                            break;
+                        }
+                    }
+                },
+                //点击规格2
+                clickSelectionAttr1:function(item){
+                    var that = this;
+                    that.attr2 = item;
+                    var attrdata = that.goodsdata.val_arr;
+                    for(var i in attrdata){
+                        if(attrdata[i].name == that.attr1 + that.attr2){
+                            // console.log(attrdata[i].id);
+                            that.attrprice = attrdata[i].spe_price;
+                            that.stock = attrdata[i].taotal;
+                            break;
+                        }
+                    }
+                },
+
+                //加入购物车和立即购买
+                okljgm:function(isnum){
+                    var that = this;
+                    // console.log(JSON.stringify(that.goodsdata.key_arr))
+                    if(that.goodsdata.key_arr.length>0){
+                        if(that.goodsdata.key_arr[1]){
+                            if(!(that.attr1 && that.attr2)){
+                                that.$toast('请选择商品属性');
+                                return false;
+                            }
+                        }else {
+                            if(!that.attr1){
+                                that.$toast('请选择商品属性');
+                                return false;
+                            }
+                        }
+                    }
+                    // console.log(this.attr1 + this.attr2)
+                    // that.isshowgg = false;
+                    var attrdata = that.goodsdata.val_arr;
+                    if(isnum==1){
+                        let obj = {};
+                        for(var i in attrdata){
+                            if(attrdata[i].name == that.attr1 + that.attr2){
+                                // console.log(attrdata[i].id);
+                                obj.attrId = attrdata[i].attr_id;
+                                break;
+                            }
+                        }
+                        obj.goodsId = api.pageParam.id;
+                        obj.buyNum = that.shopnum;
+                        if(!obj.attrId){
+                            obj.attrId = 0;
+                        }
+                        // console.log(JSON.stringify(obj))
+                        that.fnAddCart(obj);
+                    }else {
+                        let obj = {};
+                        for(var j in attrdata){
+                            if(attrdata[j].name == that.attr1 + that.attr2){
+                                // console.log(attrdata[i].id);
+                                obj.attr_id = attrdata[j].attr_id;
+                                break;
+                            }
+                        }
+                        obj.goods_id = api.pageParam.id;
+                        obj.goods_num = that.shopnum;
+                        if(!obj.attr_id){
+                            obj.attr_id = 0;
+                        }
+                        obj.cart_id = 0;
+                        that.toPage('affirm_order','./affirm_order.html',{'obj':[obj]});
+                        that.isshowgg = false;
+                    }
+                },
+
+                //加入购物车
+                fnAddCart:function (tempObj){
+                    var that = this;
+                    that.http(CartAddCart, 'post', tempObj, function (res) {
+                        console.log(JSON.stringify(res));
+                        // that.$toast(res.msg);
+                        if (res.code == 0) {
+                            that.isshowgg = false;
+                            setTimeout(function () {
+                                that.donghua();
+                            },100)
+                        }
+                    })
+                },
+
+                // 动画
+                donghua:function () {
+                    var that = this;
+                    var flyer = $('<img class="VW_40 VH_40 B_radius_circle" src="'+that.goodsdata.images[that.current]+'">');
+                    flyer.fly({
+                        start: {
+                            left: 80, //开始位置（必填）#fly元素会被设置成position: fixed
+                            top: 80 //开始位置（必填）
+                        },
+                        end: {
+                            left: $("#end").width(), //结束位置（必填）
+                            top: api.winHeight, //结束位置（必填）
+                            width: 0, //结束时宽度
+                            height: 0 //结束时高度
+                        },
+                        onEnd: function(){ //结束回调
+                            // $("#msg").show().animate({width: '250px'}, 200).fadeOut(1000); //提示信息
+                            // addcar.css("cursor","default").removeClass('orange').unbind('click');
+                            // this.destory(); //移除dom
+                            that.$toast('加入购物车成功');
+                        }
+                    });
+                }
+
+            },
+        })
+    };
+</script>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="fans_order" v-cloak class="flex_col_between flex_items_stretch VH100">
+    <div class="header W_100 flex_shrink_0 bg_2B2B2B color_fff">
+        <div class="P_4 flex_rowC relative flex_shrink_0">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">粉丝订单</span>
+        </div>
+    </div>
+
+
+    <div class="overflow_y flex_grow_1">
+        <!--订单-->
+        <van-list
+                v-model="upLoading"
+                :finished="finished"
+                finished-text="没有更多了"
+                @load="getlist"
+                :immediate-check="false">
+            <!-- 列表显示 -->
+            <div class="BB_1_eeeeee P_5" v-for="(item,index) in goodsList" :key="index">
+                <div class="flex_row_between">
+                    <div class="flex_row_left">
+                        <img :src="item.img" alt="" class="VW_10 VH_10 flex_shrink_0 B_radius_circle">
+                        <div class="PL_5 fontS_11">
+                            <div>{{item.username}}</div>
+                            <div class="PT_2">{{item.mobile}}</div>
+                        </div>
+                    </div>
+                    <div class="textR">
+                        <div class="fontS_11">{{item.create_time}}</div>
+                        <div class="PT_2 fontS_13 font_weight_bold color_FFC41C">￥{{item.price}}</div>
+                    </div>
+                </div>
+            </div>
+        </van-list>
+    </div>
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/rsa.js"></script>
+<script src="../../script/aes.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#fans_order',
+            data: {
+                goodsList:[],
+                page:1,
+                upLoading:false,
+                finished:false,
+            },
+            created: function() {
+                var that = this;
+                that.getlist();
+            },
+
+            methods: {
+                //粉丝订单
+                getlist:function () {
+                    var that = this;
+                    if(that.upLoading) { //上拉加载
+                        that.page ++;
+                    } else{
+                        that.page = 1; //刷新
+                        if(that.goodsList.length>10){
+                            that.finished = false;
+                        }
+                        that.$toast.loading({
+                            mask: true,
+                            loadingType:'spinner',
+                            message: '加载中...'
+                        });
+                    }
+                    // console.log(that.page);
+                    that.http(shopFansOrder, 'post', {'page':that.page}, function (res) {
+                        that.$toast.clear();
+                        console.log(JSON.stringify(res));
+                        if (res.code == 0) {
+                            if(res.data.length < 10) {
+                                that.finished = true;
+                            }else {
+                                that.finished = false;
+                            }
+                            if(that.upLoading) {
+                                that.goodsList = that.goodsList.concat(res.data);
+                                that.upLoading = false;
+                            }else {
+                                that.goodsList = res.data;
+                                that.downLoading = false;
+                            }
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                },
+            },
+        })
+    };
+</script>

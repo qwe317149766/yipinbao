@@ -1,0 +1,236 @@
+//全局混入 共用方法
+Vue.mixin({
+    data:function() {
+        return {
+            exitStatu: 0,
+            topBarHeight: 0,
+        }
+    },
+    created: function () {
+        this.setStatusBar('light');
+        // this.setStatusBar('dark');
+    },
+    mounted: function () {
+        this.fastclick();
+        this.topBarHeight = this.setSafeArea('.header','top');
+    },
+    methods: {
+        //点击两次返回退出程序
+        dbClickkExit:function () {
+            if (!this.exitStatu) {
+                this.exitStatu = 1;
+                api.toast({
+                    msg: "再按一次返回键退出程序",
+                    duration: 2000,
+                    location: 'bottom'
+                });
+                setTimeout(function () {
+                    this.exitStatu = 0;
+                }, 2000)
+            } else if (this.exitStatu == 1) {
+                api.closeWidget({
+                    silent: true
+                });
+            }
+        },
+        //防抖
+        debounce:function(func,wait) {
+            var timeout;
+            return function (ret) {
+                if (timeout) clearTimeout(timeout);
+                var callNow = !timeout;
+                timeout = setTimeout(() => {
+                    timeout = null;
+                }, wait)
+                if (callNow) func.call(this, arguments, ret);
+            }
+        },
+        //300ms 延迟优化
+        fastclick:function () {
+            try {
+                throw Origami.fastclick(document.body);
+            } catch (error) {
+                // console.log(JSON.stringify(error));
+            }
+        },
+
+        setStatusBar:function(value){
+            api.setStatusBarStyle({
+                style: value,
+                color:'transparent'
+            })
+        },
+
+
+        //导航栏字体颜色设置
+        setTopBarColor:function (params) {
+            api.addEventListener({ //Window 显示到屏幕的事件
+                name:'viewappear'
+            }, function(ret, err){        
+                console.log('回到上一个');
+                api.setStatusBarStyle(params);
+            });
+
+            api.addEventListener({ //Window 离开屏幕的事件
+                name:'viewdisappear'
+            }, function(ret, err){
+                api.setGlobalData({
+                    key: 'oldTopBarStyle',
+                    value: params
+                });
+            });
+
+            api.addEventListener({ //关闭Window的事件
+                name: 'keyback'
+            }, function(ret, err){
+                api.setStatusBarStyle(api.getGlobalData({
+                    key: 'oldTopBarStyle'
+                }));
+                api.closeWin();
+            });
+        },
+        //顶部,底部安全区 
+        setSafeArea:function(el,dir) {
+            if(document.querySelector(el)) {
+                var tempStr = 'padding-'+dir;
+                document.querySelector(el).style[tempStr] = api.safeArea[dir] + 'px';
+                return api.safeArea[dir];
+            }
+
+        },
+        //页面跳转
+        toPage:function (name, url, params,animation) {
+            api.openWin({
+                name: name,
+                url: url,
+                reload: true,
+                allowEdit: true,
+                bgColor:'#fff',
+                slidBackEnabled: true,
+                animation: animation || {
+                    type: "push", //动画类型（详见动画类型常量）
+                    subType: "from_right", //动画子类型（详见动画子类型常量）
+                    duration: 300 //动画过渡时间，默认300毫秒
+                },
+                pageParam: params || {}
+            });
+        },
+        //页面跳转
+        toPageios:function (name, url, params,animation) {
+            api.openWin({
+                name: name,
+                url: url,
+                reload: true,
+                allowEdit: true,
+                bgColor:'#fff',
+                slidBackEnabled: false,
+                animation: animation || {
+                    type: "push", //动画类型（详见动画类型常量）
+                    subType: "from_right", //动画子类型（详见动画子类型常量）
+                    duration: 300 //动画过渡时间，默认300毫秒
+                },
+                pageParam: params || {}
+            });
+        },
+        //打开frame
+        openFrame:function (name, url, params,animation) {
+            api.openFrame({
+                name: name,
+                url: url,
+                bounces: false,
+                animation: animation || {
+                    type: "fade", //动画类型（详见动画类型常量）
+                    duration: 300 //动画过渡时间，默认300毫秒
+                },
+                rect: {
+                    x: 0,
+                    y: 0,
+                    w: 'auto',
+                    h: 'auto'
+                },
+                pageParam: params || {}
+            });
+        },
+        //返回上一页
+        goBack:function (name, animation) {
+            api.closeWin({
+                name: name || '',
+                animation: animation || {
+                    type: "push", //动画类型（详见动画类型常量）
+                    subType: "from_left", //动画子类型（详见动画子类型常量）
+                    duration: 300 //动画过渡时间，默认300毫秒
+                }
+            });
+            // api.closeWin();
+        },
+        //close frame
+        closeFrame:function (name, animation) {
+            api.closeFrame({
+                name: name || '',
+                animation: animation || {
+                    type: "fade", //动画类型（详见动画类型常量）
+                    // subType: "from_left", //动画子类型（详见动画子类型常量）
+                    duration: 300 //动画过渡时间，默认300毫秒
+                }
+            });
+        },
+        //ajax
+        http: function (url, method, param, funSuc, funErr) {
+            var that = this;
+            var userInfo = $api.getStorage('userInfo');
+            // var key = getKey(); //生成随机key
+            // var rsa = RSA(key); //生成对key 进行加密
+            // param = AESEnc(key, JSON.stringify(param)); //对传入的参数进行加密,(先转换为字符串)
+            var headers = {
+                'Content-Type': 'application/json;charset=utf-8'
+            };
+            if (userInfo && userInfo.token) {
+                headers = {
+                    'Content-Type': 'application/json;charset=utf-8',
+                    'token': userInfo.token
+                };
+            }
+            // console.log(JSON.stringify(userInfo))
+            api.ajax({
+                url: url,
+                method: method,
+                headers: headers,
+                data: {
+                    body: param,
+                    // body: {
+                    //     _rsa: rsa,
+                    //     _cipher: param
+                    // }
+                }
+            }, function (ret, err) {
+                // console.log(JSON.stringify(url));
+                console.log(JSON.stringify(param));
+                // console.log(JSON.stringify(ret));
+                if(ret) {
+                    if(ret.code === 403){
+                        $api.rmStorage('userInfo');
+                        setTimeout(function () {
+                            // api.openWin({
+                            //     name: "login",
+                            //     url: 'widget://html/login/login.html',
+                            //     reload: true,
+                            //     bgColor:'#fff',
+                            //     slidBackEnabled: false
+                            // });
+                            that.toPageios('login','widget://html/login/login.html');
+                        },500)
+                    }
+                    // else {
+                    //     ret.data = JSON.parse(AESDec(key,ret.data)); //解密
+                    // }
+                    funSuc.call(that,ret);
+                }else {
+                    console.log(JSON.stringify(err));
+                    if(funErr && err) {
+                        funErr.call(that,err);
+                    }
+                }
+            });
+        },
+    }
+});

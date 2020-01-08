@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="affirm_order" v-cloak class="flex_col_start VW_100 flex_items_stretch VH100">
+    <div class="header bg_2B2B2B W_100 color_fff flex_shrink_0">
+        <div class="P_4 flex_rowC relative flex_shrink_0 ">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">确认订单</span>
+        </div>
+    </div>
+
+
+    <div class="overflow_y flex_grow_1 bg_f2f2f2 PLR_4 PB_4">
+        <!--订单地址-->
+        <div v-if="goods_data.address.id" class="W_100 flex_row_left P_5 bg_fff B_radius_10 MT_5" @click="toPage('address_list','./address_list.html',{'selectId':goods_data.address.id})">
+            <i class="iconfont icon107 color_FFC41C fontS_30"></i>
+            <div class="PL_5 W_100">
+                <div class="flex_row_left">
+                    <div class="fontS_16">{{goods_data.address.name}}</div>
+                    <div class="color_999 PL_2">{{goods_data.address.mobile}}</div>
+                </div>
+                <div class="color_999 MT_2">{{goods_data.address.province}}{{goods_data.address.city}}{{goods_data.address.country}}{{goods_data.address.detail}}</div>
+            </div>
+            <i class="iconfont iconfanhui1 color_FFC41C"></i>
+        </div>
+
+        <div v-if="!goods_data.address.id" @click="toPage('address_list','./address_list.html',{'selectId':'a'})" class="W_100 flex_row_between color_ccc P_5 bg_fff B_radius_10 MT_5">
+            <div class="flex_row_left">
+                <i class="iconfont icon107 fontS_25 PR_4"></i>
+                <span class="color_999">暂无收货地址，点击添加</span>
+            </div>
+            <i class="iconfont iconfanhui1"></i>
+        </div>
+
+        <!--商品-->
+        <div class="P_4 bg_fff B_radius_10 MT_5" v-for="list in goods_data.goods">
+            <div class="flex_row_left">
+                <!--<i class="iconfont iconai204 fontS_25 color_F3CB7B"></i>-->
+                <img v-if="list.title=='自营店铺'" src="../../image/logo.png" alt="" class="VW_5">
+                <img v-else src="../../image/sjpic.png" alt="" class="VW_5">
+                <div class="PL_2 fontS_16">{{list.title}}</div>
+            </div>
+            <div class="PTB_3 flex_row_between" v-for="item in list.goods_list">
+                <img :src="item.thumb" alt="" class="VW_25 VH_25 B_radius_5 flex_shrink_0">
+                <div class="W_50 flex_self_start PTB_2 PL_3">
+                    <div class="text_overflow_2">{{item.goods_name}}</div>
+                    <div class="color_999 PT_3" v-if="item.attr_text">【{{item.attr_text}}】</div>
+                </div>
+                <div class="W_20 flex_self_start textR PT_2">
+                    <div>￥{{item.spe_price}}</div>
+                    <div class="color_999 PT_3">X{{item.goods_num}}</div>
+                </div>
+            </div>
+
+            <div class="flex_row_between MT_5 fontS_11">
+                <div>配送方式<span class="color_999 PL_2">普通快递</span></div>
+                <div class="flex_row_left">快递 {{list.postage>0?list.postage:'包邮'}}
+                    <i class="iconfont iconfanhui1 fontS_10"></i>
+                </div>
+            </div>
+
+            <div class="flex_row_right PTB_3 BB_1_eeeeee">
+                <div>共{{list.goods_list.length}}件，实付：</div>
+                <div class="color_red fontS_16">￥{{list.goods_price}}</div>
+            </div>
+
+            <div class="flex_row_left PT_3 BT_1_eeeeee">
+                <div class="fontS_15">备注</div>
+                <input type="text" v-model="list.content" placeholder="请输入备注信息" class="PL_4 W_80">
+            </div>
+        </div>
+
+
+        <!--水滴抵扣-->
+        <div class="W_100 P_5 bg_fff B_radius_10 MTB_5">
+            <div class="color_F3CB7B PB_3">根据您的消费星级：{{goods_data.zhekou>=10?'无折扣':goods_data.zhekou+'折'}}</div>
+            <div class="fontS_14 flex_row_left">
+                <img src="../../image/water.png" alt="" class="VH_5 VW_5">
+                <div class="PL_3">购买成功后赠送水滴：{{(pay_money*0.01).toFixed(2)}}个</div>
+            </div>
+            <div class="flex_row_between W_100 MT_3" v-if="goods_data.gold>=goods_data.dikou">
+                <div class="flex_row_left">
+                    <div class="fontS_10">水滴</div>
+                    <div class="fontS_10 PL_3">共{{goods_data.gold}}，</div>
+                    <div class="fontS_10">可用{{goods_data.dikou}}，</div>
+                    <div class="fontS_10">抵￥{{goods_data.dikou}}</div>
+                </div>
+                <van-switch v-model="iswater" active-color="#F3CB7B" size="16px"/>
+                <!--<i @click="iswater=!iswater" :class="iswater?'iconyuan':'iconyuan1'" class="flex_rowC iconfont color_F3CB7B VW_5 VH_5"></i>-->
+            </div>
+        </div>
+
+    </div>
+    <!-- 结算 -->
+    <div class="flex_row_right PLR_4 PTB_2 color_666 bg_fff BT_1_f2f2f2 flex_shrink_0">
+        <div class="flex_row_right PR_4 fontS_12">
+            <div>共{{goods_data.totalNum}}件，合计：</div>
+            <div class="color_red fontS_16">￥{{pay_money.toFixed(2)}}</div>
+        </div>
+        <button class="PTB_3 PLR_5 color_fff bg_F3CB7B fontS_13 B_radius_20" @click="submitOrder">确认支付</button>
+    </div>
+</div>
+</body>
+</html>
+<script type="text/javascript" src="../../lib/api.js"></script>
+<script type="text/javascript" src="../../lib/vue/vue.js"></script>
+<script type="text/javascript" src="../../script/const.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/rsa.js"></script>
+<script src="../../script/aes.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#affirm_order',
+            data: {
+                iswater:false,//是否使用水滴
+                goods_data:{
+                    zhekou:10,
+                    address:{}
+                },
+
+                pay_money:0
+            },
+            created: function() {
+                var that = this;
+                // console.log(JSON.stringify(api.pageParam.obj))
+                that.getorderdata(api.pageParam.obj);
+            },
+
+            watch:{
+                iswater:function (value) {
+                    var that = this;
+                    if(value){
+                        that.pay_money =  (that.goods_data.pay_price - that.goods_data.dikou);
+                    }else {
+                        that.pay_money = that.goods_data.pay_price;
+                    }
+                }
+            },
+
+
+            methods: {
+                // 获取订单详情
+                getorderdata:function (data) {
+                    var that = this;
+                    // console.log(JSON.stringify(data));
+                    that.$toast.loading({
+                        mask: true,
+                        loadingType:'spinner',
+                        message: '加载中...'
+                    });
+                    that.http(orderCheck, 'post', {'goods_info':data}, function (res) {
+                        console.log(JSON.stringify(res));
+                        that.$toast.clear();
+                        if (res.code == 0) {
+                            that.goods_data = res.data;
+                            if(!that.goods_data.address){
+                                that.goods_data.address = {}
+                            }
+                            that.pay_money = res.data.pay_price;
+                        }else {
+                            that.$toast(res.msg);
+                            setTimeout(function () {
+                                that.goBack()
+                            },1500)
+                        }
+                    })
+                },
+
+
+                //设置地址
+                setdizhi:function (data) {
+                    var that = this;
+                    console.log(JSON.stringify(data));
+                    that.goods_data.address = {};
+                    that.goods_data.address.id = data.id;
+                    that.goods_data.address.name = data.name;
+                    that.goods_data.address.mobile = data.tel;
+                    that.goods_data.address.province = data.province;
+                    that.goods_data.address.city = data.city;
+                    that.goods_data.address.county = data.county;
+                    that.goods_data.address.detail = data.addressDetail;
+                },
+
+
+                //立即购买提交订单
+                submitOrder:function () {
+                    var that = this;
+                    var spdata = [];
+                    for(var i=0;i<that.goods_data.goods.length;i++){
+                        var objsp = {};
+                        objsp.shop_id = that.goods_data.goods[i].id;
+                        objsp.content = that.goods_data.goods[i].content;
+                    }
+                    spdata.push(objsp);
+                    if(!that.goods_data.address.id){
+                        that.$toast('请选择收货地址');
+                        return false;
+                    }
+                    var conditionParam = {'goods_info':api.pageParam.obj,'address_id':that.goods_data.address.id,'info':spdata,'is_dikou':that.iswater?1:0};
+                    // console.log(JSON.stringify(conditionParam))
+                    that.$toast.loading({
+                        mask: true,
+                        loadingType:'spinner',
+                        message: '加载中...'
+                    });
+                    that.http(orderCreateOrder, 'post', conditionParam, function (res) {
+                        console.log(JSON.stringify(res));
+                        that.$toast.clear();
+                        if (res.code == 0) {
+                            // api.execScript({//创建成功后刷新购物车
+                            //     name:'shopping_cart',
+                            //     script:'vm.getlist()'
+                            // });
+                            that.toPage('pay','./pay.html',{
+                                payname:'订单支付',
+                                payId: res.data.payId,
+                                price: res.data.price,
+                                paySite:res.data.type,
+                            })
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                }
+
+            },
+        })
+    };
+</script>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="back_orders" v-cloak class="flex_col_between flex_items_stretch VH100">
+    <div class="header W_100 flex_shrink_0 bg_2B2B2B color_fff">
+        <div class="P_4 flex_rowC relative flex_shrink_0">
+            <i class="iconfont iconfanhui absolute fontS_18 PL_4" style="left: 0;" @click="goBack()"></i>
+            <span class="fontS_15">找回订单</span>
+        </div>
+    </div>
+
+
+    <div class="overflow_y flex_grow_1">
+        <div class="flex_rowC PTB_6">
+            <img src="../../image/222.png" alt="" class="VW_20 VH_20">
+            <!--<i class="iconfont iconchazhaowenjian color_F3CB7B fontS_40"></i>-->
+        </div>
+
+
+        <div class="P_6">
+            <div>
+                <div class="fontS_13">第一步：由于淘宝官方规定市场，用户必须完成淘宝账号授权才可以自动获取佣金，请尽快完成授权</div>
+                <div class="W_100 MT_5 flex_rowC VH_10 B_radius_20 color_fff bg_d43d3d">去淘宝授权</div>
+            </div>
+            <div class="MT_8">
+                <div class="fontS_13">第二步：未获得佣金的订单需手动找回才可获</div>
+                <div class="W_100 MT_5 flex_row_between VH_10 B_radius_20 B_1_eeeeee borderColor_d43d3d">
+                    <input type="text" placeholder="输入淘宝订单编号" class="W_80 PL_5">
+                    <div class="VH_10 VW_25 bg_d43d3d flex_rowC color_fff PLR_5 B_radius_20">找回</div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="PLR_6 PTB_2">
+            <div class="fontS_16 textC">如何获取订单编号</div>
+            <div v-for="(item,index) in 2" class="MT_5">
+                <div class="flex_row_left">
+                    <div class="VH_10 VW_10 B_radius_circle color_fff bg_f59000 flex_rowC">{{index + 1}}</div>
+                    <div class="PL_2">打开“手机淘宝”APP-我的淘宝-查看我的订单</div>
+                </div>
+                <img src="../../image/1111.jpg" alt="" class="MT_2">
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#back_orders',
+            data: {
+
+            },
+            created: function() {
+                var that = this;
+
+            },
+
+            methods: {
+
+
+
+            },
+        })
+    };
+</script>

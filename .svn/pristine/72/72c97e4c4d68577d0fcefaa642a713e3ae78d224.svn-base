@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width,viewport-fit=cover" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css" />
+    <link rel="stylesheet" href="../lib/vant/vant.css">
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+        html,body{
+            background: transparent;
+        }
+
+        .van-tabbar-item:nth-child(3) .van-tabbar-item__icon {
+            width: 40px;
+            height: 40px;
+            z-index: 99999;
+            margin-top: -10px;
+        }
+        .van-tabbar-item:nth-child(3) img {
+            width: 40px;
+            height: 40px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="tabBar" v-cloak>
+        <van-tabbar v-model="active" active-color="#FF0000" @change="setBtn" :safe-area-inset-bottom="true">
+            <van-tabbar-item v-for="(item,idx) of navArr" :icon="item.normal" :key="idx">
+                <img slot="icon"
+                     slot-scope="props"
+                     :src="props.active ? item.active : item.normal">
+                <span>{{item.title}}</span>
+            </van-tabbar-item>
+        </van-tabbar>
+    </div>
+</body>
+
+</html>
+<script type="text/javascript" src="../lib/api.js"></script>
+<script type="text/javascript" src="../lib/vue/vue.js"></script>
+<script type="text/javascript" src="../script/common.js"></script>
+<script src="../lib/vant/vant.min.js"></script>
+<script src="../lib/fastclick.min.js"></script>
+<script>
+    apiready = function () {
+        window.vm = new Vue({
+            el: '#tabBar',
+            data: {
+                active: 0,
+                navArr:[
+                    {
+                        title:'首页',
+                        normal: '../image/1.png',
+                        active: '../image/1-1.png'
+                    },
+                    {
+                        title:'加盟',
+                        normal: '../image/1-2.png',
+                        active: '../image/1-3.png'
+                    },
+                    {
+                        title:'',
+                        normal: '../image/superSearch.png',
+                        active: '../image/superSearch.png'
+                    },
+                    {
+                        title:'订单',
+                        normal: '../image/1-5.png',
+                        active: '../image/1-6.png'
+                    },
+                    {
+                        title:'我的',
+                        normal: '../image/1-7.png',
+                        active: '../image/1-8.png'
+                    }
+                ]
+            },
+            methods: {
+                //跳转frame
+                setBtn: function(idx) {
+                    api.execScript({
+                        name: 'root',
+                        script: 'vm.randomSwitchBtn(' + idx + ');',
+                    });
+                },
+            }
+
+        })
+    };
+</script>

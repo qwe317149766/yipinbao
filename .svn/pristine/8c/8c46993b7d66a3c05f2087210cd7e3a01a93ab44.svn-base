@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="order_detail" v-cloak class="flex_col_between flex_items_stretch VH100">
+    <div class="header bg_2B2B2B W_100 flex_shrink_0">
+        <div class="P_4 color_fff flex_row_left relative flex_shrink_0 ">
+            <i class="iconfont iconfanhui fontS_18" @click="goBack()"></i>
+            <span class="fontS_15 PL_4">订单详情</span>
+        </div>
+    </div>
+
+
+
+    <div class="overflow_y flex_grow_1">
+        <!--订单地址-->
+        <div class="W_100 flex_row_left PTB_5 PLR_7 BB_10_eeeeee">
+            <i class="iconfont icon107 color_FFC41C fontS_30"></i>
+            <div class="PL_5">
+                <div class="flex_row_left">
+                    <div class="fontS_16">{{goods_data.username}}</div>
+                    <div class="color_999 PL_2">{{goods_data.mobile}}</div>
+                </div>
+                <div class="color_999 MT_2">{{goods_data.province}}{{goods_data.city}}{{goods_data.district}}{{goods_data.address}}</div>
+            </div>
+        </div>
+
+
+        <!--订单商品-->
+        <div class="P_4 BB_2_eeeeee">
+            <div class="PTB_3 flex_row_between" v-for="item in goods_data.goods">
+                <img :src="item.thumb" alt="" class="VW_25 VH_25 B_radius_5">
+                <div class="W_50 flex_self_start PTB_2 PL_3">
+                    <div class="text_overflow_2">{{item.goods_name}}</div>
+                    <div class="color_999 PT_3" v-if="item.attr_text">【{{item.attr_text}}】</div>
+                </div>
+                <div class="W_20 flex_self_start textR PT_2">
+                    <div>￥{{item.goods_price}}</div>
+                    <div class="color_999 PT_3">X{{item.goods_num}}</div>
+                </div>
+            </div>
+            <div class="color_F3CB7B PTB_2">根据您的消费星级：{{goods_data.zhekou>=10?'无折扣':goods_data.zhekou+'折'}}</div>
+            <div class="fontS_14 MT_2 flex_row_left">
+                <img src="../../image/water.png" alt="" class="VH_5 VW_5">
+                <div class="PL_3 color_999">购买成功后赠送水滴：{{goods_data.sendgold}}个</div>
+            </div>
+            <div class="flex_row_between MT_5 color_999">
+                <div>运费</div>
+                <div>￥{{goods_data.freight}}</div>
+            </div>
+            <div class="flex_row_between MT_2 color_999">
+                <div>使用水滴抵扣</div>
+                <div>￥{{goods_data.use_ticket}}</div>
+            </div>
+            <div class="flex_row_between MT_2 color_999">
+                <div>实付款（含运费）</div>
+                <div class="color_red">￥{{goods_data.count_price}}</div>
+            </div>
+        </div>
+
+        <!--订单信息-->
+        <div class="P_4 BB_2_eeeeee">
+            <div class="flex_row_left BL_4_eeeeee PL_2 borderColor_F3CB7B">订单信息</div>
+            <div class="flex_row_between MT_5 fontS_11 color_999">
+                <div>订单编号：<span class="PL_5">{{goods_data.order_no}}</span></div>
+                <div class="color_yellow_600" @click="copy(goods_data.order_no)">复制</div>
+            </div>
+            <div class="MT_5 fontS_11 color_999">
+                <div>创建时间：<span class="PL_5">{{goods_data.create_time}}</span></div>
+            </div>
+            <div class="MT_5 fontS_11 color_999" v-if="goods_data.pay_time">
+                <div>付款时间：<span class="PL_5">{{goods_data.pay_time}}</span></div>
+            </div>
+            <div class="MT_5 fontS_11 color_999" v-if="goods_data.delivery_time">
+                <div>发货时间：<span class="PL_5">{{goods_data.delivery_time}}</span></div>
+            </div>
+            <div class="MT_5 fontS_11 color_999" v-if="goods_data.finish_time">
+                <div>成交时间：<span class="PL_5">{{goods_data.finish_time}}</span></div>
+            </div>
+        </div>
+
+
+        <div class="flex_row_right M_4">
+            <div class="PTB_2 PLR_5 B_radius_20 bg_F3CB7B ML_2" @click="quxiao()" v-if="goods_data.order_status==0">取消订单</div>
+            <div class="PTB_2 PLR_5 B_radius_20 bg_F3CB7B ML_2" @click="gopay" v-if="goods_data.order_status==0">去付款</div>
+            <div class="PTB_2 PLR_5 B_radius_20 bg_F3CB7B ML_2" v-if="goods_data.order_status==2" @click="qrsh">确认收货</div>
+            <div class="PTB_2 PLR_5 B_radius_20 bg_F3CB7B ML_2" v-if="goods_data.order_status==2" @click="lookwl">查看物流</div>
+            <div class="PTB_2 PLR_5 B_radius_20 bg_F3CB7B ML_2" v-if="goods_data.order_status==2"@click="getyuanyin();isshow=true">退款退货</div>
+        </div>
+    </div>
+
+
+    <!--提现弹框-->
+    <van-popup v-model="isshow" @closed="parame={}" class="VW_100" position="bottom" round>
+        <div class="PTB_5 flex_rowC BB_1_eeeeee">
+            <div>退款退货</div>
+        </div>
+
+        <div class="flex_row_between BB_1_eeeeee P_4 W_100">
+            <div>退款原因：</div>
+            <div class="flex_row_right color_999" @click="isproject=true">
+                <div>{{parame.reason?parame.reason:'请选择'}}</div>
+                <i class="iconfont iconfanhui1 fontS_13 PL_2"></i>
+            </div>
+        </div>
+
+        <div class="P_4 W_100">
+            <div>退款说明：</div>
+            <div class="B_1_eeeeee W_100 P_3 MT_3">
+                <textarea v-model="parame.explain" cols="30" rows="3" class="W_100"></textarea>
+            </div>
+        </div>
+
+        <div class="flex_row_between MB_5 W_80 MLR_auto">
+            <div class="textC PTB_1 W_25 B_1_eeeeee borderColor_999 B_radius_5" @click="isshow=false">取消</div>
+            <div class="textC PTB_1 W_25 B_1_eeeeee borderColor_999 B_radius_5" @click="oktuikuan">确认</div>
+        </div>
+    </van-popup>
+
+
+
+    <!--退款原因-->
+    <van-popup v-model="isproject" position="bottom">
+        <van-picker :columns="projectArry" value-key="reason" :default-index="0" @confirm="gettype" @cancel="isproject=false" show-toolbar/>
+    </van-popup>
+
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/rsa.js"></script>
+<script src="../../script/aes.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#order_detail',
+            data: {
+                isshow:false,//退款弹框
+                isproject:false,
+                projectArry:[],//退款原因列表
+                parame:{//退款
+                    order_id:'',
+                    reason:'',
+                    explain:'',
+                },
+
+                id:'',
+                goods_data:{}
+            },
+            created: function() {
+                var that = this;
+                that.id = api.pageParam.id;
+                that.getorderdata();
+            },
+
+            methods: {
+                // 获取订单详情
+                getorderdata:function () {
+                    var that = this;
+                    // console.log(JSON.stringify(data));
+                    that.$toast.loading({
+                        mask: true,
+                        loadingType:'spinner',
+                        message: '加载中...'
+                    });
+                    that.http(orderOrderDetail, 'post', {'order_id':that.id}, function (res) {
+                        console.log(JSON.stringify(res));
+                        that.$toast.clear();
+                        if (res.code == 0) {
+                            that.goods_data = res.data;
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                },
+
+
+                //复制订单
+                copy: function(value) {
+                    var that = this;
+                    var clipBoard = api.require('clipBoard');
+                    clipBoard.set({
+                        value: value
+                    }, function(ret, err) {
+                        if (ret) {
+                            that.$toast('已复制');
+                        } else {
+                            that.$toast(err);
+                        }
+                    });
+                },
+
+                // 取消单
+                quxiao:function(){
+                    var that = this;
+                    that.$dialog.confirm({
+                        message: '确定取消？'
+                    }).then(function() {
+                        that.http(orderCancelOrder, 'post', {'order_id':that.goods_data.id}, function (res) {
+                            console.log(JSON.stringify(res));
+                            if (res.code == 0) {
+                                that.$toast('取消成功');
+                                setTimeout(function () {
+                                    api.execScript({
+                                        name:'root',
+                                        frameName: 'frame3',
+                                        script:'vm.getlist()'
+                                    });
+                                },500)
+                            }else {
+                                that.$toast(res.msg)
+                            }
+                        })
+                    }).catch(function() {
+                        // on cancel
+                    });
+                },
+
+
+                //去支付
+                gopay:function () {
+                    var that = this;
+                    that.toPage('pay','../frame1/pay.html',{
+                        payname:'订单详情支付',
+                        payId: that.goods_data.payid,
+                        price: that.goods_data.pay_price,
+                        paySite:that.goods_data.paySite,
+                    })
+                },
+
+
+                // 确认收货
+                qrsh:function(){
+                    var that = this;
+                    that.$dialog.confirm({
+                        message: '确定收货？'
+                    }).then(function() {
+                        that.http(orderConfirm, 'post', {'order_id':that.goods_data.id}, function (res) {
+                            console.log(JSON.stringify(res));
+                            if (res.code == 0) {
+                                that.$toast('收货成功');
+                                setTimeout(function () {
+                                    that.getorderdata();
+                                    api.execScript({
+                                        name:'root',
+                                        frameName: 'frame3',
+                                        script:'vm.typeactive=4;vm.getlist()'
+                                    });
+                                },500);
+                            }else {
+                                that.$toast(res.msg)
+                            }
+                        })
+                    }).catch(function() {
+                        // on cancel
+                    });
+                },
+
+
+                //查看物流
+                lookwl:function () {
+                    var that = this;
+                    that.http(orderGetExpressInfo, 'post', {'order_id':that.goods_data.id}, function (res) {
+                        // console.log(JSON.stringify(res));
+                        if (res.code == 0) {
+                            var browser = api.require('webBrowser');
+                            browser.open({
+                                url: res.data.post_url
+                            });
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                },
+
+
+
+                //获取退款原因
+                getyuanyin:function(){
+                    var that = this;
+                    that.parame.order_id = that.goods_data.id;
+                    that.http(orderCancelReason, 'post', {}, function (res) {
+                        // console.log(JSON.stringify(res));
+                        if (res.code == 0) {
+                            that.projectArry = res.data;
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                },
+
+                //退款原因
+                gettype(value,index) {
+                    var that = this;
+                    that.isproject=false;
+                    // console.log(value)
+                    // console.log(index)
+                    that.parame.reason = value.reason;
+                },
+
+                //退款
+                oktuikuan:function () {
+                    var that = this;
+                    // console.log(JSON.stringify(that.parame))
+                    if(!that.parame.reason){
+                        that.$toast('请选择退款原因');
+                        return false;
+                    }
+                    if(!that.parame.explain){
+                        that.$toast('请输入退款说明');
+                        return false;
+                    }
+                    that.http(orderRefundOrder, 'post', that.parame, function (res) {
+                        // console.log(JSON.stringify(res));
+                        that.isshow=false;
+                        if (res.code == 0) {
+                            that.$toast('申请成功');
+                            setTimeout(function () {
+                                that.getorderdata();
+                                api.execScript({
+                                    name:'root',
+                                    frameName: 'frame3',
+                                    script:'vm.typeactive=5;vm.getlist()'
+                                });
+                            },500)
+                        }else {
+                            that.$toast(res.msg)
+                        }
+                    })
+                }
+
+
+            },
+        })
+    };
+</script>

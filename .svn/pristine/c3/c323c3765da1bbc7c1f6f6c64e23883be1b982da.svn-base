@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width,viewport-fit=cover" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" href="lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="css/api.css" />
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div id="app" v-cloak>
+
+</div>
+</body>
+<script src="lib/api.js"></script>
+<script src="lib/vue/vue.js"></script>
+<script src="script/common.js"></script>
+<script src="lib/fastclick.min.js"></script>
+<script src="lib/vant/vant.min.js"></script>
+<script src="lib/jquery-3.0.0.min.js"></script>
+<script type="text/javascript">
+    apiready = function(){
+        window.vm = new Vue({
+            el: '#app',
+            data: {
+                map:api.require('bMap')
+            },
+            created:function(){
+                var that = this;
+                that.getSdAuth();
+            },
+            mounted:function () {
+                var that = this;
+                $api.setStorage('city', '郑州市');
+                if(api.systemType === 'ios'){
+                    that.map.initMapSDK(function(ret,err) {
+                        console.log(JSON.stringify(ret))
+                        console.log(JSON.stringify(err))
+                        console.log('11111111111')
+                        if (ret.status) {
+                            console.log('地图模块初始化成功!');
+                            that.getcity();
+                        }
+                    });
+                }else {
+                    that.getcity();
+                }
+                that.funIniGroup();
+                api.addEventListener({ //关闭Window的事件
+                    name: 'keyback'
+                }, function(ret, err){
+                    that.dbClickkExit();
+                });
+            },
+
+            methods: {
+
+                //获取 存储 和定位权限
+                getSdAuth:function(){
+                    var that = this;
+                    var resultList = api.hasPermission({
+                        list:['storage','location']
+                    });
+                    if(!resultList[0].granted) {
+                        api.requestPermission({
+                            list:[resultList[0].name],
+                            code:1
+                        }, function(ret, err){
+                            if(!ret.list[0].granted && !ret.never) {
+                                return that.getSdAuth();
+                            }
+                        });
+                    }
+                },
+
+
+
+                //获取当前位置
+                getcity:function(){
+                    var that = this;
+                    // $api.setStorage('city', '郑州市');
+                    that.map.getLocation({
+                        accuracy: '100m',
+                        autoStop: true,
+                        filter: 1
+                    }, function (ret, err) {
+                        console.log(JSON.stringify(ret));
+                        if (ret.status) {
+                            that.map.getNameFromCoords({
+                                lon: ret.lon,
+                                lat: ret.lat
+                            }, function (res, err) {
+                                console.log(JSON.stringify(res));
+                                console.log(JSON.stringify(err));
+                                if (res.status) {
+                                    $api.setStorage('city', res.city);
+                                }else {
+                                    $api.setStorage('city', '郑州市');
+                                }
+                            });
+                        } else {
+                            $api.setStorage('city', '郑州市');
+                            // that.$toast('请打开手机定位');
+                            console.log(err.code);
+                        }
+                    });
+                },
+
+
+                //打开底部tabbar
+                opentabbar:function(){
+                    api.openFrame({
+                        name: 'tabBar',
+                        url: './html/tabBar.html',
+                        bounces:false,
+                        rect: {
+                            x: 0,
+                            y: api.winHeight - 60,
+                            w: 'auto',
+                            h: 60
+                        },
+                        pageParam: {}
+                    });
+                },
+
+
+                //跳转frame
+                randomSwitchBtn: function(idx) {
+                    var that = this;
+                    // that.active = idx;
+                    if((idx === 3 || idx === 4) && !($api.getStorage('userInfo') && $api.getStorage('userInfo').token)) {
+                        api.execScript({
+                            frameName:'tabBar',
+                            script:'vm.active=0'
+                        });
+                        api.setFrameGroupIndex({
+                            name: 'group',
+                            index: 0,
+                            reload: false
+                        });
+                        that.toPage('login','./html/login/login.html');
+                    }else {
+                        api.setFrameGroupIndex({
+                            name: 'group',
+                            index: idx,
+                            reload: false
+                        });
+                    }
+                },
+                //载入frame组
+                funIniGroup: function(){
+                    var that = this;
+                    var frames = [];
+                    for (var i = 0; i < 5; i++) {
+                        frames.push({
+                            name: 'frame'+i,
+                            url: './html/frame'+i+'.html',
+                            bounces:false,
+                            reload:true,
+                            bgColor: '#fff',
+                            pageParam: {}
+                        })
+                    }
+                    api.openFrameGroup({
+                        name: 'group',
+                        scrollEnabled: false,
+                        rect: {
+                            x: 0,
+                            y: 0,
+                            w: api.winWidth,
+                            // h: api.winHeight - $api.dom("#tabbar").offsetHeight
+                            h: api.winHeight - 50
+                        },
+                        index: 0,
+                        // preload: frames.length,
+                        preload: 2,
+                        frames: frames
+                    }, function (ret, err) {
+                        that.opentabbar();
+                    });
+                },
+
+
+                //跳转微信
+                setsys:function () {
+                    if (api.systemType == 'android') {
+                        api.openApp({
+                            androidPkg: 'com.tencent.mm',
+                            mimeType: 'text/html',
+                            uri: Uri.parse("weixin://"),
+                            // uri: 'http://mp.weixin.qq.com/',
+                            // uri: 'weixin://dl/scan',
+                        }, function (ret, err) {
+                            if (ret) {
+                                // alert(JSON.stringify(ret));
+                            } else {
+                                // alert(JSON.stringify(err));
+                            }
+                        });
+                    } else if (api.systemType == 'ios') {
+                        api.openApp({
+                            iosUrl: 'weixin://scanqrcode', //打开微信的扫一扫，其中weixin为微信的URL Scheme
+                            appParam: {
+                                // appParam: 'app参数'
+                            }
+                        });
+                    }
+                },
+
+            },
+        })
+    }
+</script>
+
+</html>

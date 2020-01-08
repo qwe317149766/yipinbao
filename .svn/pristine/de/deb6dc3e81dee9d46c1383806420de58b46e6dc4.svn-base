@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="../../lib/vant/vant.css">
+    <link rel="stylesheet" type="text/css" href="../../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="../../lib/animate.css">
+</head>
+<body>
+<div id="video_url" v-cloak>
+    <div class="header bg_2B2B2B W_100 flex_shrink_0">
+        <div class="P_4 color_fff flex_rowC relative flex_shrink_0 ">
+            <span class="absolute PL_4 flex_row_left" style="left: 0;">
+                <i class="iconfont iconfanhui fontS_18" @click="fanhui"></i>
+                <span class="color_999 PL_2" @click="goBack()">关闭</span>
+            </span>
+
+            <span class="fontS_15">{{title.length<8?title:title.slice(0,7)+'...'}}</span>
+            <span class="absolute PR_4" style="right: 0" @click="lineSwitching">切换路径</span>
+        </div>
+    </div>
+
+    <!--<div class="overflow_y flex_grow_1">-->
+
+    <!--</div>-->
+</div>
+</body>
+</html>
+<script src="../../lib/api.js"></script>
+<script src="../../script/const.js"></script>
+<script src="../../lib/vue/vue.js"></script>
+<script src="../../lib/fastclick.min.js"></script>
+<script src="../../lib/vant/vant.min.js"></script>
+<script src="../../script/common.js"></script>
+<script>
+    apiready = function() {
+        window.vm = new Vue({
+            el: '#video_url',
+            data: {
+                title:'标题'
+            },
+            created: function() {
+                var that = this;
+            },
+
+            mounted:function(){
+                var that = this;
+                that.openurl();
+            },
+
+            methods: {
+                //打开链接
+                openurl:function () {
+                    var that = this;
+                    var browser = api.require('webBrowser');
+                    browser.openView({
+                        url: 'https://v.qq.com/',
+                        rect: {
+                            x: 0,
+                            y: $api.dom('.header').offsetHeight,
+                            w: 'auto',
+                            h: 'auto'
+                        }
+                    }, function(ret, err) {
+                        console.log(JSON.stringify(ret));
+                        switch (ret.state) {
+                            case 0:
+                                break;
+                            case 1: //console.log(ret.progress);//加载进度
+                                break;
+                            case 2:
+                                break;
+                            case 3: that.title = ret.title;//标题
+                                break;
+                            case 4:
+                                break;
+                            default:
+                                break;
+                        }
+                    });
+                },
+
+                //返回
+                fanhui:function(){
+                    var browser = api.require('webBrowser');
+                    browser.historyBack(
+                        function(ret, err) {
+                            // console.log(JSON.stringify(ret));
+                            if (!ret.status) {
+                                api.closeWin();
+                            }
+                        }
+                    );
+                },
+
+
+                //切换线路
+                lineSwitching:function () {
+                    api.actionSheet({
+                        cancelTitle: '取消',
+                        buttons: ['线路一', '线路二', '线路三']
+                    }, function(ret, err) {
+                        var index = ret.buttonIndex;
+                        console.log(index)
+                    });
+                }
+
+            },
+        })
+    };
+</script>
